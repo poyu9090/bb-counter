@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BB Counter — App 支援</title>
+  <meta name="description" content="BB Counter 使用說明、聯絡方式與隱私說明。" />
+  <style>
+    :root {
+      --bg: #0f1114;
+      --card: #171a20;
+      --stroke: rgba(255, 255, 255, 0.12);
+      --text: rgba(255, 255, 255, 0.92);
+      --muted: rgba(255, 255, 255, 0.62);
+      --accent: #7fb3ff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      padding: 1.5rem clamp(1rem, 4vw, 2rem) 3rem;
+    }
+    .wrap { max-width: 40rem; margin: 0 auto; }
+    header {
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--stroke);
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin: 0 0 0.35rem;
+    }
+    .tagline { color: var(--muted); font-size: 0.95rem; margin: 0; }
+    h2 {
+      font-size: 1.05rem;
+      font-weight: 650;
+      margin: 1.75rem 0 0.65rem;
+      color: var(--accent);
+    }
+    p, li { color: var(--muted); font-size: 0.95rem; }
+    ul { padding-left: 1.2rem; }
+    li { margin: 0.35rem 0; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: 14px;
+      padding: 1rem 1.15rem;
+      margin-top: 1rem;
+    }
+    .note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--stroke);
+    }
+    hr.sep {
+      border: none;
+      border-top: 1px solid var(--stroke);
+      margin: 2.5rem 0 1.5rem;
+    }
+    .lang-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 0.25rem; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>BB Counter</h1>
+      <p class="tagline">App 支援 · Support</p>
+    </header>
+
+    <p class="lang-label">繁體中文</p>
+    <h2>這是什麼 App？</h2>
+    <p>BB Counter 協助你在現場牌局或錦標賽中，依<strong>籌碼總量</strong>與<strong>目前大盲</strong>快速換算你還有多少 <strong>BB</strong>，並可搭配<strong>盲注計時</strong>與<strong>盲注結構</strong>；計時進行時可透過<strong>即時動態（Live Activity）</strong>在鎖屏與動態島查看重點資訊。</p>
+
+    <h2>怎麼用（簡要）</h2>
+    <ul>
+      <li>輸入籌碼 → 設定目前盲注（大盲）→ 在結果頁查看 BB 換算。</li>
+      <li>可從結果頁編輯籌碼或盲注；支援快捷加減籌碼。</li>
+      <li>開啟盲注計時後，請在系統設定中允許「即時動態」，以便在鎖屏／動態島顯示倒數與下一級盲注。</li>
+    </ul>
+
+    <h2>隱私</h2>
+    <div class="card">
+      <p style="margin:0">BB Counter 設計為<strong>無需註冊帳號</strong>。你輸入的籌碼、盲注與計時相關設定主要儲存在<strong>你的裝置上</strong>；本 App 並未內建將這些資料上傳至開發者伺服器的功能。若你透過電子郵件聯絡我們，僅會處理你信中自願提供的內容。</p>
+    </div>
+
+    <h2>聯絡我們</h2>
+    <p>使用問題、建議或錯誤回報，請寄信至：</p>
+    <p><a href="mailto:YOUR_EMAIL@example.com">YOUR_EMAIL@example.com</a></p>
+    <p><small>請將上方信箱替換成你的實際聯絡信箱後再上線此頁面。</small></p>
+
+    <hr class="sep" />
+
+    <p class="lang-label">English</p>
+    <h2>What is BB Counter?</h2>
+    <p>BB Counter helps you estimate your <strong>stack in big blinds (BB)</strong> from your <strong>chip count</strong> and the <strong>current big blind</strong>, with an optional <strong>blind timer</strong> and <strong>blind structure</strong>. While the timer runs, <strong>Live Activities</strong> can show key info on the Lock Screen and Dynamic Island.</p>
+
+    <h2>Quick start</h2>
+    <ul>
+      <li>Enter chips → set the current blind level (big blind) → review your BB on the results screen.</li>
+      <li>Edit chips or blinds from the results screen; quick +/- chip buttons are available.</li>
+      <li>For Live Activities, allow the permission in Settings so countdown and next blind info can appear on the Lock Screen / Dynamic Island.</li>
+    </ul>
+
+    <h2>Privacy</h2>
+    <div class="card">
+      <p style="margin:0">BB Counter is built to work <strong>without a sign-in</strong>. Your inputs and related settings are stored <strong>on-device</strong>; the app does not include functionality to upload that data to a developer-operated server. If you email us, we only process what you voluntarily include in your message.</p>
+    </div>
+
+    <h2>Contact</h2>
+    <p>For support, feedback, or bug reports:</p>
+    <p><a href="mailto:YOUR_EMAIL@example.com">YOUR_EMAIL@example.com</a></p>
+
+    <p class="note">此頁面僅供 App Store「支援 URL」等用途。上架前請將 <code>YOUR_EMAIL@example.com</code> 改成你的聯絡信箱，並確認網址為 <code>https://</code> 且全世界可開啟。</p>
+  </div>
+</body>
+</html>
