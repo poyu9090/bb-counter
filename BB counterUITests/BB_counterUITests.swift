@@ -23,12 +23,59 @@ final class BB_counterUITests: XCTestCase {
     }
 
     @MainActor
-    func testExample() throws {
-        // UI tests must launch the application that they test.
+    func testStackEntryFlowShowsResultDashboard() throws {
         let app = XCUIApplication()
+        app.launchArguments = ["-uiTestingResetDefaults"]
         app.launch()
 
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
+        app.buttons["onboarding.continue"].tap()
+
+        let addTenK = app.buttons["chip.plus.10k"]
+        XCTAssertTrue(addTenK.waitForExistence(timeout: 5))
+        addTenK.tap()
+        addTenK.tap()
+        app.buttons["chip.plus.5k"].tap()
+        app.buttons["chips.next"].tap()
+
+        let blindPreset = app.buttons["blind.preset.1000"]
+        XCTAssertTrue(blindPreset.waitForExistence(timeout: 5))
+        blindPreset.tap()
+        app.buttons["blind.showResult"].tap()
+
+        XCTAssertTrue(app.scrollViews["result.screen"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["timer.configure"].exists)
+        XCTAssertTrue(app.switches["timer.toggle"].exists)
+    }
+
+    @MainActor
+    func testTimerConfigStartsBlindTimer() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uiTestingResetDefaults"]
+        app.launch()
+
+        app.buttons["onboarding.continue"].tap()
+
+        let addTenK = app.buttons["chip.plus.10k"]
+        XCTAssertTrue(addTenK.waitForExistence(timeout: 5))
+        addTenK.tap()
+        app.buttons["chips.next"].tap()
+
+        let blindPreset = app.buttons["blind.preset.1000"]
+        XCTAssertTrue(blindPreset.waitForExistence(timeout: 5))
+        blindPreset.tap()
+        app.buttons["blind.showResult"].tap()
+
+        let configure = app.buttons["timer.configure"]
+        XCTAssertTrue(configure.waitForExistence(timeout: 5))
+        configure.tap()
+
+        XCTAssertTrue(app.buttons["timer.scheme.0"].waitForExistence(timeout: 5))
+        app.buttons["timer.scheme.0"].tap()
+        app.buttons["timer.start"].tap()
+
+        let timerSwitch = app.switches["timer.toggle"]
+        XCTAssertTrue(timerSwitch.waitForExistence(timeout: 5))
+        XCTAssertEqual(timerSwitch.value as? String, "1")
     }
 
     @MainActor
