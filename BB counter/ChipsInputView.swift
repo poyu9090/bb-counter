@@ -13,6 +13,7 @@ struct ChipsInputView: View {
     @AppStorage("chipBreakdown") private var chipBreakdownStored: String = "0,0,0,0,0"
     
     private static let denomValues: [Int] = [10000, 5000, 1000, 500, 100]
+    private static let maxChipValue: Int = 999_999_999
     
     init(
         chipsText: Binding<String>,
@@ -28,6 +29,23 @@ struct ChipsInputView: View {
     
     private func total(from b: [Int]) -> Int {
         zip(Self.denomValues, b).reduce(0) { $0 + $1.0 * $1.1 }
+    }
+
+    private var parsedChips: Int? {
+        Int(chipsText)
+    }
+
+    private var inputErrorKey: String? {
+        guard !chipsText.isEmpty else { return nil }
+        guard let value = parsedChips else { return "input.error_too_large" }
+        if value <= 0 { return "input.error_required" }
+        if value > Self.maxChipValue { return "input.error_too_large" }
+        return nil
+    }
+
+    private var canProceed: Bool {
+        guard let value = parsedChips else { return false }
+        return value > 0 && value <= Self.maxChipValue
     }
     
     /// 仅当用户手动输入数字时，用贪心分解同步 breakdown（例如输入 1 万 → 1 枚 1 万）
@@ -109,6 +127,13 @@ struct ChipsInputView: View {
                     onAppear()
                     restoreOrSyncBreakdown()
                 }
+            if let inputErrorKey {
+                Text(LocalizedStringKey(inputErrorKey))
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Theme.healthRed)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal)
+            }
             
             ChipStackView(breakdown: breakdown)
                 .frame(height: 120)
@@ -140,7 +165,7 @@ struct ChipsInputView: View {
                 .buttonStyle(.borderedProminent)
                 .accessibilityIdentifier("chips.next")
                 .padding(.horizontal)
-                .disabled((Int(chipsText) ?? 0) <= 0)
+                .disabled(!canProceed)
             }
             .padding(.vertical, 8)
             .background(Theme.background.opacity(0.9))
@@ -151,6 +176,7 @@ struct ChipsInputView: View {
     private func addByDenomination(_ amount: Int) {
         if amount > 0 {
             guard let idx = Self.denomValues.firstIndex(of: amount) else { return }
+            guard total(from: breakdown) + amount <= Self.maxChipValue else { return }
             breakdown[idx] += 1
             skipSyncFromText = true
             chipsText = String(total(from: breakdown))

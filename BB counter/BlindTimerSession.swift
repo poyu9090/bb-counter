@@ -25,6 +25,23 @@ final class BlindTimerSession: ObservableObject {
         activeCustomProgression ?? Self.progression
     }
 
+    func restorePersistedState(
+        remainingSeconds: Int,
+        isPaused: Bool,
+        countdownEndEpoch: Double,
+        selectedNextIndex: Int,
+        queuedIndices: [Int],
+        activeCustomProgression: [(sb: Int, bb: Int)]?
+    ) {
+        self.remainingSeconds = max(0, remainingSeconds)
+        self.isPaused = isPaused
+        self.countdownPeriodEnd = countdownEndEpoch > 0 ? Date(timeIntervalSince1970: countdownEndEpoch) : nil
+        self.selectedNextIndex = max(0, selectedNextIndex)
+        self.queuedIndices = queuedIndices
+        self.selectedIndicesSet = Set(queuedIndices)
+        self.activeCustomProgression = activeCustomProgression
+    }
+
     func setupNextLevel(bigBlind: Int) {
         let progression = Self.progression
         if let idx = progression.firstIndex(where: { $0.bb == bigBlind }), idx + 1 < progression.count {
@@ -65,6 +82,10 @@ final class BlindTimerSession: ObservableObject {
 
     func invalidateCountdownAnchor() {
         countdownPeriodEnd = nil
+    }
+
+    func setCountdownEnd(_ date: Date?) {
+        countdownPeriodEnd = date
     }
 
     func snapRemainingAtPause() {
@@ -137,5 +158,24 @@ final class BlindTimerSession: ObservableObject {
         } else {
             advanceBlindLevel(bigBlind: &bigBlind)
         }
+    }
+
+    static func encodeQueuedIndices(_ indices: [Int]) -> String {
+        indices.map(String.init).joined(separator: ",")
+    }
+
+    static func decodeQueuedIndices(_ string: String) -> [Int] {
+        string.split(separator: ",").compactMap { Int($0) }
+    }
+
+    static func encodeProgression(_ progression: [(sb: Int, bb: Int)]?) -> String {
+        guard let progression else { return "" }
+        return BlindStructureCodec.encodeLevels(progression.map { BlindLevel(sb: $0.sb, bb: $0.bb) })
+    }
+
+    static func decodeProgression(_ string: String) -> [(sb: Int, bb: Int)]? {
+        let levels = BlindStructureCodec.decodeLevels(from: string)
+        guard !levels.isEmpty else { return nil }
+        return levels.map { ($0.sb, $0.bb) }
     }
 }

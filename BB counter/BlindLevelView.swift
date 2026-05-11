@@ -28,6 +28,24 @@ struct BlindLevelView: View {
         (100, 200), (200, 400), (300, 600), (500, 1000), (1000, 2000),
         (1500, 3000), (2000, 4000), (3000, 6000), (5000, 10000)
     ]
+    private let maxBlindValue: Int = 99_999_999
+
+    private var parsedBigBlind: Int? {
+        Int(bigBlindText)
+    }
+
+    private var inputErrorKey: String? {
+        guard !bigBlindText.isEmpty else { return nil }
+        guard let value = parsedBigBlind else { return "input.error_too_large" }
+        if value <= 0 { return "input.error_required" }
+        if value > maxBlindValue { return "input.error_too_large" }
+        return nil
+    }
+
+    private var canProceed: Bool {
+        guard let value = parsedBigBlind else { return false }
+        return value > 0 && value <= maxBlindValue
+    }
     
     var body: some View {
         VStack(spacing: 24) {
@@ -103,6 +121,11 @@ struct BlindLevelView: View {
                     .onAppear {
                         onAppear()
                     }
+                if let inputErrorKey {
+                    Text(LocalizedStringKey(inputErrorKey))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Theme.healthRed)
+                }
             }
             .padding(.horizontal)
             
@@ -123,7 +146,7 @@ struct BlindLevelView: View {
                     .buttonStyle(.borderedProminent)
                     .accessibilityIdentifier("blind.done")
                     .padding(.horizontal)
-                    .disabled((Int(bigBlindText) ?? 0) <= 0)
+                    .disabled(!canProceed)
                 } else {
                     // 正常流程：显示"显示结果"和"返回"按钮
                     Button(action: onShowResult) {
@@ -136,7 +159,7 @@ struct BlindLevelView: View {
                     .buttonStyle(.borderedProminent)
                     .accessibilityIdentifier("blind.showResult")
                     .padding(.horizontal)
-                    .disabled((Int(bigBlindText) ?? 0) <= 0)
+                    .disabled(!canProceed)
                     
                     Button(role: .cancel, action: onBack) {
                         Text("action.back")

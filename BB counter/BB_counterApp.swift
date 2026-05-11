@@ -16,10 +16,18 @@ struct BB_counterApp: App {
                 "bigBlind",
                 "timerEnabled",
                 "timerDurationSec",
+                "timerRemainingSec",
+                "timerIsPaused",
+                "timerCountdownEndEpoch",
+                "timerSelectedNextIndex",
+                "timerQueuedIndices",
+                "timerActiveCustomProgression",
                 "hasCompletedOnboarding",
                 "chipBreakdown",
                 "customBlindStructure",
                 "customBlindCurrentIndex",
+                "customBlindStructures",
+                "selectedCustomBlindStructureID",
                 "dontShowResetConfirmation"
             ].forEach { UserDefaults.standard.removeObject(forKey: $0) }
         }

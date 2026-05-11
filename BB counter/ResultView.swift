@@ -79,6 +79,7 @@ struct ResultView: View {
 	@State private var showTimerSheet: Bool = false
 	@State private var showResetConfirmation: Bool = false
 	@State private var dontShowResetConfirmation: Bool = false
+	@State private var liveActivityStatusKey: String?
 	@AppStorage("dontShowResetConfirmation") private var dontShowResetConfirmationStored: Bool = false
 
 	private var stackStatusKey: String {
@@ -119,6 +120,22 @@ struct ResultView: View {
 					)
 				}
 				timerDashboard
+				if let liveActivityStatusKey {
+					HStack(spacing: 10) {
+						Image(systemName: "exclamationmark.triangle.fill")
+							.foregroundStyle(Theme.healthYellow)
+						Text(LocalizedStringKey(liveActivityStatusKey))
+							.font(.caption.weight(.semibold))
+							.foregroundStyle(Theme.secondaryText)
+							.fixedSize(horizontal: false, vertical: true)
+						Spacer(minLength: 0)
+					}
+					.padding(12)
+					.background(
+						RoundedRectangle(cornerRadius: 14, style: .continuous)
+							.fill(Theme.healthYellow.opacity(0.12))
+					)
+				}
 			}
 			.padding(.horizontal, 16)
 			.padding(.top, 18)
@@ -151,6 +168,9 @@ struct ResultView: View {
 		}
 		.onChange(of: blindSession.queuedIndices) { _, _ in
 			syncLiveActivityFromCurrentState()
+		}
+		.onReceive(NotificationCenter.default.publisher(for: .blindTimerLiveActivityStatusChanged)) { notification in
+			liveActivityStatusKey = notification.object as? String
 		}
 		.safeAreaInset(edge: .bottom) {
 			VStack(spacing: 10) {

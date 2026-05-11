@@ -8,6 +8,7 @@
 "action.reset" = "重設";
 "action.confirm" = "確認";
 "action.cancel" = "取消";
+"action.delete" = "刪除";
 "reset.confirm_title" = "確認重設";
 "reset.confirm_message" = "確認要重新設定嗎？目前的籌碼與盲注記錄將消失。";
 "reset.dont_show_again" = "未來不再顯示此彈窗";
@@ -72,6 +73,11 @@
 "timer.blind_structure_detail" = "盲注結構詳情";
 "timer.scheme_one" = "結構一";
 "timer.scheme_custom" = "自定義盲注結構";
+"timer.default_custom_name" = "自訂結構";
+"timer.structure_name" = "結構名稱";
+"timer.structure_name_placeholder" = "我的盲注結構";
+"timer.custom_new_structure" = "新增結構";
+"timer.custom_switch_structure" = "切換結構";
 "timer.custom_edit_levels" = "編輯級別";
 "timer.add_level" = "新增級別";
 "timer.next_levels" = "後續級別：";
@@ -82,11 +88,30 @@
 "timer.next_stack" = "下級後剩 %@ BB";
 "timer.off_title" = "計時器未啟用";
 "timer.off_body" = "開啟後可在 App 與即時動態中追蹤升盲倒數。";
+"timer.validation_name_required" = "請輸入結構名稱。";
+"timer.validation_levels_required" = "至少需要一個盲注級別。";
+"timer.validation_positive" = "SB 與 BB 必須大於 0。";
+"timer.validation_bb_lt_sb" = "第 %d 級的 BB 不可小於 SB。";
+"timer.validation_not_increasing" = "第 %d 級的 BB 必須高於上一級。";
+"timer.validation_duplicate" = "第 %d 級與上一級重複。";
+
+/* 輸入驗證 */
+"input.error_required" = "請輸入大於 0 的數值。";
+"input.error_too_large" = "數值過大。";
+
+/* 通知 */
+"notification.reminder_title" = "即將升盲";
+"notification.reminder_body" = "下一級盲注：%@，剩 1 分鐘。";
+"notification.advance_title" = "盲注升級";
+"notification.advance_body" = "請升至 %@。";
 
 /* 即時動態 — 靈動島摘要（主 App 組字） */
 "live.island.chips_bb" = "目前籌碼：%1$@（%2$@bb）";
 "live.island.upgrade_at" = "盲注升級時間：%1$@";
 "live.island.upgrade_paused" = "盲注升級時間：—";
+"live.status.unsupported" = "即時動態需要 iOS 16.2 或更新版本。";
+"live.status.disabled" = "系統設定已關閉即時動態。";
+"live.status.failed" = "即時動態無法啟動，App 內計時仍會繼續。";
 
 /* Onboarding */
 "onboarding.title" = "歡迎使用 BB counter";

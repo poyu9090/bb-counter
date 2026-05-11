@@ -8,6 +8,7 @@
 "action.reset" = "Reset";
 "action.confirm" = "Confirm";
 "action.cancel" = "Cancel";
+"action.delete" = "Delete";
 "reset.confirm_title" = "Confirm Reset";
 "reset.confirm_message" = "Are you sure you want to reset? Current chips and blind records will be lost.";
 "reset.dont_show_again" = "Don't show this again";
@@ -72,6 +73,11 @@
 "timer.blind_structure_detail" = "Blind Structure Details";
 "timer.scheme_one" = "Structure 1";
 "timer.scheme_custom" = "Custom blind structure";
+"timer.default_custom_name" = "Custom structure";
+"timer.structure_name" = "Structure name";
+"timer.structure_name_placeholder" = "My blind structure";
+"timer.custom_new_structure" = "New structure";
+"timer.custom_switch_structure" = "Switch structure";
 "timer.custom_edit_levels" = "Edit levels";
 "timer.add_level" = "Add level";
 "timer.next_levels" = "Upcoming levels:";
@@ -82,11 +88,30 @@
 "timer.next_stack" = "%@ BB after next level";
 "timer.off_title" = "Timer is off";
 "timer.off_body" = "Turn it on to keep the blind clock visible in the app and Live Activity.";
+"timer.validation_name_required" = "Enter a structure name.";
+"timer.validation_levels_required" = "Add at least one blind level.";
+"timer.validation_positive" = "SB and BB must be greater than zero.";
+"timer.validation_bb_lt_sb" = "Level %d has BB lower than SB.";
+"timer.validation_not_increasing" = "Level %d must have a higher BB than the previous level.";
+"timer.validation_duplicate" = "Level %d duplicates the previous level.";
+
+/* Input validation */
+"input.error_required" = "Enter a value greater than zero.";
+"input.error_too_large" = "Value is too large.";
+
+/* Notifications */
+"notification.reminder_title" = "Blind level soon";
+"notification.reminder_body" = "Next blind: %@ in 1 minute.";
+"notification.advance_title" = "Blinds are up";
+"notification.advance_body" = "Advance to %@.";
 
 /* Live Activity — Dynamic Island summary (built in app) */
 "live.island.chips_bb" = "Stack: %1$@ (%2$@bb)";
 "live.island.upgrade_at" = "Blinds up at %1$@";
 "live.island.upgrade_paused" = "Blinds up at: —";
+"live.status.unsupported" = "Live Activity requires iOS 16.2 or later.";
+"live.status.disabled" = "Live Activity is disabled in system settings.";
+"live.status.failed" = "Live Activity could not start. The in-app timer is still running.";
 
 /* Onboarding */
 "onboarding.title" = "Welcome to BB Counter";

@@ -25,6 +25,12 @@ struct ContentView: View {
     @StateObject private var blindTimerSession = BlindTimerSession()
     @AppStorage("timerEnabled") private var timerEnabled: Bool = false
     @AppStorage("timerDurationSec") private var timerDurationSec: Int = 1500
+    @AppStorage("timerRemainingSec") private var timerRemainingStored: Int = 1500
+    @AppStorage("timerIsPaused") private var timerIsPausedStored: Bool = false
+    @AppStorage("timerCountdownEndEpoch") private var timerCountdownEndEpochStored: Double = 0
+    @AppStorage("timerSelectedNextIndex") private var timerSelectedNextIndexStored: Int = 0
+    @AppStorage("timerQueuedIndices") private var timerQueuedIndicesStored: String = ""
+    @AppStorage("timerActiveCustomProgression") private var timerActiveCustomProgressionStored: String = ""
     @AppStorage("hasCompletedOnboarding") private var hasCompletedOnboarding: Bool = false
     
     // Persisted values
@@ -118,6 +124,7 @@ struct ContentView: View {
                             isEditingChipsFromResult = false
                             isEditingBlindsFromResult = false
                             timerEnabled = false
+                            clearPersistedTimerState()
                             blindTimerSession.resetAfterGlobalReset(timerDurationSec: timerDurationSec)
                             step = .chips
                         }
@@ -172,26 +179,36 @@ struct ContentView: View {
             syncLiveActivityFromContent()
         }
         .onChange(of: timerEnabled) { _, _ in
+            persistTimerState()
+            updateBlindTimerNotification()
             syncLiveActivityFromContent()
         }
         .onChange(of: blindTimerSession.remainingSeconds) { _, _ in
+            persistTimerState()
             syncLiveActivityFromContent()
         }
         .onChange(of: blindTimerSession.isPaused) { _, _ in
+            persistTimerState()
+            updateBlindTimerNotification()
             syncLiveActivityFromContent()
         }
         .onChange(of: blindTimerSession.selectedNextIndex) { _, _ in
+            persistTimerState()
             syncLiveActivityFromContent()
         }
         .onChange(of: blindTimerSession.queuedIndices) { _, _ in
+            persistTimerState()
             syncLiveActivityFromContent()
         }
         .onChange(of: blindTimerSession.countdownPeriodEnd) { _, _ in
+            persistTimerState()
+            updateBlindTimerNotification()
             if timerEnabled {
                 syncLiveActivityFromContent()
             }
         }
         .onAppear {
+            restoreTimerStateIfNeeded()
             // Keep onboarding for truly new users only.
             if !hasCompletedOnboarding, (chipsStored > 0 || bigBlindStored > 0) {
                 hasCompletedOnboarding = true
@@ -223,6 +240,50 @@ struct ContentView: View {
             bigBlind: bigBlindStored,
             blindSession: blindTimerSession,
             timerEnabled: timerEnabled
+        )
+    }
+
+    private func restoreTimerStateIfNeeded() {
+        guard timerEnabled else { return }
+        blindTimerSession.restorePersistedState(
+            remainingSeconds: timerRemainingStored,
+            isPaused: timerIsPausedStored,
+            countdownEndEpoch: timerCountdownEndEpochStored,
+            selectedNextIndex: timerSelectedNextIndexStored,
+            queuedIndices: BlindTimerSession.decodeQueuedIndices(timerQueuedIndicesStored),
+            activeCustomProgression: BlindTimerSession.decodeProgression(timerActiveCustomProgressionStored)
+        )
+        runBlindTimerWallClockSync()
+        updateBlindTimerNotification()
+    }
+
+    private func persistTimerState() {
+        timerRemainingStored = blindTimerSession.remainingSeconds
+        timerIsPausedStored = blindTimerSession.isPaused
+        timerCountdownEndEpochStored = blindTimerSession.countdownPeriodEnd?.timeIntervalSince1970 ?? 0
+        timerSelectedNextIndexStored = blindTimerSession.selectedNextIndex
+        timerQueuedIndicesStored = BlindTimerSession.encodeQueuedIndices(blindTimerSession.queuedIndices)
+        timerActiveCustomProgressionStored = BlindTimerSession.encodeProgression(blindTimerSession.activeCustomProgression)
+    }
+
+    private func clearPersistedTimerState() {
+        timerRemainingStored = timerDurationSec
+        timerIsPausedStored = false
+        timerCountdownEndEpochStored = 0
+        timerSelectedNextIndexStored = 0
+        timerQueuedIndicesStored = ""
+        timerActiveCustomProgressionStored = ""
+        BlindTimerNotificationScheduler.cancel()
+    }
+
+    private func updateBlindTimerNotification() {
+        guard timerEnabled, !blindTimerSession.isPaused else {
+            BlindTimerNotificationScheduler.cancel()
+            return
+        }
+        BlindTimerNotificationScheduler.schedule(
+            endDate: blindTimerSession.countdownPeriodEnd,
+            nextBlindText: blindTimerSession.nextDisplayLevelText(for: bigBlindStored)
         )
     }
     

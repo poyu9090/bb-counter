@@ -2,6 +2,10 @@ import ActivityKit
 import BBLiveActivityKit
 import Foundation
 
+extension Notification.Name {
+    static let blindTimerLiveActivityStatusChanged = Notification.Name("blindTimerLiveActivityStatusChanged")
+}
+
 /// 盲注倒數計時開啟時，同步「即時動態」顯示籌碼、BB 與倒數。
 @MainActor
 enum BlindTimerLiveActivityController {
@@ -20,14 +24,20 @@ enum BlindTimerLiveActivityController {
         islandBlindUpgradeTimeLine: String,
         islandUpgradeAtClock: String
     ) {
-        guard #available(iOS 16.2, *) else { return }
+        guard #available(iOS 16.2, *) else {
+            postStatus("live.status.unsupported")
+            return
+        }
 
         if !timerEnabled {
             Task { await endSyncAsync() }
             return
         }
 
-        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else {
+            postStatus("live.status.disabled")
+            return
+        }
 
         let state = BlindTimerAttributes.ContentState(
             chips: chips,
@@ -51,6 +61,7 @@ enum BlindTimerLiveActivityController {
     private static func startOrUpdate(using state: BlindTimerAttributes.ContentState) async {
         if let existing = activity {
             await existing.update(.init(state: state, staleDate: nil))
+            postStatus(nil)
             return
         }
         do {
@@ -59,8 +70,10 @@ enum BlindTimerLiveActivityController {
                 content: .init(state: state, staleDate: nil),
                 pushType: nil
             )
+            postStatus(nil)
         } catch {
             activity = nil
+            postStatus("live.status.failed")
         }
     }
 
@@ -69,5 +82,13 @@ enum BlindTimerLiveActivityController {
         guard let existing = activity else { return }
         await existing.end(nil, dismissalPolicy: .immediate)
         activity = nil
+        postStatus(nil)
+    }
+
+    private static func postStatus(_ key: String?) {
+        NotificationCenter.default.post(
+            name: .blindTimerLiveActivityStatusChanged,
+            object: key
+        )
     }
 }

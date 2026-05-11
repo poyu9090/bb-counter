@@ -14,24 +14,48 @@ struct TimerConfigSheet: View {
 	@State private var selectedScheme: Int = 0
 	@State private var showBlindStructureDetail: Bool = false
 	@State private var showCustomEditSheet: Bool = false
+	@State private var editingCustomStructure: BlindStructure?
 	@AppStorage("customBlindStructure") private var customBlindStructureStored: String = ""
 	@AppStorage("customBlindCurrentIndex") private var customBlindCurrentIndexStored: Int = 0
-	@State private var customLevels: [(sb: Int, bb: Int)] = []
+	@AppStorage("customBlindStructures") private var customBlindStructuresStored: String = ""
+	@AppStorage("selectedCustomBlindStructureID") private var selectedCustomBlindStructureID: String = ""
+	@State private var customStructures: [BlindStructure] = []
 	
-	private func loadCustomLevels() {
-		let parts = customBlindStructureStored.split(separator: ",").compactMap { Int($0) }
-		var levels: [(sb: Int, bb: Int)] = []
-		var i = 0
-		while i + 1 < parts.count {
-			levels.append((sb: parts[i], bb: parts[i + 1]))
-			i += 2
+	private func loadCustomStructures() {
+		var decoded = BlindStructureCodec.decodeStructures(from: customBlindStructuresStored)
+		if decoded.isEmpty {
+			let legacy = BlindStructureCodec.decodeLegacyLevels(from: customBlindStructureStored)
+			if !legacy.isEmpty {
+				decoded = [BlindStructure(name: NSLocalizedString("timer.scheme_custom", comment: ""), levels: legacy)]
+				customBlindStructuresStored = BlindStructureCodec.encodeStructures(decoded)
+				selectedCustomBlindStructureID = decoded[0].id
+			}
 		}
-		customLevels = levels
+		customStructures = decoded
+		if selectedCustomBlindStructureID.isEmpty, let first = decoded.first {
+			selectedCustomBlindStructureID = first.id
+		}
 	}
 	
-	private func saveCustomLevels(_ levels: [(sb: Int, bb: Int)]) {
-		customBlindStructureStored = levels.flatMap { ["\($0.sb)", "\($0.bb)"] }.joined(separator: ",")
-		customLevels = levels
+	private func saveCustomStructure(_ structure: BlindStructure, currentIndex: Int?) {
+		if let existing = customStructures.firstIndex(where: { $0.id == structure.id }) {
+			customStructures[existing] = structure
+		} else {
+			customStructures.append(structure)
+		}
+		selectedCustomBlindStructureID = structure.id
+		customBlindCurrentIndexStored = currentIndex ?? 0
+		customBlindStructuresStored = BlindStructureCodec.encodeStructures(customStructures)
+		customBlindStructureStored = BlindStructureCodec.encodeLevels(structure.levels)
+	}
+
+	private func deleteSelectedCustomStructure() {
+		guard !selectedCustomBlindStructureID.isEmpty else { return }
+		customStructures.removeAll { $0.id == selectedCustomBlindStructureID }
+		selectedCustomBlindStructureID = customStructures.first?.id ?? ""
+		customBlindStructuresStored = BlindStructureCodec.encodeStructures(customStructures)
+		customBlindStructureStored = customStructures.first.map { BlindStructureCodec.encodeLevels($0.levels) } ?? ""
+		selectedScheme = selectedCustomBlindStructureID.isEmpty ? 0 : idxForCustomStructure(id: selectedCustomBlindStructureID)
 	}
 	
 	var body: some View {
@@ -136,7 +160,7 @@ struct TimerConfigSheet: View {
 									} label: {
 										VStack(alignment: .leading, spacing: 10) {
 											HStack(spacing: 8) {
-												Text(LocalizedStringKey(scheme.titleKey))
+												Text(scheme.title)
 													.font(.body.bold())
 													.foregroundStyle(Theme.primaryText)
 												Spacer()
@@ -177,14 +201,43 @@ struct TimerConfigSheet: View {
 												Label("timer.blind_structure_detail", systemImage: "info.circle")
 											}
 											.buttonStyle(.bordered)
-										} else if idx == 1 {
+										} else if idx > 0 {
+												if customStructures.count > 1 {
+													Menu {
+														ForEach(customStructures) { structure in
+															Button(structure.name) {
+																selectedCustomBlindStructureID = structure.id
+																selectedScheme = idxForCustomStructure(id: structure.id)
+															}
+														}
+													} label: {
+														Label("timer.custom_switch_structure", systemImage: "rectangle.2.swap")
+													}
+													.buttonStyle(.bordered)
+												}
 												Button {
+													editingCustomStructure = scheme.customStructure
 													showCustomEditSheet = true
 												} label: {
 													Label("timer.custom_edit_levels", systemImage: "pencil")
 												}
 												.buttonStyle(.bordered)
+												if scheme.customStructure != nil {
+													Button(role: .destructive) {
+														deleteSelectedCustomStructure()
+													} label: {
+														Label("action.delete", systemImage: "trash")
+													}
+													.buttonStyle(.bordered)
+												}
 										}
+										Button {
+											editingCustomStructure = nil
+											showCustomEditSheet = true
+										} label: {
+											Label("timer.custom_new_structure", systemImage: "plus")
+										}
+										.buttonStyle(.bordered)
 										Spacer(minLength: 0)
 									}
 									.padding(.horizontal, 2)
@@ -200,7 +253,7 @@ struct TimerConfigSheet: View {
 			}
 		}
 		.onAppear {
-			loadCustomLevels()
+			loadCustomStructures()
 			let schemes = availableSchemes()
 			if selectedScheme >= schemes.count {
 				selectedScheme = 0
@@ -220,15 +273,10 @@ struct TimerConfigSheet: View {
 		.sheet(isPresented: $showCustomEditSheet) {
 			CustomBlindEditSheet(
 				isPresented: $showCustomEditSheet,
-				initialLevels: customLevels,
-				initialCurrentIndex: customBlindCurrentIndexStored >= 0 && customBlindCurrentIndexStored < customLevels.count ? customBlindCurrentIndexStored : nil,
-				onSave: { levels, currentIndex in
-					saveCustomLevels(levels)
-					if let idx = currentIndex {
-						customBlindCurrentIndexStored = idx
-					} else {
-						customBlindCurrentIndexStored = 0
-					}
+				initialStructure: editingCustomStructure ?? selectedCustomStructure(),
+				initialCurrentIndex: currentIndexForSelectedCustomStructure(),
+				onSave: { structure, currentIndex in
+					saveCustomStructure(structure, currentIndex: currentIndex)
 				}
 			)
 		}
@@ -255,6 +303,11 @@ struct TimerConfigSheet: View {
 						let indices = scheme.indices
 						selectedIndicesSet = Set(indices)
 						let customProg = scheme.customLevels
+						if customProg?.isEmpty == true {
+							editingCustomStructure = scheme.customStructure
+							showCustomEditSheet = true
+							return
+						}
 						if let custom = customProg, !custom.isEmpty {
 							onStart(indices, custom, customBlindCurrentIndexStored >= 0 && customBlindCurrentIndexStored < custom.count ? customBlindCurrentIndexStored : 0)
 						} else {
@@ -302,7 +355,7 @@ struct TimerConfigSheet: View {
 		String(format: NSLocalizedString("timer.selected_count", comment: ""), count)
 	}
 	
-	private func availableSchemes() -> [(titleKey: String, indices: [Int], displayText: String, customLevels: [(sb: Int, bb: Int)]?)] {
+	private func availableSchemes() -> [TimerBlindScheme] {
 		let startIdx = (currentIndex ?? -1)
 		let base = max(0, startIdx)
 		let total = progression.count
@@ -316,19 +369,25 @@ struct TimerConfigSheet: View {
 			return pairs.isEmpty ? NSLocalizedString("timer.no_levels", comment: "No levels") : pairs.joined(separator: "  ·  ")
 		}
 		
-		var schemes: [(titleKey: String, indices: [Int], displayText: String, customLevels: [(sb: Int, bb: Int)]?)] = []
+		var schemes: [TimerBlindScheme] = []
 		if total > 0 {
 			let start = base + 1
 			let end = total - 1
 			let allUpcoming: [Int] = start <= end && start < total ? Array(start...end) : []
-			schemes.append(("timer.scheme_one", allUpcoming, textFor(allUpcoming, prog: progression), nil))
+			schemes.append(TimerBlindScheme(title: NSLocalizedString("timer.scheme_one", comment: ""), indices: allUpcoming, displayText: textFor(allUpcoming, prog: progression), customLevels: nil, customStructure: nil))
 		}
-		let customIndices = Array(0..<customLevels.count)
-		schemes.append(("timer.scheme_custom", customIndices, textFor(customIndices, prog: customLevels), customLevels))
+		for structure in customStructures {
+			let levels = structure.levels.map { ($0.sb, $0.bb) }
+			let customIndices = Array(0..<levels.count)
+			schemes.append(TimerBlindScheme(title: structure.name, indices: customIndices, displayText: textFor(customIndices, prog: levels), customLevels: levels, customStructure: structure))
+		}
+		if customStructures.isEmpty {
+			schemes.append(TimerBlindScheme(title: NSLocalizedString("timer.scheme_custom", comment: ""), indices: [], displayText: NSLocalizedString("timer.no_levels", comment: ""), customLevels: [], customStructure: nil))
+		}
 		return schemes
 	}
 	
-	private func nextThreeLevelsArray(for scheme: (titleKey: String, indices: [Int], displayText: String, customLevels: [(sb: Int, bb: Int)]?)) -> [String] {
+	private func nextThreeLevelsArray(for scheme: TimerBlindScheme) -> [String] {
 		let prog = scheme.customLevels ?? progression
 		let nextThree = Array(scheme.indices.prefix(3))
 		guard !nextThree.isEmpty else {
@@ -340,6 +399,31 @@ struct TimerConfigSheet: View {
 			return "\(l.sb) / \(l.bb)"
 		}
 	}
+
+	private func selectedCustomStructure() -> BlindStructure? {
+		if let selected = customStructures.first(where: { $0.id == selectedCustomBlindStructureID }) {
+			return selected
+		}
+		return customStructures.first
+	}
+
+	private func currentIndexForSelectedCustomStructure() -> Int? {
+		guard let selected = selectedCustomStructure() else { return nil }
+		return customBlindCurrentIndexStored >= 0 && customBlindCurrentIndexStored < selected.levels.count ? customBlindCurrentIndexStored : nil
+	}
+
+	private func idxForCustomStructure(id: String) -> Int {
+		let schemes = availableSchemes()
+		return schemes.firstIndex { $0.customStructure?.id == id } ?? selectedScheme
+	}
+}
+
+private struct TimerBlindScheme {
+	let title: String
+	let indices: [Int]
+	let displayText: String
+	let customLevels: [(sb: Int, bb: Int)]?
+	let customStructure: BlindStructure?
 }
 
 private struct TimerConfigSection<Content: View>: View {
@@ -395,9 +479,9 @@ private struct TimerDurationOption: View {
 // MARK: - Custom Blind Edit Sheet
 private struct CustomBlindEditSheet: View {
 	@Binding var isPresented: Bool
-	let initialLevels: [(sb: Int, bb: Int)]
+	let initialStructure: BlindStructure?
 	let initialCurrentIndex: Int?
-	let onSave: ([(sb: Int, bb: Int)], Int?) -> Void
+	let onSave: (BlindStructure, Int?) -> Void
 	
 	private struct LevelRow: Identifiable {
 		let id = UUID()
@@ -406,10 +490,14 @@ private struct CustomBlindEditSheet: View {
 	}
 	
 	@State private var rows: [LevelRow] = []
+	@State private var nameText: String = ""
 	@State private var selectedCurrentIndex: Int? = nil
+	@State private var validationMessage: String? = nil
 	
 	private func loadRowsIfNeeded() {
 		if rows.isEmpty {
+			nameText = initialStructure?.name ?? NSLocalizedString("timer.default_custom_name", comment: "")
+			let initialLevels = initialStructure?.levels ?? []
 			if initialLevels.isEmpty {
 				rows = [LevelRow(sb: "", bb: "")]
 			} else {
@@ -437,16 +525,25 @@ private struct CustomBlindEditSheet: View {
 	}
 	
 	private func commitAndClose() {
-		let cleaned: [(sb: Int, bb: Int)] = rows.compactMap { row in
+		let cleaned: [BlindLevel] = rows.compactMap { row in
 			let sb = Int(row.sb.filter { $0.isNumber }) ?? 0
 			let bb = Int(row.bb.filter { $0.isNumber }) ?? 0
 			guard sb > 0, bb > 0 else { return nil }
-			return (sb: sb, bb: bb)
+			return BlindLevel(sb: sb, bb: bb)
+		}
+		if let error = BlindStructureValidation.validate(name: nameText, levels: cleaned) {
+			validationMessage = error
+			return
 		}
 		let validIndex = selectedCurrentIndex.flatMap { idx in
 			(idx >= 0 && idx < cleaned.count) ? idx : nil
 		}
-		onSave(cleaned, validIndex)
+		let structure = BlindStructure(
+			id: initialStructure?.id ?? UUID().uuidString,
+			name: nameText.trimmingCharacters(in: .whitespacesAndNewlines),
+			levels: cleaned
+		)
+		onSave(structure, validIndex)
 		isPresented = false
 	}
 	
@@ -470,6 +567,33 @@ private struct CustomBlindEditSheet: View {
 				}
 				.padding(.horizontal)
 				.padding(.top, 8)
+
+				VStack(alignment: .leading, spacing: 8) {
+					Text("timer.structure_name")
+						.font(.caption.weight(.bold))
+						.foregroundStyle(Theme.secondaryText)
+					TextField(LocalizedStringKey("timer.structure_name_placeholder"), text: $nameText)
+						.textFieldStyle(.plain)
+						.foregroundStyle(Theme.primaryText)
+						.padding(.vertical, 12)
+						.padding(.horizontal, 14)
+						.background(
+							RoundedRectangle(cornerRadius: 12, style: .continuous)
+								.fill(Theme.surface)
+						)
+						.overlay(
+							RoundedRectangle(cornerRadius: 12, style: .continuous)
+								.stroke(Theme.surfaceStroke, lineWidth: 1)
+						)
+					if let validationMessage {
+						Text(validationMessage)
+							.font(.caption.weight(.semibold))
+							.foregroundStyle(Theme.healthRed)
+							.fixedSize(horizontal: false, vertical: true)
+					}
+				}
+				.padding(.horizontal)
+				.padding(.top, 14)
 				
 				ScrollView {
 					VStack(spacing: 10) {
