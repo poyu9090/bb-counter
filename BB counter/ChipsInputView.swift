@@ -3,26 +3,33 @@ import SwiftUI
 struct ChipsInputView: View {
     @Binding var chipsText: String
     let onNext: () -> Void
+    let onBack: (() -> Void)?
     let onAppear: () -> Void
     let buttonLabelKey: String
     
-    /// 各面额枚数 [1万, 5千, 1千, 500, 100]，不自动换算（5 个 1 千不合并成 1 个 5 千）
-    @State private var breakdown: [Int] = [0, 0, 0, 0, 0]
+    /// 各面额枚数 [5万, 1万, 5千, 1千, 500, 100]，不自动换算（5 个 1 千不合并成 1 个 5 千）
+    @State private var breakdown: [Int] = [0, 0, 0, 0, 0, 0]
     /// 由按钮更新 chipsText 时设为 true，避免 onChange 里用贪心覆盖 breakdown
     @State private var skipSyncFromText: Bool = false
-    @AppStorage("chipBreakdown") private var chipBreakdownStored: String = "0,0,0,0,0"
+    @State private var increaseAmountText: String = ""
+    @State private var decreaseAmountText: String = ""
+    @State private var adjustmentBaseChips: Int?
+    @FocusState private var focusedInput: ChipsFocusedInput?
+    @AppStorage("chipBreakdown") private var chipBreakdownStored: String = "0,0,0,0,0,0"
     
-    private static let denomValues: [Int] = [10000, 5000, 1000, 500, 100]
+    private static let denomValues: [Int] = [50000, 10000, 5000, 1000, 500, 100]
     private static let maxChipValue: Int = 999_999_999
     
     init(
         chipsText: Binding<String>,
         onNext: @escaping () -> Void,
+        onBack: (() -> Void)? = nil,
         onAppear: @escaping () -> Void,
         buttonLabelKey: String = "action.next"
     ) {
         self._chipsText = chipsText
         self.onNext = onNext
+        self.onBack = onBack
         self.onAppear = onAppear
         self.buttonLabelKey = buttonLabelKey
     }
@@ -38,14 +45,30 @@ struct ChipsInputView: View {
     private var inputErrorKey: String? {
         guard !chipsText.isEmpty else { return nil }
         guard let value = parsedChips else { return "input.error_too_large" }
-        if value <= 0 { return "input.error_required" }
+        if value < 0 { return "input.error_required" }
+        if value == 0, onBack == nil { return "input.error_required" }
         if value > Self.maxChipValue { return "input.error_too_large" }
         return nil
     }
 
     private var canProceed: Bool {
         guard let value = parsedChips else { return false }
+        if onBack != nil {
+            return value >= 0 && value <= Self.maxChipValue
+        }
         return value > 0 && value <= Self.maxChipValue
+    }
+
+    private var titleKey: LocalizedStringKey {
+        onBack == nil ? "chips.title" : "chips.current_title"
+    }
+
+    private var adjustmentPreviewValue: Int {
+        Int(chipsText) ?? 0
+    }
+
+    private func formattedChips(_ value: Int) -> String {
+        value.formatted(.number.grouping(.automatic))
     }
     
     /// 仅当用户手动输入数字时，用贪心分解同步 breakdown（例如输入 1 万 → 1 枚 1 万）
@@ -84,76 +107,134 @@ struct ChipsInputView: View {
     }
     
     var body: some View {
-        VStack(spacing: 24) {
-            Spacer(minLength: 0)
-            
-            VStack(spacing: 8) {
-                Text("chips.title")
-					.font(.largeTitle).bold()
-                    .foregroundStyle(Theme.primaryText)
-                
-            }
-            .multilineTextAlignment(.center)
-            
-            TextField(LocalizedStringKey("chips.placeholder"), text: $chipsText)
-                .keyboardType(.numberPad)
-                .textFieldStyle(.plain)
-                .accessibilityIdentifier("chips.input")
-                .font(.largeTitle)
-                .foregroundStyle(Theme.primaryText)
-                .multilineTextAlignment(.center)
-                .padding(.vertical, 12)
-                .padding(.horizontal, 16)
-                .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(Theme.surface)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(Theme.surfaceStroke, lineWidth: 1)
-                )
-                .padding(.horizontal)
-                .onChange(of: chipsText) { _, newValue in
-                    let filtered = newValue.filter { $0.isNumber }
-                    if filtered != newValue {
-                        chipsText = filtered
-                    } else if !skipSyncFromText {
-                        syncBreakdownFromText()
-                    } else {
-                        skipSyncFromText = false
+        ScrollViewReader { proxy in
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 24) {
+                    HStack(spacing: 12) {
+                        if let onBack {
+                            Button(action: onBack) {
+                                Image(systemName: "chevron.left")
+                                    .font(.headline.weight(.bold))
+                                    .foregroundStyle(Theme.primaryText)
+                                    .frame(width: 44, height: 44)
+                                    .background(
+                                        Circle()
+                                            .fill(Theme.surfaceElevated)
+                                    )
+                                    .overlay(
+                                        Circle()
+                                            .stroke(Theme.surfaceStroke, lineWidth: 1)
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(Text("action.back"))
+                            .accessibilityIdentifier("chips.back")
+                        } else {
+                            Color.clear
+                                .frame(width: 44, height: 44)
+                        }
+
+                        Text(titleKey)
+                            .font(.largeTitle).bold()
+                            .foregroundStyle(Theme.primaryText)
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.68)
+                            .frame(maxWidth: .infinity)
+
+                        Color.clear
+                            .frame(width: 44, height: 44)
+                    }
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 40)
+
+                    TextField(LocalizedStringKey("chips.placeholder"), text: $chipsText)
+                        .keyboardType(.numberPad)
+                        .focused($focusedInput, equals: .chips)
+                        .textFieldStyle(.plain)
+                        .accessibilityIdentifier("chips.input")
+                        .font(.largeTitle)
+                        .foregroundStyle(Theme.primaryText)
+                        .multilineTextAlignment(.center)
+                        .padding(.vertical, 12)
+                        .padding(.horizontal, 16)
+                        .background(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .fill(Theme.surface)
+                        )
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                .stroke(Theme.surfaceStroke, lineWidth: 1)
+                        )
+                        .padding(.horizontal)
+                        .id(ChipsFocusedInput.chips)
+                        .onChange(of: chipsText) { _, newValue in
+                            let filtered = newValue.filter { $0.isNumber }
+                            if filtered != newValue {
+                                chipsText = filtered
+                            } else if !skipSyncFromText {
+                                if focusedInput == .chips {
+                                    increaseAmountText = ""
+                                    decreaseAmountText = ""
+                                    adjustmentBaseChips = Int(filtered) ?? 0
+                                }
+                                syncBreakdownFromText()
+                            } else {
+                                skipSyncFromText = false
+                            }
+                        }
+                        .onAppear {
+                            onAppear()
+                            restoreOrSyncBreakdown()
+                            adjustmentBaseChips = Int(chipsText) ?? 0
+                        }
+                    if let inputErrorKey {
+                        Text(LocalizedStringKey(inputErrorKey))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Theme.healthRed)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal)
+                    }
+
+                    ChipStackView(breakdown: breakdown)
+                        .frame(height: 120)
+                        .padding(.horizontal)
+
+                    if onBack == nil {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 10)], spacing: 10) {
+                            ForEach(Self.denomValues, id: \.self) { value in
+                                ChipAdjustControl(
+                                    label: denominationLabel(value),
+                                    isSubtractDisabled: total(from: breakdown) == 0,
+                                    addAction: { addByDenomination(value) },
+                                    subtractAction: { subtractByDenomination(value) }
+                                )
+                            }
+                        }
+                        .padding(.horizontal)
+                    }
+
+                    if onBack != nil {
+                        customAmountControl
+                            .padding(.horizontal)
+                            .id(ChipsFocusedInput.increaseAmount)
                     }
                 }
-                .onAppear {
-                    onAppear()
-                    restoreOrSyncBreakdown()
-                }
-            if let inputErrorKey {
-                Text(LocalizedStringKey(inputErrorKey))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Theme.healthRed)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal)
+                .padding(.bottom, 28)
             }
-            
-            ChipStackView(breakdown: breakdown)
-                .frame(height: 120)
-                .padding(.horizontal)
-            
-			LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 10)], spacing: 10) {
-				ForEach(Self.denomValues, id: \.self) { value in
-					ChipAdjustControl(
-						label: denominationLabel(value),
-						addAction: { addByDenomination(value) },
-						subtractAction: { addByDenomination(-value) }
-					)
-				}
-			}
-			.padding(.horizontal)
-            
-            Spacer(minLength: 0)
+            .scrollDismissesKeyboard(.interactively)
+            .onChange(of: focusedInput) { _, input in
+                guard let input else { return }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    withAnimation(.easeOut(duration: 0.2)) {
+                        let target = input == .decreaseAmount ? ChipsFocusedInput.increaseAmount : input
+                        proxy.scrollTo(target, anchor: .center)
+                    }
+                }
+            }
         }
         .padding(.top, 32)
-        .safeAreaInset(edge: .bottom) {
+        .keyboardAwareBottomBar {
             VStack(spacing: 12) {
                 Button(action: onNext) {
                     Text(LocalizedStringKey(buttonLabelKey))
@@ -172,30 +253,188 @@ struct ChipsInputView: View {
         }
     }
     
-    /// 增加：按面额逐一增加，不自动换算。扣除：先减总面额，再按贪心换算展示。
+    /// 增加：按面额逐一增加，不自动换算。
     private func addByDenomination(_ amount: Int) {
-        if amount > 0 {
-            guard let idx = Self.denomValues.firstIndex(of: amount) else { return }
-            guard total(from: breakdown) + amount <= Self.maxChipValue else { return }
-            breakdown[idx] += 1
-            skipSyncFromText = true
-            chipsText = String(total(from: breakdown))
-            saveBreakdown()
-        } else {
-            let absAmount = abs(amount)
-            guard Self.denomValues.contains(absAmount) else { return }
-            let currentTotal = total(from: breakdown)
-            let newTotal = max(0, currentTotal - absAmount)
-            skipSyncFromText = true
-            chipsText = String(newTotal)
-            applyGreedyBreakdown(to: newTotal)
-            saveBreakdown()
+        guard amount > 0, let idx = Self.denomValues.firstIndex(of: amount) else { return }
+        guard total(from: breakdown) + amount <= Self.maxChipValue else { return }
+        breakdown[idx] += 1
+        updateTextFromBreakdown()
+    }
+
+    /// 扣除：按总额扣减并用贪心重排展示；扣超过目前总额时归零。
+    private func subtractByDenomination(_ amount: Int) {
+        guard amount > 0, Self.denomValues.contains(amount) else { return }
+        let newTotal = max(0, total(from: breakdown) - amount)
+        applyGreedyBreakdown(to: newTotal)
+        updateTextFromBreakdown()
+    }
+
+    private func updateTextFromBreakdown() {
+        skipSyncFromText = true
+        chipsText = String(total(from: breakdown))
+        saveBreakdown()
+        if focusedInput != .increaseAmount && focusedInput != .decreaseAmount {
+            adjustmentBaseChips = Int(chipsText) ?? 0
+            increaseAmountText = ""
+            decreaseAmountText = ""
+        }
+    }
+
+    private func applyAdjustmentChange() {
+        let base = adjustmentBaseChips ?? Int(chipsText) ?? 0
+        let increase = Int(increaseAmountText) ?? 0
+        let decrease = Int(decreaseAmountText) ?? 0
+        let nextTotal = min(Self.maxChipValue, max(0, base + increase - decrease))
+        applyGreedyBreakdown(to: nextTotal)
+        updateTextFromAdjustment(total: nextTotal)
+    }
+
+    private func updateTextFromAdjustment(total: Int) {
+        skipSyncFromText = true
+        chipsText = String(total)
+        saveBreakdown()
+    }
+
+    private func beginAdjustmentEditing() {
+        if adjustmentBaseChips == nil || (increaseAmountText.isEmpty && decreaseAmountText.isEmpty) {
+            adjustmentBaseChips = Int(chipsText) ?? 0
         }
     }
 
 	private func denominationLabel(_ value: Int) -> String {
 		value >= 1000 ? "\(value / 1000)k" : "\(value)"
 	}
+
+    private var customAmountControl: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(alignment: .center, spacing: 10) {
+                Image(systemName: "clock.arrow.circlepath")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.accent)
+                    .frame(width: 28, height: 28)
+                    .background(Circle().fill(Theme.accent.opacity(0.16)))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("chips.adjustment_title")
+                        .font(.headline.weight(.semibold))
+                        .foregroundStyle(Theme.primaryText)
+                    Text("chips.adjustment_subtitle")
+                        .font(.caption)
+                        .foregroundStyle(Theme.secondaryText)
+                }
+
+                Spacer(minLength: 0)
+            }
+
+            VStack(spacing: 10) {
+                adjustmentField(
+                    titleKey: "chips.increase_amount",
+                    placeholderKey: "chips.custom_amount_placeholder",
+                    text: $increaseAmountText,
+                    focus: .increaseAmount,
+                    accessibilityIdentifier: "chips.increaseAmount",
+                    iconName: "plus",
+                    tint: Theme.healthGreen
+                )
+                adjustmentField(
+                    titleKey: "chips.decrease_amount",
+                    placeholderKey: "chips.custom_amount_placeholder",
+                    text: $decreaseAmountText,
+                    focus: .decreaseAmount,
+                    accessibilityIdentifier: "chips.decreaseAmount",
+                    iconName: "minus",
+                    tint: Theme.healthRed
+                )
+            }
+
+            HStack {
+                Text("chips.after_adjustment")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Theme.secondaryText)
+                Spacer(minLength: 8)
+                Text(formattedChips(adjustmentPreviewValue))
+                    .font(.subheadline.weight(.bold).monospacedDigit())
+                    .foregroundStyle(Theme.primaryText)
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Theme.background.opacity(0.45))
+            )
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(Theme.surfaceElevated)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(Theme.surfaceStroke, lineWidth: 1)
+        )
+    }
+
+    private func adjustmentField(
+        titleKey: String,
+        placeholderKey: String,
+        text: Binding<String>,
+        focus: ChipsFocusedInput,
+        accessibilityIdentifier: String,
+        iconName: String,
+        tint: Color
+    ) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: iconName)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(tint)
+                .frame(width: 38, height: 38)
+                .background(Circle().fill(tint.opacity(0.16)))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(LocalizedStringKey(titleKey))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.primaryText)
+
+                TextField(LocalizedStringKey(placeholderKey), text: Binding(
+                    get: { text.wrappedValue },
+                    set: { newValue in
+                        text.wrappedValue = newValue.filter { $0.isNumber }
+                        applyAdjustmentChange()
+                    }
+                ))
+                .keyboardType(.numberPad)
+                .focused($focusedInput, equals: focus)
+                .textFieldStyle(.plain)
+                .font(.title3.weight(.bold).monospacedDigit())
+                .foregroundStyle(Theme.primaryText)
+                .multilineTextAlignment(.leading)
+                .frame(minHeight: 30)
+                .accessibilityIdentifier(accessibilityIdentifier)
+                .onChange(of: focusedInput) { _, input in
+                    if input == focus {
+                        beginAdjustmentEditing()
+                    }
+                }
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Theme.background.opacity(0.55))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(focusedInput == focus ? tint.opacity(0.7) : Theme.surfaceStroke, lineWidth: 1)
+        )
+    }
+}
+
+private enum ChipsFocusedInput: Hashable {
+    case chips
+    case increaseAmount
+    case decreaseAmount
 }
 
 // MARK: - Chip Stack (堆叠筹码，按实际操作面额显示，不自动换算)
@@ -205,8 +444,9 @@ private struct ChipDenomination: Identifiable {
     let edgeColor: Color
     let innerColor: Color
     
-    /// 面额顺序：1万、5千、1千、500、100（点 +1万 显示 1 枚 1 万，不合并为 2×5千）
+    /// 面额顺序：5万、1万、5千、1千、500、100（点 +1万 显示 1 枚 1 万，不合并为 2×5千）
     static let all: [ChipDenomination] = [
+        ChipDenomination(id: 50000, value: 50000, edgeColor: Color(red: 0.35, green: 0.78, blue: 0.9), innerColor: Color(red: 0.1, green: 0.46, blue: 0.72)),
         ChipDenomination(id: 10000, value: 10000, edgeColor: Color(red: 0.95, green: 0.45, blue: 0.65), innerColor: Color(red: 0.9, green: 0.25, blue: 0.55)),
         ChipDenomination(id: 5000, value: 5000, edgeColor: Color(red: 0.6, green: 0.35, blue: 0.5), innerColor: Color(red: 0.75, green: 0.5, blue: 0.65)),
         ChipDenomination(id: 1000, value: 1000, edgeColor: Color(red: 0.95, green: 0.82, blue: 0.25), innerColor: Color(red: 0.95, green: 0.55, blue: 0.2)),

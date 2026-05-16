@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ContentView: View {
-    enum Step {
+    enum Step: Equatable {
         case chips
         case blinds
         case result
@@ -35,102 +35,20 @@ struct ContentView: View {
     
     // Persisted values
     @AppStorage("chips") private var chipsStored: Int = 0
+    @AppStorage("smallBlind") private var smallBlindStored: Int = 0
     @AppStorage("bigBlind") private var bigBlindStored: Int = 0
+    @AppStorage("chipChangeRecords") private var chipChangeRecordsStored: String = "[]"
     
     // Working text states for inputs
     @State private var chipsText: String = ""
+    @State private var smallBlindText: String = ""
     @State private var bigBlindText: String = ""
     
     var body: some View {
         ZStack {
             Theme.background
                 .ignoresSafeArea()
-            Group {
-                switch step {
-                case .chips:
-                    ChipsInputView(
-                        chipsText: $chipsText,
-                        onNext: {
-                            let chips = numericValue(from: chipsText)
-                            guard chips > 0 else { return }
-                            chipsStored = chips
-                            if isEditingChipsFromResult {
-                                isEditingChipsFromResult = false
-                                step = .result
-                            } else {
-                                step = .blinds
-                            }
-                        },
-                        onAppear: {
-                            if chipsStored > 0 && chipsText.isEmpty {
-                                chipsText = String(chipsStored)
-                            }
-                        },
-                        buttonLabelKey: isEditingChipsFromResult ? "action.done" : "action.next"
-                    )
-                case .blinds:
-                    BlindLevelView(
-                        bigBlindText: $bigBlindText,
-                        selectPreset: { bb in
-                            bigBlindStored = bb
-                            bigBlindText = String(bb)
-                        },
-                        onShowResult: {
-                            let bb = numericValue(from: bigBlindText)
-                            guard bb > 0 else { return }
-                            bigBlindStored = bb
-                            if isEditingBlindsFromResult {
-                                isEditingBlindsFromResult = false
-                            }
-                            step = .result
-                        },
-                        onBack: {
-                            if isEditingBlindsFromResult {
-                                isEditingBlindsFromResult = false
-                                step = .result
-                            } else {
-                                step = .chips
-                            }
-                        },
-                        onAppear: {
-                            if bigBlindStored > 0 && bigBlindText.isEmpty {
-                                bigBlindText = String(bigBlindStored)
-                            }
-                        },
-                        isEditingFromResult: isEditingBlindsFromResult
-                    )
-                case .result:
-				ResultView(
-					chips: chipsStored,
-					bigBlind: $bigBlindStored,
-					blindSession: blindTimerSession,
-					timerEnabled: $timerEnabled,
-					timerDurationSec: $timerDurationSec,
-                        onEditChips: {
-                            skipApplyFreshTimerDefaultsOnNextResult = true
-                            isEditingChipsFromResult = true
-                            step = .chips
-                        },
-                        onEditBlinds: {
-                            skipApplyFreshTimerDefaultsOnNextResult = true
-                            isEditingBlindsFromResult = true
-                            step = .blinds
-                        },
-                        onReset: {
-                            chipsStored = 0
-                            bigBlindStored = 0
-                            chipsText = ""
-                            bigBlindText = ""
-                            isEditingChipsFromResult = false
-                            isEditingBlindsFromResult = false
-                            timerEnabled = false
-                            clearPersistedTimerState()
-                            blindTimerSession.resetAfterGlobalReset(timerDurationSec: timerDurationSec)
-                            step = .chips
-                        }
-                    )
-                }
-            }
+            currentStepView
             if !hasCompletedOnboarding {
                 OnboardingView {
                     hasCompletedOnboarding = true
@@ -141,72 +59,9 @@ struct ContentView: View {
         }
         .tint(Theme.accent)
         .preferredColorScheme(.dark)
+        .keyboardConfirmationToolbar()
         .animation(.default, value: step)
-        .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
-            runBlindTimerWallClockSync()
-            if timerEnabled {
-                syncLiveActivityFromContent()
-            }
-        }
-        .onChange(of: scenePhase) { _, phase in
-            if phase == .active {
-                runBlindTimerWallClockSync()
-                if timerEnabled {
-                    syncLiveActivityFromContent()
-                }
-            }
-        }
-        .onChange(of: timerDurationSec) { _, _ in
-            if timerEnabled, !blindTimerSession.isPaused {
-                blindTimerSession.invalidateCountdownAnchor()
-            }
-        }
-        .onChange(of: step) { old, new in
-            guard new == .result else { return }
-            if skipApplyFreshTimerDefaultsOnNextResult {
-                skipApplyFreshTimerDefaultsOnNextResult = false
-                return
-            }
-            if old == .blinds {
-                timerEnabled = false
-                blindTimerSession.applyFreshResultDefaults(timerDurationSec: timerDurationSec, bigBlind: bigBlindStored)
-            }
-        }
-        .onChange(of: chipsStored) { _, _ in
-            syncLiveActivityFromContent()
-        }
-        .onChange(of: bigBlindStored) { _, _ in
-            syncLiveActivityFromContent()
-        }
-        .onChange(of: timerEnabled) { _, _ in
-            persistTimerState()
-            updateBlindTimerNotification()
-            syncLiveActivityFromContent()
-        }
-        .onChange(of: blindTimerSession.remainingSeconds) { _, _ in
-            persistTimerState()
-            syncLiveActivityFromContent()
-        }
-        .onChange(of: blindTimerSession.isPaused) { _, _ in
-            persistTimerState()
-            updateBlindTimerNotification()
-            syncLiveActivityFromContent()
-        }
-        .onChange(of: blindTimerSession.selectedNextIndex) { _, _ in
-            persistTimerState()
-            syncLiveActivityFromContent()
-        }
-        .onChange(of: blindTimerSession.queuedIndices) { _, _ in
-            persistTimerState()
-            syncLiveActivityFromContent()
-        }
-        .onChange(of: blindTimerSession.countdownPeriodEnd) { _, _ in
-            persistTimerState()
-            updateBlindTimerNotification()
-            if timerEnabled {
-                syncLiveActivityFromContent()
-            }
-        }
+        .modifier(contentLifecycleModifier)
         .onAppear {
             restoreTimerStateIfNeeded()
             // Keep onboarding for truly new users only.
@@ -217,15 +72,267 @@ struct ContentView: View {
             if chipsStored > 0 && chipsText.isEmpty {
                 chipsText = String(chipsStored)
             }
+            if smallBlindStored == 0, bigBlindStored > 0 {
+                smallBlindStored = bigBlindStored / 2
+            }
+            if smallBlindStored > 0 && smallBlindText.isEmpty {
+                smallBlindText = String(smallBlindStored)
+            }
             if bigBlindStored > 0 && bigBlindText.isEmpty {
                 bigBlindText = String(bigBlindStored)
             }
         }
     }
 
+    private var contentLifecycleModifier: ContentLifecycleModifier {
+        ContentLifecycleModifier(
+            scenePhase: scenePhase,
+            step: step,
+            timerEnabled: timerEnabled,
+            timerDurationSec: timerDurationSec,
+            timerRemainingSeconds: blindTimerSession.remainingSeconds,
+            timerIsPaused: blindTimerSession.isPaused,
+            timerSelectedNextIndex: blindTimerSession.selectedNextIndex,
+            timerQueuedIndices: blindTimerSession.queuedIndices,
+            timerCountdownPeriodEnd: blindTimerSession.countdownPeriodEnd,
+            chips: chipsStored,
+            smallBlind: smallBlindStored,
+            bigBlind: bigBlindStored,
+            onTick: handleTimerTick,
+            onSceneActive: handleSceneActive,
+            onTimerDurationChanged: handleTimerDurationChanged,
+            onStepChanged: handleStepChanged,
+            onStoredValueChanged: syncLiveActivityFromContent,
+            onTimerEnabledChanged: handleTimerEnabledChanged,
+            onTimerProgressChanged: handleTimerProgressChanged,
+            onTimerPauseChanged: handleTimerPauseChanged,
+            onTimerQueueChanged: handleTimerQueueChanged,
+            onTimerCountdownEndChanged: handleTimerCountdownEndChanged
+        )
+    }
+
+    @ViewBuilder
+    private var currentStepView: some View {
+        switch step {
+        case .chips:
+            chipsStepView
+        case .blinds:
+            blindsStepView
+        case .result:
+            resultStepView
+        }
+    }
+
+    private var chipsStepView: some View {
+        ChipsInputView(
+            chipsText: $chipsText,
+            onNext: commitChipsStep,
+            onBack: isEditingChipsFromResult ? leaveChipsStep : nil,
+            onAppear: restoreChipsText,
+            buttonLabelKey: isEditingChipsFromResult ? "action.done" : "action.next"
+        )
+    }
+
+    private var blindsStepView: some View {
+        BlindLevelView(
+            smallBlindText: $smallBlindText,
+            bigBlindText: $bigBlindText,
+            selectPreset: applyBlindPreset,
+            onShowResult: commitBlindsStep,
+            onBack: leaveBlindsStep,
+            onAppear: restoreBlindTexts,
+            isEditingFromResult: isEditingBlindsFromResult
+        )
+    }
+
+    private var resultStepView: some View {
+        ResultView(
+            chips: chipsStored,
+            smallBlind: $smallBlindStored,
+            bigBlind: $bigBlindStored,
+            blindSession: blindTimerSession,
+            timerEnabled: $timerEnabled,
+            timerDurationSec: $timerDurationSec,
+            chipChangeRecords: chipChangeRecords,
+            onClearChipHistory: clearChipChangeRecords,
+            onEditChips: startEditingChips,
+            onEditBlinds: startEditingBlinds,
+            onReset: resetAll
+        )
+    }
+
+    private func commitChipsStep() {
+        let chips = numericValue(from: chipsText)
+        guard isEditingChipsFromResult ? chips >= 0 : chips > 0 else { return }
+        let previousChips = chipsStored
+        chipsStored = chips
+        if isEditingChipsFromResult, previousChips > 0, previousChips != chips {
+            appendChipChangeRecord(previousChips: previousChips, newChips: chips)
+        }
+        if isEditingChipsFromResult {
+            isEditingChipsFromResult = false
+            step = .result
+        } else {
+            step = .blinds
+        }
+    }
+
+    private func leaveChipsStep() {
+        isEditingChipsFromResult = false
+        restoreChipsTextFromStored()
+        step = .result
+    }
+
+    private func restoreChipsText() {
+        if chipsStored > 0 && chipsText.isEmpty {
+            chipsText = String(chipsStored)
+        }
+    }
+
+    private func restoreChipsTextFromStored() {
+        chipsText = chipsStored > 0 ? String(chipsStored) : ""
+    }
+
+    private func applyBlindPreset(_ smallBlind: Int, _ bigBlind: Int) {
+        smallBlindStored = smallBlind
+        bigBlindStored = bigBlind
+        smallBlindText = String(smallBlind)
+        bigBlindText = String(bigBlind)
+    }
+
+    private func commitBlindsStep() {
+        let sb = numericValue(from: smallBlindText)
+        let bb = numericValue(from: bigBlindText)
+        guard sb > 0, bb > 0, bb >= sb else { return }
+        smallBlindStored = sb
+        bigBlindStored = bb
+        if isEditingBlindsFromResult {
+            isEditingBlindsFromResult = false
+        }
+        step = .result
+    }
+
+    private func leaveBlindsStep() {
+        if isEditingBlindsFromResult {
+            isEditingBlindsFromResult = false
+            step = .result
+        } else {
+            step = .chips
+        }
+    }
+
+    private func restoreBlindTexts() {
+        if smallBlindStored == 0, bigBlindStored > 0 {
+            smallBlindStored = bigBlindStored / 2
+        }
+        if smallBlindStored > 0 && smallBlindText.isEmpty {
+            smallBlindText = String(smallBlindStored)
+        }
+        if bigBlindStored > 0 && bigBlindText.isEmpty {
+            bigBlindText = String(bigBlindStored)
+        }
+    }
+
+    private func startEditingChips() {
+        skipApplyFreshTimerDefaultsOnNextResult = true
+        isEditingChipsFromResult = true
+        step = .chips
+    }
+
+    private func startEditingBlinds() {
+        skipApplyFreshTimerDefaultsOnNextResult = true
+        isEditingBlindsFromResult = true
+        step = .blinds
+    }
+
+    private func resetAll() {
+        chipsStored = 0
+        smallBlindStored = 0
+        bigBlindStored = 0
+        chipsText = ""
+        smallBlindText = ""
+        bigBlindText = ""
+        clearChipChangeRecords()
+        isEditingChipsFromResult = false
+        isEditingBlindsFromResult = false
+        timerEnabled = false
+        clearPersistedTimerState()
+        blindTimerSession.resetAfterGlobalReset(timerDurationSec: timerDurationSec)
+        step = .chips
+    }
+
+    private func handleTimerTick() {
+        runBlindTimerWallClockSync()
+        if timerEnabled {
+            syncLiveActivityFromContent()
+        }
+    }
+
+    private func handleSceneActive() {
+        runBlindTimerWallClockSync()
+        if timerEnabled {
+            syncLiveActivityFromContent()
+        }
+    }
+
+    private func handleTimerDurationChanged() {
+        if timerEnabled, !blindTimerSession.isPaused {
+            blindTimerSession.invalidateCountdownAnchor()
+        }
+    }
+
+    private func handleStepChanged(old: Step, new: Step) {
+        guard new == .result else { return }
+        if skipApplyFreshTimerDefaultsOnNextResult {
+            skipApplyFreshTimerDefaultsOnNextResult = false
+            return
+        }
+        if old == .blinds {
+            timerEnabled = false
+            blindTimerSession.applyFreshResultDefaults(timerDurationSec: timerDurationSec, bigBlind: bigBlindStored)
+        }
+    }
+
+    private func handleTimerEnabledChanged() {
+        persistTimerState()
+        updateBlindTimerNotification()
+        syncLiveActivityFromContent()
+    }
+
+    private func handleTimerProgressChanged() {
+        persistTimerState()
+        syncLiveActivityFromContent()
+    }
+
+    private func handleTimerPauseChanged() {
+        persistTimerState()
+        updateBlindTimerNotification()
+        syncLiveActivityFromContent()
+    }
+
+    private func handleTimerQueueChanged() {
+        persistTimerState()
+        syncLiveActivityFromContent()
+    }
+
+    private func handleTimerCountdownEndChanged() {
+        persistTimerState()
+        updateBlindTimerNotification()
+        if timerEnabled {
+            syncLiveActivityFromContent()
+        }
+    }
+
     private func runBlindTimerWallClockSync() {
+        var sb = smallBlindStored
         var bb = bigBlindStored
-        blindTimerSession.syncFromWallClock(timerEnabled: timerEnabled, timerDurationSec: timerDurationSec, bigBlind: &bb)
+        blindTimerSession.syncFromWallClock(timerEnabled: timerEnabled, timerDurationSec: timerDurationSec, smallBlind: &sb, bigBlind: &bb)
+        if sb != smallBlindStored {
+            smallBlindStored = sb
+            if step == .blinds {
+                smallBlindText = String(sb)
+            }
+        }
         if bb != bigBlindStored {
             bigBlindStored = bb
             if step == .blinds {
@@ -237,6 +344,7 @@ struct ContentView: View {
     private func syncLiveActivityFromContent() {
         syncLiveActivityPayload(
             chips: chipsStored,
+            smallBlind: smallBlindStored,
             bigBlind: bigBlindStored,
             blindSession: blindTimerSession,
             timerEnabled: timerEnabled
@@ -291,6 +399,111 @@ struct ContentView: View {
         let digits = text.filter { $0.isNumber }
         return Int(digits) ?? 0
     }
+
+    private var chipChangeRecords: [ChipChangeRecord] {
+        guard let data = chipChangeRecordsStored.data(using: .utf8),
+              let records = try? JSONDecoder().decode([ChipChangeRecord].self, from: data) else {
+            return []
+        }
+        return records
+    }
+
+    private func appendChipChangeRecord(previousChips: Int, newChips: Int) {
+        var records = chipChangeRecords
+        records.insert(
+            ChipChangeRecord(
+                id: UUID(),
+                previousChips: previousChips,
+                newChips: newChips,
+                changedAt: Date()
+            ),
+            at: 0
+        )
+        persistChipChangeRecords(Array(records.prefix(50)))
+    }
+
+    private func clearChipChangeRecords() {
+        persistChipChangeRecords([])
+    }
+
+    private func persistChipChangeRecords(_ records: [ChipChangeRecord]) {
+        guard let data = try? JSONEncoder().encode(records),
+              let payload = String(data: data, encoding: .utf8) else {
+            return
+        }
+        chipChangeRecordsStored = payload
+    }
+
+}
+
+private struct ContentLifecycleModifier: ViewModifier {
+    let scenePhase: ScenePhase
+    let step: ContentView.Step
+    let timerEnabled: Bool
+    let timerDurationSec: Int
+    let timerRemainingSeconds: Int
+    let timerIsPaused: Bool
+    let timerSelectedNextIndex: Int
+    let timerQueuedIndices: [Int]
+    let timerCountdownPeriodEnd: Date?
+    let chips: Int
+    let smallBlind: Int
+    let bigBlind: Int
+    let onTick: () -> Void
+    let onSceneActive: () -> Void
+    let onTimerDurationChanged: () -> Void
+    let onStepChanged: (_ old: ContentView.Step, _ new: ContentView.Step) -> Void
+    let onStoredValueChanged: () -> Void
+    let onTimerEnabledChanged: () -> Void
+    let onTimerProgressChanged: () -> Void
+    let onTimerPauseChanged: () -> Void
+    let onTimerQueueChanged: () -> Void
+    let onTimerCountdownEndChanged: () -> Void
+
+    func body(content: Content) -> some View {
+        content
+            .onReceive(Timer.publish(every: 1, on: .main, in: .common).autoconnect()) { _ in
+                onTick()
+            }
+            .onChange(of: scenePhase) { _, phase in
+                if phase == .active {
+                    onSceneActive()
+                }
+            }
+            .onChange(of: timerDurationSec) { _, _ in
+                onTimerDurationChanged()
+            }
+            .onChange(of: step) { old, new in
+                onStepChanged(old, new)
+            }
+            .onChange(of: chips) { _, _ in
+                onStoredValueChanged()
+            }
+            .onChange(of: smallBlind) { _, _ in
+                onStoredValueChanged()
+            }
+            .onChange(of: bigBlind) { _, _ in
+                onStoredValueChanged()
+            }
+            .onChange(of: timerEnabled) { _, _ in
+                onTimerEnabledChanged()
+            }
+            .onChange(of: timerRemainingSeconds) { _, _ in
+                onTimerProgressChanged()
+            }
+            .onChange(of: timerIsPaused) { _, _ in
+                onTimerPauseChanged()
+            }
+            .onChange(of: timerSelectedNextIndex) { _, _ in
+                onTimerQueueChanged()
+            }
+            .onChange(of: timerQueuedIndices) { _, _ in
+                onTimerQueueChanged()
+            }
+            .onChange(of: timerCountdownPeriodEnd) { _, _ in
+                onTimerCountdownEndChanged()
+            }
+    }
 }
 
 private struct OnboardingView: View {
@@ -334,7 +547,7 @@ private struct OnboardingView: View {
         }
         .padding(.top, 32)
         .background(Theme.background.ignoresSafeArea())
-        .safeAreaInset(edge: .bottom) {
+        .keyboardAwareBottomBar {
             Button(action: onContinue) {
                 Text("onboarding.continue")
                     .frame(maxWidth: .infinity)

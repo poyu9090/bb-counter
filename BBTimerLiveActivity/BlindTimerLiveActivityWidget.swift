@@ -6,12 +6,13 @@ import WidgetKit
 // MARK: - Visual tokens（與主 App Theme 對齊的深色牌桌風格）
 
 private enum LivePalette {
-    static let bgTop = Color(red: 0.10, green: 0.11, blue: 0.16)
-    static let bgBottom = Color(red: 0.06, green: 0.07, blue: 0.10)
-    static let cardFill = Color.white.opacity(0.08)
-    static let cardStroke = Color.white.opacity(0.14)
+    static let bgTop = Color(red: 0.08, green: 0.13, blue: 0.12)
+    static let bgBottom = Color(red: 0.04, green: 0.05, blue: 0.08)
+    static let cardFill = Color.white.opacity(0.075)
+    static let cardStroke = Color.white.opacity(0.13)
     static let accent = Color(red: 0.50, green: 0.70, blue: 1.00)
     static let accentMuted = Color(red: 0.50, green: 0.70, blue: 1.00).opacity(0.35)
+    static let felt = Color(red: 0.09, green: 0.30, blue: 0.24)
     static let primary = Color.white.opacity(0.92)
     static let secondary = Color.white.opacity(0.58)
 
@@ -39,32 +40,28 @@ struct BlindTimerLiveActivityWidget: Widget {
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    expandedMetricBlock(
-                        icon: "square.stack.3d.up.fill",
-                        titleKey: "live.chips",
-                        value: formattedChips(context.state.chips),
-                        valueFont: .title2
-                    )
+                    expandedStackBlock(state: context.state)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    expandedMetricBlock(
-                        icon: "rectangle.split.2x1.fill",
-                        titleKey: "live.level",
-                        value: context.state.currentBlindsText,
-                        valueFont: .title3
-                    )
+                    expandedBlindBlock(state: context.state)
                 }
                 DynamicIslandExpandedRegion(.bottom) {
                     expandedBottomRow(state: context.state)
                 }
             } compactLeading: {
-                compactIslandChipsRow(state: context.state)
+                compactIslandStackRow(state: context.state)
             } compactTrailing: {
                 compactIslandTimerColumn(state: context.state)
             } minimal: {
-                Image(systemName: "timer")
-                    .foregroundStyle(LivePalette.accent)
+                ZStack {
+                    Circle()
+                        .fill(LivePalette.stackBBColor(tier: context.state.stackBBHealthTier).opacity(0.2))
+                    Image(systemName: "timer")
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(LivePalette.stackBBColor(tier: context.state.stackBBHealthTier))
+                }
             }
+            .keylineTint(LivePalette.stackBBColor(tier: context.state.stackBBHealthTier))
         }
     }
 
@@ -72,157 +69,220 @@ struct BlindTimerLiveActivityWidget: Widget {
 
     @ViewBuilder
     private func lockScreenView(_ state: BlindTimerAttributes.ContentState) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .top, spacing: 10) {
-                metricTile(
-                    icon: "square.stack.3d.up.fill",
-                    titleKey: "live.chips",
-                    primary: formattedChips(state.chips)
-                )
-                metricTile(
-                    icon: "rectangle.split.2x1.fill",
-                    titleKey: "live.level",
-                    primary: state.currentBlindsText
-                )
+        VStack(alignment: .leading, spacing: 14) {
+            HStack(spacing: 10) {
+                Label {
+                    Text("BB Counter")
+                        .font(.caption.weight(.heavy))
+                        .foregroundStyle(LivePalette.primary)
+                } icon: {
+                    Image(systemName: "suit.club.fill")
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(LivePalette.accent)
+                }
+                .labelStyle(.titleAndIcon)
+
+                Spacer(minLength: 8)
+
+                blindPill(state.currentBlindsText, icon: "rectangle.split.2x1.fill")
             }
 
-            HStack(alignment: .lastTextBaseline, spacing: 8) {
-                Text(state.stackBBNumericText)
-                    .font(.system(size: 44, weight: .bold, design: .rounded))
-                    .foregroundStyle(LivePalette.stackBBColor(tier: state.stackBBHealthTier))
-                    .minimumScaleFactor(0.5)
-                    .lineLimit(1)
-                Text(String(localized: "live.bb_unit"))
-                    .font(.title3.weight(.semibold))
-                    .foregroundStyle(LivePalette.secondary)
+            HStack(alignment: .center, spacing: 14) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(String(localized: "live.stack"))
+                        .font(.caption2.weight(.bold))
+                        .foregroundStyle(LivePalette.secondary)
+                    HStack(alignment: .firstTextBaseline, spacing: 5) {
+                        Text(state.stackBBNumericText)
+                            .font(.system(size: 46, weight: .black, design: .rounded))
+                            .foregroundStyle(LivePalette.stackBBColor(tier: state.stackBBHealthTier))
+                            .minimumScaleFactor(0.55)
+                            .lineLimit(1)
+                        Text(String(localized: "live.bb_unit"))
+                            .font(.title3.weight(.heavy))
+                            .foregroundStyle(LivePalette.secondary)
+                    }
+                    Text(formattedChips(state.chips))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(LivePalette.secondary)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+
                 Spacer(minLength: 8)
+
                 countdownCapsule(state: state)
             }
 
-            if !state.nextBlindText.isEmpty {
-                HStack(spacing: 8) {
-                    Image(systemName: "arrow.up.right.circle.fill")
-                        .font(.subheadline)
-                        .foregroundStyle(LivePalette.accent)
-                    Text(String(localized: "live.next_level"))
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(LivePalette.secondary)
-                    Text(state.nextBlindText)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(LivePalette.primary)
-                        .monospacedDigit()
-                }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(
-                    Capsule(style: .continuous)
-                        .fill(LivePalette.accentMuted.opacity(0.45))
-                )
-            }
+            bottomInfoStrip(state: state)
         }
         .padding(16)
         .background(
-            LinearGradient(
-                colors: [LivePalette.bgTop, LivePalette.bgBottom],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
+            ZStack {
+                LinearGradient(
+                    colors: [LivePalette.bgTop, LivePalette.bgBottom],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+                LinearGradient(
+                    colors: [LivePalette.felt.opacity(0.45), .clear],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                )
+            }
         )
         .activityBackgroundTint(Color.black.opacity(0.25))
+        .activitySystemActionForegroundColor(LivePalette.accent)
     }
 
     // MARK: Pieces
 
-    private func metricTile(icon: String, titleKey: LocalizedStringKey, primary: String) -> some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Label {
-                Text(titleKey)
-                    .font(.caption2.weight(.semibold))
-                    .foregroundStyle(LivePalette.secondary)
-            } icon: {
-                Image(systemName: icon)
-                    .font(.caption2)
-                    .foregroundStyle(LivePalette.accent)
-            }
-            .labelStyle(.titleAndIcon)
-            Text(primary)
-                .font(.headline.weight(.bold))
+    private func blindPill(_ text: String, icon: String) -> some View {
+        Label {
+            Text(text)
+                .font(.caption.weight(.heavy))
                 .foregroundStyle(LivePalette.primary)
-                .minimumScaleFactor(0.6)
-                .lineLimit(2)
+                .monospacedDigit()
+                .lineLimit(1)
+        } icon: {
+            Image(systemName: icon)
+                .font(.caption2.weight(.bold))
+                .foregroundStyle(LivePalette.accent)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
+        .labelStyle(.titleAndIcon)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
         .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
+            Capsule(style: .continuous)
                 .fill(LivePalette.cardFill)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    Capsule(style: .continuous)
                         .stroke(LivePalette.cardStroke, lineWidth: 1)
                 )
         )
     }
 
-    private func expandedMetricBlock(icon: String, titleKey: LocalizedStringKey, value: String, valueFont: Font) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Label {
-                Text(titleKey)
-                    .font(.caption2)
+    private func expandedStackBlock(state: BlindTimerAttributes.ContentState) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(String(localized: "live.stack"))
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                Text(state.stackBBNumericText)
+                    .font(.system(size: 28, weight: .black, design: .rounded))
+                    .foregroundStyle(LivePalette.stackBBColor(tier: state.stackBBHealthTier))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+                Text(String(localized: "live.bb_unit"))
+                    .font(.caption.weight(.heavy))
                     .foregroundStyle(.secondary)
-            } icon: {
-                Image(systemName: icon)
-                    .font(.caption2)
-                    .foregroundStyle(LivePalette.accent)
             }
-            .labelStyle(.titleAndIcon)
-            Text(value)
-                .font(valueFont.bold())
-                .foregroundStyle(.primary)
-                .minimumScaleFactor(0.5)
+            Text(formattedChips(state.chips))
+                .font(.caption2.weight(.medium))
+                .foregroundStyle(.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func expandedBottomRow(state: BlindTimerAttributes.ContentState) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            if !state.islandChipsSummaryLine.isEmpty {
-                Text(state.islandChipsSummaryLine)
-                    .font(.caption.weight(.medium))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(2)
-                    .minimumScaleFactor(0.75)
-            }
-            if !state.islandBlindUpgradeTimeLine.isEmpty {
-                Text(state.islandBlindUpgradeTimeLine)
-                    .font(.caption.weight(.medium))
+    private func expandedBlindBlock(state: BlindTimerAttributes.ContentState) -> some View {
+        VStack(alignment: .trailing, spacing: 4) {
+            Text(String(localized: "live.current_short"))
+                .font(.caption2.weight(.semibold))
+                .foregroundStyle(.secondary)
+            Text(state.currentBlindsText)
+                .font(.headline.weight(.heavy))
+                .foregroundStyle(.primary)
+                .monospacedDigit()
+                .lineLimit(1)
+                .minimumScaleFactor(0.55)
+            if !state.nextBlindText.isEmpty {
+                Text("\(String(localized: "live.next_short")) \(state.nextBlindText)")
+                    .font(.caption2.weight(.semibold))
                     .foregroundStyle(.secondary)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.75)
+                    .minimumScaleFactor(0.6)
             }
-            HStack(alignment: .firstTextBaseline, spacing: 6) {
-                Text(state.stackBBNumericText)
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
-                    .foregroundStyle(LivePalette.stackBBColor(tier: state.stackBBHealthTier))
-                Text(String(localized: "live.bb_unit"))
-                    .font(.subheadline.weight(.semibold))
+        }
+        .frame(maxWidth: .infinity, alignment: .trailing)
+    }
+
+    private func expandedBottomRow(state: BlindTimerAttributes.ContentState) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 8) {
+                Image(systemName: "timer")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(LivePalette.accent)
+                Text(String(localized: "live.countdown"))
+                    .font(.caption.weight(.semibold))
                     .foregroundStyle(.secondary)
                 Spacer(minLength: 12)
                 liveCountdownText(state)
-                    .font(.title3.monospacedDigit().bold())
+                    .font(.title2.monospacedDigit().bold())
                     .foregroundStyle(LivePalette.accent)
             }
-            if !state.nextBlindText.isEmpty {
-                HStack(spacing: 6) {
-                    Text(String(localized: "live.next_short"))
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                    Text(state.nextBlindText)
-                        .font(.caption.weight(.semibold))
-                        .foregroundStyle(.secondary)
+
+            HStack(spacing: 10) {
+                if !state.islandUpgradeAtClock.isEmpty {
+                    Label {
+                        Text(state.islandUpgradeAtClock)
+                            .monospacedDigit()
+                    } icon: {
+                        Image(systemName: "arrow.up.forward.circle.fill")
+                    }
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
+                }
+                if !state.nextBlindText.isEmpty {
+                    Label {
+                        Text(state.nextBlindText)
+                            .monospacedDigit()
+                    } icon: {
+                        Text(String(localized: "live.next_short"))
+                    }
+                    .font(.caption2.weight(.semibold))
+                    .foregroundStyle(.secondary)
                 }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func bottomInfoStrip(state: BlindTimerAttributes.ContentState) -> some View {
+        HStack(spacing: 8) {
+            if !state.nextBlindText.isEmpty {
+                Label {
+                    Text(state.nextBlindText)
+                        .monospacedDigit()
+                } icon: {
+                    Text(String(localized: "live.next_short"))
+                }
+            }
+            Spacer(minLength: 4)
+            if !state.islandUpgradeAtClock.isEmpty {
+                Label {
+                    Text(state.islandUpgradeAtClock)
+                        .monospacedDigit()
+                } icon: {
+                    Text(String(localized: "live.up_at"))
+                }
+            }
+        }
+        .font(.caption.weight(.semibold))
+        .foregroundStyle(LivePalette.secondary)
+        .lineLimit(1)
+        .minimumScaleFactor(0.7)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 7)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(LivePalette.cardFill)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .stroke(LivePalette.cardStroke, lineWidth: 1)
+                )
+        )
     }
 
     private func countdownCapsule(state: BlindTimerAttributes.ContentState) -> some View {
@@ -253,34 +313,27 @@ struct BlindTimerLiveActivityWidget: Widget {
         )
     }
 
-    /// 緊湊靈動島左側：籌碼標題 + 數量與 (xxbb)（長按展開可看完整兩行說明）
-    private func compactIslandChipsRow(state: BlindTimerAttributes.ContentState) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(String(localized: "live.compact.chips_caption"))
-                .font(.system(size: 8, weight: .semibold))
+    private func compactIslandStackRow(state: BlindTimerAttributes.ContentState) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 2) {
+            Text(state.stackBBNumericText)
+                .font(.system(size: 14, weight: .black, design: .rounded))
+                .foregroundStyle(LivePalette.stackBBColor(tier: state.stackBBHealthTier))
+            Text("BB")
+                .font(.system(size: 8, weight: .heavy, design: .rounded))
                 .foregroundStyle(.secondary)
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(formattedChips(state.chips))
-                    .font(.system(size: 11, weight: .bold, design: .rounded))
-                    .foregroundStyle(LivePalette.primary)
-                Text("(\(state.stackBBNumericText)bb)")
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundStyle(LivePalette.stackBBColor(tier: state.stackBBHealthTier))
-            }
-            .lineLimit(1)
-            .minimumScaleFactor(0.55)
         }
+        .lineLimit(1)
+        .minimumScaleFactor(0.6)
     }
 
-    /// 緊湊靈動島右側：倒數 + 升盲牆上時鐘
     private func compactIslandTimerColumn(state: BlindTimerAttributes.ContentState) -> some View {
         VStack(alignment: .trailing, spacing: 2) {
             liveCountdownText(state)
-                .font(.caption2.monospacedDigit().bold())
+                .font(.system(size: 13, weight: .heavy, design: .rounded).monospacedDigit())
                 .foregroundStyle(LivePalette.accent)
             if !state.islandUpgradeAtClock.isEmpty {
                 HStack(alignment: .firstTextBaseline, spacing: 3) {
-                    Text(String(localized: "live.compact.blinds_caption"))
+                    Text(String(localized: "live.up_at"))
                         .font(.system(size: 8, weight: .medium))
                         .foregroundStyle(.secondary)
                     Text(state.islandUpgradeAtClock)

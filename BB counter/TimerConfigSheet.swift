@@ -5,22 +5,26 @@ struct TimerConfigSheet: View {
 	@Binding var isPresented: Bool
 	@Binding var timerEnabled: Bool
 	@Binding var timerDurationSec: Int
+	@Binding var timerRemainingSec: Int
 	let progression: [(sb: Int, bb: Int)]
 	let currentIndex: Int?
 	@Binding var selectedIndicesSet: Set<Int>
 	let onStart: ([Int], [(sb: Int, bb: Int)]?, Int?) -> Void  // indices, customProgression, customCurrentIndex
-	
+
 	@State private var customMinutesText: String = ""
+	@State private var remainingMinutesText: String = ""
 	@State private var selectedScheme: Int = 0
 	@State private var showBlindStructureDetail: Bool = false
 	@State private var showCustomEditSheet: Bool = false
 	@State private var editingCustomStructure: BlindStructure?
+	@State private var isCreatingCustomStructure: Bool = false
+	@FocusState private var focusedTimerInput: TimerInputField?
 	@AppStorage("customBlindStructure") private var customBlindStructureStored: String = ""
 	@AppStorage("customBlindCurrentIndex") private var customBlindCurrentIndexStored: Int = 0
 	@AppStorage("customBlindStructures") private var customBlindStructuresStored: String = ""
 	@AppStorage("selectedCustomBlindStructureID") private var selectedCustomBlindStructureID: String = ""
 	@State private var customStructures: [BlindStructure] = []
-	
+
 	private func loadCustomStructures() {
 		var decoded = BlindStructureCodec.decodeStructures(from: customBlindStructuresStored)
 		if decoded.isEmpty {
@@ -36,7 +40,7 @@ struct TimerConfigSheet: View {
 			selectedCustomBlindStructureID = first.id
 		}
 	}
-	
+
 	private func saveCustomStructure(_ structure: BlindStructure, currentIndex: Int?) {
 		if let existing = customStructures.firstIndex(where: { $0.id == structure.id }) {
 			customStructures[existing] = structure
@@ -47,6 +51,7 @@ struct TimerConfigSheet: View {
 		customBlindCurrentIndexStored = currentIndex ?? 0
 		customBlindStructuresStored = BlindStructureCodec.encodeStructures(customStructures)
 		customBlindStructureStored = BlindStructureCodec.encodeLevels(structure.levels)
+		selectedScheme = idxForCustomStructure(id: structure.id)
 	}
 
 	private func deleteSelectedCustomStructure() {
@@ -57,10 +62,16 @@ struct TimerConfigSheet: View {
 		customBlindStructureStored = customStructures.first.map { BlindStructureCodec.encodeLevels($0.levels) } ?? ""
 		selectedScheme = selectedCustomBlindStructureID.isEmpty ? 0 : idxForCustomStructure(id: selectedCustomBlindStructureID)
 	}
-	
+
 	var body: some View {
 		ZStack {
-			Theme.background.ignoresSafeArea()
+			Theme.background
+				.ignoresSafeArea()
+				.contentShape(Rectangle())
+				.onTapGesture {
+					focusedTimerInput = nil
+					UIApplication.shared.dismissKeyboard()
+				}
 			ScrollView(.vertical, showsIndicators: false) {
 				VStack(spacing: 18) {
 					HStack {
@@ -86,7 +97,7 @@ struct TimerConfigSheet: View {
 					}
 					.padding(.horizontal)
 					.padding(.top, 8)
-					
+
 					TimerConfigSection(titleKey: "timer.duration", iconName: "clock") {
 						LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 10)], spacing: 10) {
 							ForEach([600, 900, 1200, 1500, 1800, 3600], id: \.self) { sec in
@@ -95,6 +106,7 @@ struct TimerConfigSheet: View {
 									isSelected: timerDurationSec == sec,
 									action: {
 										timerDurationSec = sec
+										clampRemainingToDuration()
 										customMinutesText = ""
 									}
 								)
@@ -113,10 +125,12 @@ struct TimerConfigSheet: View {
 										customMinutesText = filtered
 										if let mins = Int(filtered), mins > 0 {
 											timerDurationSec = mins * 60
+											clampRemainingToDuration()
 										}
 									})
 								)
 								.keyboardType(.numberPad)
+								.focused($focusedTimerInput, equals: .customMinutes)
 								.textFieldStyle(.plain)
 								.font(.title3)
 								.multilineTextAlignment(.center)
@@ -131,26 +145,60 @@ struct TimerConfigSheet: View {
 								)
 								.foregroundStyle(Theme.primaryText)
 								.accessibilityIdentifier("timer.customMinutes")
-								
+
 								Text(LocalizedStringKey("timer.min_unit"))
 									.font(.body)
 									.foregroundStyle(Theme.secondaryText)
-								
+
 								Spacer()
 							}
 						}
 
-						HStack {
-							Text(LocalizedStringKey("timer.current"))
-								.font(.subheadline)
-								.foregroundStyle(Theme.secondaryText)
-							Text(labelForDuration(timerDurationSec))
+						VStack(alignment: .leading, spacing: 8) {
+							Text("timer.current_blind_remaining")
 								.font(.subheadline.bold())
-								.foregroundStyle(Theme.accent)
+								.foregroundStyle(Theme.primaryText)
+							HStack(spacing: 12) {
+								TextField("", text: Binding(
+									get: { remainingMinutesText },
+									set: { newValue in
+										let filtered = newValue.filter { $0.isNumber }
+										remainingMinutesText = filtered
+										if let mins = Int(filtered), mins > 0 {
+											timerRemainingSec = min(mins * 60, timerDurationSec)
+										} else if filtered.isEmpty {
+											timerRemainingSec = timerDurationSec
+										}
+									})
+								)
+								.keyboardType(.numberPad)
+								.focused($focusedTimerInput, equals: .remainingMinutes)
+								.textFieldStyle(.plain)
+								.font(.title3)
+								.multilineTextAlignment(.center)
+								.frame(width: 96)
+								.padding(.vertical, 12)
+								.padding(.horizontal, 16)
+								.background(
+									RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.surface)
+								)
+								.overlay(
+									RoundedRectangle(cornerRadius: 12, style: .continuous).stroke(Theme.surfaceStroke, lineWidth: 1)
+								)
+								.foregroundStyle(Theme.primaryText)
+								.accessibilityIdentifier("timer.remainingMinutes")
+
+								Text(LocalizedStringKey("timer.min_unit"))
+									.font(.body)
+									.foregroundStyle(Theme.secondaryText)
+
+								Spacer()
+							}
 						}
+
 					}
 					.padding(.horizontal)
-					
+
 					TimerConfigSection(titleKey: "timer.blind_structure", iconName: "list.bullet.rectangle") {
 						VStack(spacing: 12) {
 							ForEach(Array(availableSchemes().enumerated()), id: \.offset) { (idx, scheme) in
@@ -214,11 +262,12 @@ struct TimerConfigSheet: View {
 														Label("timer.custom_switch_structure", systemImage: "rectangle.2.swap")
 													}
 													.buttonStyle(.bordered)
-												}
-												Button {
-													editingCustomStructure = scheme.customStructure
-													showCustomEditSheet = true
-												} label: {
+													}
+													Button {
+														isCreatingCustomStructure = false
+														editingCustomStructure = scheme.customStructure
+														showCustomEditSheet = true
+													} label: {
 													Label("timer.custom_edit_levels", systemImage: "pencil")
 												}
 												.buttonStyle(.bordered)
@@ -231,29 +280,37 @@ struct TimerConfigSheet: View {
 													.buttonStyle(.bordered)
 												}
 										}
-										Button {
-											editingCustomStructure = nil
-											showCustomEditSheet = true
-										} label: {
-											Label("timer.custom_new_structure", systemImage: "plus")
-										}
-										.buttonStyle(.bordered)
 										Spacer(minLength: 0)
 									}
 									.padding(.horizontal, 2)
 								}
 							}
+							Button {
+								isCreatingCustomStructure = true
+								editingCustomStructure = nil
+								showCustomEditSheet = true
+							} label: {
+								Label("timer.custom_add_levels", systemImage: "plus.circle.fill")
+									.frame(maxWidth: .infinity)
+									.padding(.vertical, 12)
+							}
+							.buttonStyle(.bordered)
+							.accessibilityIdentifier("timer.customAddLevels")
 						}
 					}
 					.padding(.horizontal)
-					
+
 					Spacer(minLength: 20)
 				}
 				.padding(.bottom, 8)
 			}
+			.scrollDismissesKeyboard(.interactively)
 		}
 		.onAppear {
 			loadCustomStructures()
+			if timerRemainingSec <= 0 || timerRemainingSec > timerDurationSec {
+				timerRemainingSec = timerDurationSec
+			}
 			let schemes = availableSchemes()
 			if selectedScheme >= schemes.count {
 				selectedScheme = 0
@@ -273,14 +330,15 @@ struct TimerConfigSheet: View {
 		.sheet(isPresented: $showCustomEditSheet) {
 			CustomBlindEditSheet(
 				isPresented: $showCustomEditSheet,
-				initialStructure: editingCustomStructure ?? selectedCustomStructure(),
-				initialCurrentIndex: currentIndexForSelectedCustomStructure(),
+				initialStructure: isCreatingCustomStructure ? nil : (editingCustomStructure ?? selectedCustomStructure()),
+				initialCurrentIndex: isCreatingCustomStructure ? nil : currentIndexForSelectedCustomStructure(),
 				onSave: { structure, currentIndex in
 					saveCustomStructure(structure, currentIndex: currentIndex)
+					isCreatingCustomStructure = false
 				}
 			)
 		}
-		.safeAreaInset(edge: .bottom) {
+		.keyboardAwareBottomBar {
 			VStack(spacing: 8) {
 				HStack(spacing: 12) {
 					Button(role: .cancel) {
@@ -291,7 +349,7 @@ struct TimerConfigSheet: View {
 							.padding()
 					}
 					.buttonStyle(.bordered)
-					
+
 					Button {
 						let schemes = availableSchemes()
 						guard !schemes.isEmpty else {
@@ -304,10 +362,9 @@ struct TimerConfigSheet: View {
 						selectedIndicesSet = Set(indices)
 						let customProg = scheme.customLevels
 						if customProg?.isEmpty == true {
-							editingCustomStructure = scheme.customStructure
-							showCustomEditSheet = true
 							return
 						}
+						timerRemainingSec = resolvedRemainingSeconds()
 						if let custom = customProg, !custom.isEmpty {
 							onStart(indices, custom, customBlindCurrentIndexStored >= 0 && customBlindCurrentIndexStored < custom.count ? customBlindCurrentIndexStored : 0)
 						} else {
@@ -330,14 +387,17 @@ struct TimerConfigSheet: View {
 			.padding(.vertical, 8)
 			.background(Theme.background.opacity(0.95))
 		}
+		.keyboardConfirmationToolbar {
+			focusedTimerInput = nil
+		}
 	}
-	
+
 	private func upcomingLevels() -> [(sb: Int, bb: Int)] {
 		let start = (currentIndex ?? -1) + 1
 		guard start >= 0 else { return progression }
 		return Array(progression.suffix(from: start))
 	}
-	
+
 	// MARK: - Helpers
 	private func labelForDuration(_ seconds: Int) -> String {
 		switch seconds {
@@ -350,16 +410,31 @@ struct TimerConfigSheet: View {
 		default: return "\(seconds / 60)m"
 		}
 	}
-	
+
+	private func resolvedRemainingSeconds() -> Int {
+		guard let mins = Int(remainingMinutesText), mins > 0 else {
+			return timerDurationSec
+		}
+		return min(mins * 60, timerDurationSec)
+	}
+
 	private func selectedCountString(_ count: Int) -> String {
 		String(format: NSLocalizedString("timer.selected_count", comment: ""), count)
 	}
-	
+
+	private func clampRemainingToDuration() {
+		if timerRemainingSec <= 0 {
+			timerRemainingSec = timerDurationSec
+		} else if timerRemainingSec > timerDurationSec {
+			timerRemainingSec = timerDurationSec
+		}
+	}
+
 	private func availableSchemes() -> [TimerBlindScheme] {
 		let startIdx = (currentIndex ?? -1)
 		let base = max(0, startIdx)
 		let total = progression.count
-		
+
 		func textFor(_ indices: [Int], prog: [(sb: Int, bb: Int)]) -> String {
 			let pairs = indices.compactMap { i -> String? in
 				guard i >= 0 && i < prog.count else { return nil }
@@ -368,7 +443,7 @@ struct TimerConfigSheet: View {
 			}
 			return pairs.isEmpty ? NSLocalizedString("timer.no_levels", comment: "No levels") : pairs.joined(separator: "  ·  ")
 		}
-		
+
 		var schemes: [TimerBlindScheme] = []
 		if total > 0 {
 			let start = base + 1
@@ -381,12 +456,9 @@ struct TimerConfigSheet: View {
 			let customIndices = Array(0..<levels.count)
 			schemes.append(TimerBlindScheme(title: structure.name, indices: customIndices, displayText: textFor(customIndices, prog: levels), customLevels: levels, customStructure: structure))
 		}
-		if customStructures.isEmpty {
-			schemes.append(TimerBlindScheme(title: NSLocalizedString("timer.scheme_custom", comment: ""), indices: [], displayText: NSLocalizedString("timer.no_levels", comment: ""), customLevels: [], customStructure: nil))
-		}
 		return schemes
 	}
-	
+
 	private func nextThreeLevelsArray(for scheme: TimerBlindScheme) -> [String] {
 		let prog = scheme.customLevels ?? progression
 		let nextThree = Array(scheme.indices.prefix(3))
@@ -418,6 +490,11 @@ struct TimerConfigSheet: View {
 	}
 }
 
+private enum TimerInputField: Hashable {
+	case customMinutes
+	case remainingMinutes
+}
+
 private struct TimerBlindScheme {
 	let title: String
 	let indices: [Int]
@@ -433,9 +510,13 @@ private struct TimerConfigSection<Content: View>: View {
 
 	var body: some View {
 		VStack(alignment: .leading, spacing: 14) {
-			Label(titleKey, systemImage: iconName)
-				.font(.headline)
-				.foregroundStyle(Theme.primaryText)
+			Label {
+				Text(LocalizedStringKey(titleKey))
+			} icon: {
+				Image(systemName: iconName)
+			}
+			.font(.headline)
+			.foregroundStyle(Theme.primaryText)
 
 			content
 		}
@@ -482,35 +563,37 @@ private struct CustomBlindEditSheet: View {
 	let initialStructure: BlindStructure?
 	let initialCurrentIndex: Int?
 	let onSave: (BlindStructure, Int?) -> Void
-	
+
 	private struct LevelRow: Identifiable {
 		let id = UUID()
 		var sb: String
 		var bb: String
 	}
-	
+
 	@State private var rows: [LevelRow] = []
 	@State private var nameText: String = ""
 	@State private var selectedCurrentIndex: Int? = nil
 	@State private var validationMessage: String? = nil
-	
+	@StateObject private var keyboard = KeyboardVisibilityObserver()
+	private let defaultCustomLevelCount = 10
+
 	private func loadRowsIfNeeded() {
 		if rows.isEmpty {
 			nameText = initialStructure?.name ?? NSLocalizedString("timer.default_custom_name", comment: "")
 			let initialLevels = initialStructure?.levels ?? []
 			if initialLevels.isEmpty {
-				rows = [LevelRow(sb: "", bb: "")]
+				rows = (0..<defaultCustomLevelCount).map { _ in LevelRow(sb: "", bb: "") }
 			} else {
 				rows = initialLevels.map { LevelRow(sb: "\($0.sb)", bb: "\($0.bb)") }
 			}
 			selectedCurrentIndex = initialCurrentIndex
 		}
 	}
-	
+
 	private func addRow() {
 		rows.append(LevelRow(sb: "", bb: ""))
 	}
-	
+
 	private func removeRow(at index: Int) {
 		guard rows.indices.contains(index) else { return }
 		rows.remove(at: index)
@@ -523,13 +606,17 @@ private struct CustomBlindEditSheet: View {
 			rows.append(LevelRow(sb: "", bb: ""))
 		}
 	}
-	
+
 	private func commitAndClose() {
 		let cleaned: [BlindLevel] = rows.compactMap { row in
 			let sb = Int(row.sb.filter { $0.isNumber }) ?? 0
 			let bb = Int(row.bb.filter { $0.isNumber }) ?? 0
 			guard sb > 0, bb > 0 else { return nil }
 			return BlindLevel(sb: sb, bb: bb)
+		}
+		if cleaned.isEmpty {
+			isPresented = false
+			return
 		}
 		if let error = BlindStructureValidation.validate(name: nameText, levels: cleaned) {
 			validationMessage = error
@@ -546,16 +633,31 @@ private struct CustomBlindEditSheet: View {
 		onSave(structure, validIndex)
 		isPresented = false
 	}
-	
+
 	var body: some View {
 		ZStack {
-			Theme.background.ignoresSafeArea()
+			Theme.background
+				.ignoresSafeArea()
+				.contentShape(Rectangle())
+				.onTapGesture {
+					UIApplication.shared.dismissKeyboard()
+				}
 			VStack(spacing: 0) {
 				// Header
 				HStack {
+					Button(role: .cancel) {
+						isPresented = false
+					} label: {
+						Text("action.back")
+							.font(.headline)
+							.foregroundStyle(Theme.secondaryText)
+					}
+					.accessibilityIdentifier("timer.customLevels.back")
+
 					Text("timer.scheme_custom")
 						.font(.title2.bold())
 						.foregroundStyle(Theme.primaryText)
+						.frame(maxWidth: .infinity)
 					Spacer()
 					Button {
 						commitAndClose()
@@ -594,7 +696,7 @@ private struct CustomBlindEditSheet: View {
 				}
 				.padding(.horizontal)
 				.padding(.top, 14)
-				
+
 				ScrollView {
 					VStack(spacing: 10) {
 						ForEach(Array(rows.enumerated()), id: \.element.id) { (idx, row) in
@@ -610,7 +712,7 @@ private struct CustomBlindEditSheet: View {
 											.frame(minHeight: 44)
 									}
 									.buttonStyle(.plain)
-									
+
 									if isCurrent {
 										Text("timer.current_level")
 											.font(.caption.weight(.semibold))
@@ -619,9 +721,9 @@ private struct CustomBlindEditSheet: View {
 											.padding(.vertical, 4)
 											.background(Capsule().fill(Theme.accent.opacity(0.16)))
 									}
-									
+
 									Spacer()
-									
+
 									Button {
 										removeRow(at: idx)
 									} label: {
@@ -632,7 +734,7 @@ private struct CustomBlindEditSheet: View {
 									}
 									.buttonStyle(.plain)
 								}
-								
+
 								HStack(spacing: 10) {
 									CustomBlindLevelField(
 										title: "SB",
@@ -666,16 +768,19 @@ private struct CustomBlindEditSheet: View {
 					.padding(.horizontal)
 					.padding(.top, 14)
 				}
-				
-				// Add row button
-				Button(action: addRow) {
-					Text("timer.add_level")
-						.frame(maxWidth: .infinity)
-						.padding()
+				.scrollDismissesKeyboard(.interactively)
+
+				if !keyboard.isVisible {
+					// Add row button
+					Button(action: addRow) {
+						Text("timer.add_level")
+							.frame(maxWidth: .infinity)
+							.padding()
+					}
+					.buttonStyle(.bordered)
+					.padding(.horizontal)
+					.padding(.bottom, 8)
 				}
-				.buttonStyle(.bordered)
-				.padding(.horizontal)
-				.padding(.bottom, 8)
 			}
 		}
 		.onAppear {
@@ -683,6 +788,7 @@ private struct CustomBlindEditSheet: View {
 		}
 		.preferredColorScheme(.dark)
 		.tint(Theme.accent)
+		.keyboardConfirmationToolbar()
 	}
 }
 
@@ -721,7 +827,7 @@ private struct BlindStructureDetailView: View {
 	let progression: [(sb: Int, bb: Int)]
 	let currentIndex: Int?
 	@Environment(\.dismiss) private var dismiss
-	
+
 	var body: some View {
 		ZStack {
 			Theme.background.ignoresSafeArea()
@@ -742,7 +848,7 @@ private struct BlindStructureDetailView: View {
 				}
 				.padding(.horizontal)
 				.padding(.top, 8)
-				
+
 				// Blind structure list
 				ScrollView(.vertical, showsIndicators: true) {
 					VStack(spacing: 12) {
@@ -753,14 +859,14 @@ private struct BlindStructureDetailView: View {
 									.font(.subheadline.bold())
 									.foregroundStyle(Theme.secondaryText)
 									.frame(width: 40, alignment: .leading)
-								
+
 								// Blinds
 								Text("\(level.sb) / \(level.bb)")
 									.font(.body)
 									.foregroundStyle(Theme.primaryText)
-								
+
 								Spacer()
-								
+
 								// Current indicator
 								if currentIndex == idx {
 									Text("timer.current_level")

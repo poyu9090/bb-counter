@@ -95,7 +95,7 @@ final class BlindTimerSession: ObservableObject {
         countdownPeriodEnd = nil
     }
 
-    func syncFromWallClock(timerEnabled: Bool, timerDurationSec: Int, bigBlind: inout Int) {
+    func syncFromWallClock(timerEnabled: Bool, timerDurationSec: Int, smallBlind: inout Int, bigBlind: inout Int) {
         guard timerEnabled else {
             countdownPeriodEnd = nil
             return
@@ -109,11 +109,16 @@ final class BlindTimerSession: ObservableObject {
         guard var end = countdownPeriodEnd else { return }
 
         while end <= now {
-            advanceBlindLevelUsingQueue(bigBlind: &bigBlind)
+            advanceBlindLevelUsingQueue(smallBlind: &smallBlind, bigBlind: &bigBlind)
             end = end.addingTimeInterval(TimeInterval(timerDurationSec))
         }
         countdownPeriodEnd = end
         remainingSeconds = max(0, Int(ceil(end.timeIntervalSince(now))))
+    }
+
+    func syncFromWallClock(timerEnabled: Bool, timerDurationSec: Int, bigBlind: inout Int) {
+        var smallBlind = 0
+        syncFromWallClock(timerEnabled: timerEnabled, timerDurationSec: timerDurationSec, smallBlind: &smallBlind, bigBlind: &bigBlind)
     }
 
     func applyFreshResultDefaults(timerDurationSec: Int, bigBlind: Int) {
@@ -134,17 +139,23 @@ final class BlindTimerSession: ObservableObject {
         setupNextLevel(bigBlind: 0)
     }
 
-    private func advanceBlindLevel(bigBlind: inout Int) {
+    private func advanceBlindLevel(smallBlind: inout Int, bigBlind: inout Int) {
         let progression = Self.progression
         guard selectedNextIndex < progression.count else { return }
         let next = progression[selectedNextIndex]
+        smallBlind = next.sb
         bigBlind = next.bb
         if selectedNextIndex + 1 < progression.count {
             selectedNextIndex += 1
         }
     }
 
-    func advanceBlindLevelUsingQueue(bigBlind: inout Int) {
+    private func advanceBlindLevel(bigBlind: inout Int) {
+        var smallBlind = 0
+        advanceBlindLevel(smallBlind: &smallBlind, bigBlind: &bigBlind)
+    }
+
+    func advanceBlindLevelUsingQueue(smallBlind: inout Int, bigBlind: inout Int) {
         let prog = effectiveProgression()
         if !queuedIndices.isEmpty {
             var q = queuedIndices
@@ -152,12 +163,18 @@ final class BlindTimerSession: ObservableObject {
             queuedIndices = q
             if nextIdx < prog.count {
                 let next = prog[nextIdx]
+                smallBlind = next.sb
                 bigBlind = next.bb
                 selectedNextIndex = min(nextIdx + 1, max(0, prog.count - 1))
             }
         } else {
-            advanceBlindLevel(bigBlind: &bigBlind)
+            advanceBlindLevel(smallBlind: &smallBlind, bigBlind: &bigBlind)
         }
+    }
+
+    func advanceBlindLevelUsingQueue(bigBlind: inout Int) {
+        var smallBlind = 0
+        advanceBlindLevelUsingQueue(smallBlind: &smallBlind, bigBlind: &bigBlind)
     }
 
     static func encodeQueuedIndices(_ indices: [Int]) -> String {

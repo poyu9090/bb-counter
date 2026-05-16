@@ -1,9 +1,12 @@
 "live.chips" = "籌碼";
 "live.level" = "目前盲注";
+"live.stack" = "籌碼深度";
 "live.bb_unit" = "BB";
 "live.countdown" = "升盲倒數";
 "live.next_level" = "下一級盲注";
 "live.next_short" = "下一級";
+"live.current_short" = "目前";
+"live.up_at" = "升盲";
 
 /* 靈動島 — 緊湊（狹長區域） */
 "live.compact.chips_caption" = "籌碼";

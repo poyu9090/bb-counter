@@ -11,12 +11,27 @@
 "action.delete" = "Delete";
 "reset.confirm_title" = "Confirm Reset";
 "reset.confirm_message" = "Are you sure you want to reset? Current chips and blind records will be lost.";
-"reset.dont_show_again" = "Don't show this again";
 
 /* Chips Screen */
 "chips.title" = "How many chips do you have?";
+"chips.current_title" = "Your current chips";
 "chips.subtitle" = "Enter your chips";
 "chips.placeholder" = "Chips";
+"chips.custom_amount" = "Custom chips";
+"chips.custom_amount_placeholder" = "Amount";
+"chips.increase_amount" = "Increase chips";
+"chips.decrease_amount" = "Decrease chips";
+"chips.adjustment_title" = "Record this chip change";
+"chips.adjustment_subtitle" = "Enter the increase or decrease amount. Your stack updates immediately.";
+"chips.after_adjustment" = "Stack after change";
+"chips.history.title" = "History";
+"chips.history.count" = "%d records";
+"chips.history.empty_short" = "No records";
+"chips.history.empty_title" = "No chip changes yet";
+"chips.history.empty_body" = "Edit chips from the result screen and tap Done to save each applied stack change here.";
+"chips.history.clear" = "Clear history";
+"chips.history.clear_title" = "Clear chip change history?";
+"chips.history.clear_message" = "This only clears the history and will not change your current chips.";
 
 /* Quick add */
 "quick.add100" = "+100";
@@ -33,7 +48,11 @@
 /* Blinds Screen */
 "blinds.title" = "What's the current blind level?";
 "blinds.subtitle" = "Current blind level";
-"blinds.enter" = "Or enter Big Blind (BB)";
+"blinds.enter" = "Or enter blinds manually";
+"blinds.small_blind" = "Small Blind";
+"blinds.big_blind" = "Big Blind";
+"blinds.small_placeholder" = "SB";
+"blinds.big_placeholder" = "BB";
 "blinds.placeholder" = "Big Blind (BB)";
 
 /* Result Screen */
@@ -46,6 +65,52 @@
 "result.status.short" = "Short stack";
 "result.status.playable" = "Playable";
 "result.status.healthy" = "Healthy";
+"all_in_range.title" = "All-in range";
+"all_in_range.subtitle" = "Check push ranges when below 15BB";
+"all_in_range.development_title" = "This feature is still in development";
+"all_in_range.development_message" = "We recorded your interest in this feature.";
+
+/* Hand Action Line */
+"hand.title" = "Hand notes";
+"hand.entry_subtitle" = "Record action lines quickly and share them after the hand.";
+"hand.create" = "New hand";
+"hand.editor_title" = "Action line";
+"hand.default_title" = "Hand #%d";
+"hand.empty_title" = "No hand notes yet";
+"hand.empty_body" = "Create a hand, tap position and action buttons, then share a clean action line.";
+"hand.title_placeholder" = "Hand title";
+"hand.hero_cards" = "Hero cards";
+"hand.card_one" = "Card 1";
+"hand.card_two" = "Card 2";
+"hand.board_placeholder" = "Board, e.g. A89";
+"hand.board_card_count" = "Set %d board cards";
+"hand.amount_placeholder" = "Custom size";
+"hand.quick_action" = "Quick action";
+"hand.quick_action_subtitle" = "Recording %@ now. Finish this street before moving to the next step.";
+"hand.players" = "Players";
+"hand.table_center" = "Select position";
+"hand.step_locked" = "Complete board cards and actions for active players before moving to the next step.";
+"hand.no_active_players" = "No active players can act now.";
+"hand.board_required" = "Set the board cards before recording this street.";
+"hand.current_position_action" = "%@ to act";
+"hand.add_action" = "Add action";
+"hand.add_action_to" = "Add to %@";
+"hand.finish_step" = "Finish %@, go to %@";
+"hand.previous_step" = "Previous step";
+"hand.next_step" = "Next step";
+"hand.step_hint" = "Complete the current street in order";
+"hand.current_step_title" = "Current step: %@";
+"hand.timeline" = "Action line";
+"hand.timeline_empty" = "No actions yet. Add the first action above.";
+"hand.note" = "Note";
+"hand.note_placeholder" = "Decision, read, or result";
+"hand.copy" = "Copy";
+"hand.copied" = "Copied";
+"hand.share" = "Share";
+"hand.more" = "More";
+"hand.card_summary" = "%@ blinds · %d actions";
+"hand.delete_title" = "Delete this hand note?";
+"hand.delete_message" = "This hand note will be removed from local records.";
 
 /* Timer */
 "timer.title" = "Blind timer";
@@ -58,14 +123,18 @@
 "timer.60m" = "60m";
 "timer.next" = "Next blind level";
 "timer.configure" = "Configure";
-"timer.duration" = "Duration";
+"timer.duration" = "Blind level duration";
+"timer.current_blind_remaining" = "Current blind remaining time";
+"timer.current_blind_remaining_short" = "Remaining";
+"timer.remaining_minutes_placeholder" = "Minutes left";
+"timer.duration_summary" = "Current blind remaining time %@, upcoming blind countdown %@";
 "timer.select_levels" = "Select upcoming levels";
 "timer.selected_count" = "%d selected";
 "timer.start" = "Start";
 "timer.pause" = "Pause";
 "timer.resume" = "Resume";
 "timer.enable" = "Enable";
-"timer.custom" = "Custom";
+"timer.custom" = "Custom blind level duration";
 "timer.min_unit" = "min";
 "timer.plans" = "Blind Structure";
 "timer.blind_structure" = "Blind Structure";
@@ -76,9 +145,9 @@
 "timer.default_custom_name" = "Custom structure";
 "timer.structure_name" = "Structure name";
 "timer.structure_name_placeholder" = "My blind structure";
-"timer.custom_new_structure" = "New structure";
 "timer.custom_switch_structure" = "Switch structure";
 "timer.custom_edit_levels" = "Edit levels";
+"timer.custom_add_levels" = "Add custom blind levels";
 "timer.add_level" = "Add level";
 "timer.next_levels" = "Upcoming levels:";
 "timer.no_more_levels" = "No more levels available";
@@ -92,6 +161,7 @@
 "timer.validation_levels_required" = "Add at least one blind level.";
 "timer.validation_positive" = "SB and BB must be greater than zero.";
 "timer.validation_bb_lt_sb" = "Level %d has BB lower than SB.";
+"timer.validation_bb_lt_sb_plain" = "BB cannot be lower than SB.";
 "timer.validation_not_increasing" = "Level %d must have a higher BB than the previous level.";
 "timer.validation_duplicate" = "Level %d duplicates the previous level.";
 
@@ -119,7 +189,7 @@
 "onboarding.step1.title" = "1. Enter your chips";
 "onboarding.step1.description" = "Input your stack or use quick add buttons for each denomination.";
 "onboarding.step2.title" = "2. Set current blinds";
-"onboarding.step2.description" = "Pick a preset blind level or type your current big blind manually.";
+"onboarding.step2.description" = "Pick a preset blind level or type your current SB and BB manually.";
 "onboarding.step3.title" = "3. Check BB and start timer";
 "onboarding.step3.description" = "See your BB depth instantly, and enable the blind timer when needed.";
 "onboarding.continue" = "Start using app";

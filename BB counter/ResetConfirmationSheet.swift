@@ -3,7 +3,6 @@ import SwiftUI
 // MARK: - Reset Confirmation Sheet
 struct ResetConfirmationSheet: View {
 	@Binding var isPresented: Bool
-	@Binding var dontShowAgain: Bool
 	let onConfirm: () -> Void
 	
 	var body: some View {
@@ -34,28 +33,11 @@ struct ResetConfirmationSheet: View {
 					.multilineTextAlignment(.leading)
 					.padding(.horizontal)
 				
-				// Don't show again option
-				Button(action: {
-					dontShowAgain.toggle()
-				}) {
-					HStack(spacing: 12) {
-						Image(systemName: dontShowAgain ? "checkmark.square.fill" : "square")
-							.font(.title3)
-							.foregroundStyle(dontShowAgain ? Theme.accent : Theme.secondaryText)
-						Text("reset.dont_show_again")
-							.font(.subheadline)
-							.foregroundStyle(Theme.primaryText)
-						Spacer()
-					}
-				}
-				.buttonStyle(.plain)
-				.padding(.horizontal)
-				
 				Spacer()
 			}
 			.padding(.top, 16)
 		}
-		.safeAreaInset(edge: .bottom) {
+		.keyboardAwareBottomBar {
 			VStack(spacing: 12) {
 				Button(action: {
 					onConfirm()

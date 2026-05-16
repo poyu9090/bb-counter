@@ -2,10 +2,13 @@ import SwiftUI
 
 struct ResultView: View {
 	let chips: Int
+	@Binding var smallBlind: Int
 	@Binding var bigBlind: Int
 	@ObservedObject var blindSession: BlindTimerSession
 	@Binding var timerEnabled: Bool
 	@Binding var timerDurationSec: Int
+	let chipChangeRecords: [ChipChangeRecord]
+	let onClearChipHistory: () -> Void
     let onEditChips: () -> Void
     let onEditBlinds: () -> Void
     let onReset: () -> Void
@@ -13,19 +16,25 @@ struct ResultView: View {
 	// Explicit initializer to avoid private memberwise init exposure issues
 	init(
 		chips: Int,
+		smallBlind: Binding<Int>,
 		bigBlind: Binding<Int>,
 		blindSession: BlindTimerSession,
 		timerEnabled: Binding<Bool>,
 		timerDurationSec: Binding<Int>,
+		chipChangeRecords: [ChipChangeRecord],
+		onClearChipHistory: @escaping () -> Void,
 		onEditChips: @escaping () -> Void,
 		onEditBlinds: @escaping () -> Void,
 		onReset: @escaping () -> Void
 	) {
 		self.chips = chips
+		self._smallBlind = smallBlind
 		self._bigBlind = bigBlind
 		self.blindSession = blindSession
 		self._timerEnabled = timerEnabled
 		self._timerDurationSec = timerDurationSec
+		self.chipChangeRecords = chipChangeRecords
+		self.onClearChipHistory = onClearChipHistory
 		self.onEditChips = onEditChips
 		self.onEditBlinds = onEditBlinds
 		self.onReset = onReset
@@ -78,9 +87,11 @@ struct ResultView: View {
 	
 	@State private var showTimerSheet: Bool = false
 	@State private var showResetConfirmation: Bool = false
-	@State private var dontShowResetConfirmation: Bool = false
+	@State private var showChipHistory: Bool = false
+	@State private var showHandActionLines: Bool = false
+	@State private var showAllInDevelopmentAlert: Bool = false
+	@State private var hasTrackedAllInPromptImpression: Bool = false
 	@State private var liveActivityStatusKey: String?
-	@AppStorage("dontShowResetConfirmation") private var dontShowResetConfirmationStored: Bool = false
 
 	private var stackStatusKey: String {
 		switch bbCount {
@@ -96,14 +107,21 @@ struct ResultView: View {
 	}
 
 	private var blindText: String {
-		"\(bigBlind / 2)/\(bigBlind)"
+		"\(smallBlind > 0 ? smallBlind : bigBlind / 2)/\(bigBlind)"
+	}
+
+	private var shouldShowAllInRangePrompt: Bool {
+		bbCount > 0 && bbCount < 15
 	}
     
     var body: some View {
 		ScrollView(.vertical, showsIndicators: false) {
 			VStack(spacing: 16) {
 				stackHero
-				LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+				if shouldShowAllInRangePrompt {
+					allInRangePrompt
+				}
+				HStack(spacing: 12) {
 					DashboardMetricButton(
 						titleKey: "result.chips",
 						valueText: formattedChips(chips),
@@ -111,14 +129,20 @@ struct ResultView: View {
 						accent: Theme.chipGold,
 						action: onEditChips
 					)
-					DashboardMetricButton(
-						titleKey: "result.blinds",
-						valueText: blindText,
-						iconName: "rectangle.split.2x1.fill",
-						accent: Theme.accent,
-						action: onEditBlinds
+					ChipHistoryButton(
+						recordCount: chipChangeRecords.count,
+						latestDeltaText: latestChipDeltaText,
+						action: { showChipHistory = true }
 					)
 				}
+				DashboardMetricButton(
+					titleKey: "result.blinds",
+					valueText: blindText,
+					iconName: "rectangle.split.2x1.fill",
+					accent: Theme.accent,
+					action: onEditBlinds
+				)
+				handActionLineButton
 				timerDashboard
 				if let liveActivityStatusKey {
 					HStack(spacing: 10) {
@@ -139,7 +163,7 @@ struct ResultView: View {
 			}
 			.padding(.horizontal, 16)
 			.padding(.top, 18)
-			.padding(.bottom, 120)
+			.padding(.bottom, 96)
 		}
 		.accessibilityIdentifier("result.screen")
 		.background(
@@ -152,6 +176,9 @@ struct ResultView: View {
 			.ignoresSafeArea()
 		)
 		.onChange(of: chips) { _, _ in
+			syncLiveActivityFromCurrentState()
+		}
+		.onChange(of: smallBlind) { _, _ in
 			syncLiveActivityFromCurrentState()
 		}
 		.onChange(of: bigBlind) { _, _ in
@@ -172,9 +199,28 @@ struct ResultView: View {
 		.onReceive(NotificationCenter.default.publisher(for: .blindTimerLiveActivityStatusChanged)) { notification in
 			liveActivityStatusKey = notification.object as? String
 		}
-		.safeAreaInset(edge: .bottom) {
+		.onAppear {
+			trackAllInPromptImpressionIfNeeded()
+		}
+		.onChange(of: shouldShowAllInRangePrompt) { _, _ in
+			trackAllInPromptImpressionIfNeeded()
+		}
+		.keyboardAwareBottomBar {
 			VStack(spacing: 10) {
 				HStack(spacing: 12) {
+					Button(role: .destructive) {
+						showResetConfirmation = true
+					} label: {
+						Label("action.reset", systemImage: "arrow.counterclockwise")
+							.labelStyle(.iconOnly)
+							.frame(width: 44, height: 44)
+					}
+					.buttonStyle(.bordered)
+					.controlSize(.regular)
+					.tint(Theme.healthRed)
+					.accessibilityLabel(Text("action.reset"))
+					.accessibilityIdentifier("result.reset")
+
 					Button(action: onEditChips) {
 						Label("action.edit_chips", systemImage: "square.stack.3d.up.fill")
 							.frame(maxWidth: .infinity)
@@ -190,22 +236,6 @@ struct ResultView: View {
 					.buttonStyle(.bordered)
 				}
 				.padding(.horizontal)
-				
-				Button(role: .destructive, action: {
-					if dontShowResetConfirmationStored {
-						onReset()
-					} else {
-						showResetConfirmation = true
-					}
-				}) {
-					Label("action.reset", systemImage: "arrow.counterclockwise")
-						.frame(maxWidth: .infinity)
-						.padding(.vertical, 14)
-						.font(.headline)
-						.foregroundStyle(Color.white)
-				}
-				.buttonStyle(.borderedProminent)
-				.padding(.horizontal)
 			}
 			.padding(.vertical, 10)
 			.background(.ultraThinMaterial)
@@ -216,12 +246,14 @@ struct ResultView: View {
 				isPresented: $showTimerSheet,
 				timerEnabled: $timerEnabled,
 				timerDurationSec: $timerDurationSec,
+				timerRemainingSec: $blindSession.remainingSeconds,
 				progression: BlindTimerSession.progression,
 					currentIndex: blindSession.currentIndex(for: bigBlind),
 					selectedIndicesSet: $blindSession.selectedIndicesSet,
 					onStart: { orderedIndices, customProgression, customCurrentIndex in
 						blindSession.activeCustomProgression = customProgression
 						if let custom = customProgression, let cur = customCurrentIndex, cur >= 0, cur < custom.count {
+							smallBlind = custom[cur].sb
 							bigBlind = custom[cur].bb
 						blindSession.queuedIndices = Array((cur + 1)..<custom.count)
 					} else {
@@ -230,7 +262,7 @@ struct ResultView: View {
 					timerEnabled = true
 					blindSession.invalidateCountdownAnchor()
 					blindSession.isPaused = false
-					blindSession.remainingSeconds = timerDurationSec
+					blindSession.remainingSeconds = min(max(1, blindSession.remainingSeconds), timerDurationSec)
 					if let first = blindSession.queuedIndices.first {
 						blindSession.selectedNextIndex = first
 					} else {
@@ -248,21 +280,38 @@ struct ResultView: View {
 		.sheet(isPresented: $showResetConfirmation) {
 			ResetConfirmationSheet(
 				isPresented: $showResetConfirmation,
-				dontShowAgain: $dontShowResetConfirmation,
 				onConfirm: {
-					if dontShowResetConfirmation {
-						dontShowResetConfirmationStored = true
-					}
 					onReset()
 				}
 			)
 			.presentationDetents([.medium])
 			.presentationDragIndicator(.visible)
 		}
-		.onChange(of: showResetConfirmation) { _, isPresented in
-			if isPresented {
-				dontShowResetConfirmation = false
-			}
+		.sheet(isPresented: $showChipHistory) {
+			ChipChangeHistorySheet(
+				records: chipChangeRecords,
+				onClear: onClearChipHistory
+			)
+			.presentationDetents([.medium, .large])
+			.presentationDragIndicator(.visible)
+			.tint(Theme.accent)
+			.preferredColorScheme(.dark)
+		}
+		.sheet(isPresented: $showHandActionLines) {
+			HandActionLineSheet(
+				smallBlind: smallBlind > 0 ? smallBlind : bigBlind / 2,
+				bigBlind: bigBlind,
+				stackBB: bbCount
+			)
+			.presentationDetents([.large])
+			.presentationDragIndicator(.visible)
+			.tint(Theme.accent)
+			.preferredColorScheme(.dark)
+		}
+		.alert("all_in_range.development_title", isPresented: $showAllInDevelopmentAlert) {
+			Button("action.confirm", role: .cancel) {}
+		} message: {
+			Text("all_in_range.development_message")
 		}
     }
 
@@ -292,34 +341,6 @@ struct ResultView: View {
 					.foregroundStyle(Theme.primaryText.opacity(0.72))
 			}
 			.accessibilityElement(children: .combine)
-
-			VStack(alignment: .leading, spacing: 8) {
-				HStack {
-					Text("result.stack_pressure")
-						.font(.caption.weight(.semibold))
-						.foregroundStyle(Theme.secondaryText)
-					Spacer()
-					Text(formattedBB(nextLevelBBCount) + " BB")
-						.font(.caption.weight(.semibold))
-						.foregroundStyle(nextLevelBBColor)
-				}
-				GeometryReader { proxy in
-					ZStack(alignment: .leading) {
-						Capsule()
-							.fill(Color.white.opacity(0.08))
-						Capsule()
-							.fill(
-								LinearGradient(
-									colors: [bbColor.opacity(0.65), bbColor],
-									startPoint: .leading,
-									endPoint: .trailing
-								)
-							)
-							.frame(width: proxy.size.width * min(max(bbCount / 40, 0.08), 1))
-					}
-				}
-				.frame(height: 8)
-			}
 		}
 		.padding(20)
 		.frame(maxWidth: .infinity, alignment: .leading)
@@ -338,6 +359,101 @@ struct ResultView: View {
 				.stroke(Theme.surfaceStroke, lineWidth: 1)
 		)
 		.shadow(color: bbColor.opacity(0.18), radius: 30, x: 0, y: 18)
+	}
+
+	private var allInRangePrompt: some View {
+		Button {
+			AppAnalytics.trackAllInRangeTap(bbCount: bbCount, chips: chips, bigBlind: bigBlind)
+			showAllInDevelopmentAlert = true
+		} label: {
+			HStack(spacing: 12) {
+				Image(systemName: "bolt.fill")
+					.font(.headline.weight(.bold))
+					.foregroundStyle(Theme.healthOrange)
+					.frame(width: 34, height: 34)
+					.background(
+						Circle()
+							.fill(Theme.healthOrange.opacity(0.14))
+					)
+
+				VStack(alignment: .leading, spacing: 3) {
+					Text("all_in_range.title")
+						.font(.headline.weight(.bold))
+						.foregroundStyle(Theme.primaryText)
+					Text("all_in_range.subtitle")
+						.font(.caption.weight(.semibold))
+						.foregroundStyle(Theme.secondaryText)
+						.lineLimit(2)
+				}
+
+				Spacer(minLength: 8)
+
+				Image(systemName: "chevron.right")
+					.font(.caption.weight(.bold))
+					.foregroundStyle(Theme.secondaryText)
+			}
+			.padding(14)
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.background(
+				RoundedRectangle(cornerRadius: 18, style: .continuous)
+					.fill(Theme.surfaceElevated)
+			)
+			.overlay(
+				RoundedRectangle(cornerRadius: 18, style: .continuous)
+					.stroke(Theme.healthOrange.opacity(0.28), lineWidth: 1)
+			)
+		}
+		.buttonStyle(.plain)
+		.accessibilityIdentifier("allInRange.prompt")
+	}
+
+	private var handActionLineButton: some View {
+		Button {
+			showHandActionLines = true
+		} label: {
+			HStack(spacing: 12) {
+				Image(systemName: "point.3.connected.trianglepath.dotted")
+					.font(.headline.weight(.bold))
+					.foregroundStyle(Theme.accent)
+					.frame(width: 36, height: 36)
+					.background(Circle().fill(Theme.accent.opacity(0.14)))
+
+				VStack(alignment: .leading, spacing: 4) {
+					Text("hand.title")
+						.font(.headline.weight(.bold))
+						.foregroundStyle(Theme.primaryText)
+					Text("hand.entry_subtitle")
+						.font(.caption.weight(.semibold))
+						.foregroundStyle(Theme.secondaryText)
+						.lineLimit(2)
+				}
+
+				Spacer(minLength: 8)
+
+				Image(systemName: "chevron.right")
+					.font(.caption.weight(.bold))
+					.foregroundStyle(Theme.secondaryText)
+			}
+			.padding(16)
+			.frame(maxWidth: .infinity, alignment: .leading)
+			.background(
+				RoundedRectangle(cornerRadius: 20, style: .continuous)
+					.fill(Theme.surfaceElevated)
+			)
+			.overlay(
+				RoundedRectangle(cornerRadius: 20, style: .continuous)
+					.stroke(Theme.surfaceStroke, lineWidth: 1)
+			)
+		}
+		.buttonStyle(.plain)
+		.accessibilityIdentifier("hand.actionLine.open")
+	}
+
+	private var latestChipDeltaText: String {
+		guard let latest = chipChangeRecords.first else {
+			return NSLocalizedString("chips.history.empty_short", comment: "")
+		}
+		return signedChips(latest.delta)
 	}
 
 	private var timerDashboard: some View {
@@ -375,7 +491,9 @@ struct ResultView: View {
 							blindSession.setupNextLevel(bigBlind: bigBlind)
 						}
 						blindSession.invalidateCountdownAnchor()
-						blindSession.remainingSeconds = timerDurationSec
+						if blindSession.remainingSeconds <= 0 || blindSession.remainingSeconds > timerDurationSec {
+							blindSession.remainingSeconds = timerDurationSec
+						}
 						blindSession.isPaused = true
 					} else {
 						blindSession.isPaused = false
@@ -468,6 +586,11 @@ struct ResultView: View {
 		formatter.numberStyle = .decimal
 		return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
 	}
+
+	private func signedChips(_ value: Int) -> String {
+		let formatted = formattedChips(abs(value))
+		return value >= 0 ? "+\(formatted)" : "-\(formatted)"
+	}
 	
 	private func formattedTime(_ seconds: Int) -> String {
 		let m = seconds / 60
@@ -478,9 +601,21 @@ struct ResultView: View {
 	private func syncLiveActivityFromCurrentState() {
 		syncLiveActivityPayload(
 			chips: chips,
+			smallBlind: smallBlind > 0 ? smallBlind : bigBlind / 2,
 			bigBlind: bigBlind,
 			blindSession: blindSession,
 			timerEnabled: timerEnabled
 		)
+	}
+
+	private func trackAllInPromptImpressionIfNeeded() {
+		guard shouldShowAllInRangePrompt, !hasTrackedAllInPromptImpression else {
+			if !shouldShowAllInRangePrompt {
+				hasTrackedAllInPromptImpression = false
+			}
+			return
+		}
+		hasTrackedAllInPromptImpression = true
+		AppAnalytics.trackAllInRangeImpression(bbCount: bbCount, chips: chips, bigBlind: bigBlind)
 	}
 }

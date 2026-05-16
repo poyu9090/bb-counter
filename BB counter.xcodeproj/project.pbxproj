@@ -65,21 +65,11 @@
 			);
 			target = CE32C8A22F1CBE38000A8803 /* BBTimerLiveActivity */;
 		};
-		CE52ED402F9FDA5D00D0B373 /* Exceptions for "BB counter" folder in "BB counter" target */ = {
-			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
-			membershipExceptions = (
-				Untitled.swift,
-			);
-			target = CE32C77C2F1CBE36000A882E /* BB counter */;
-		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CE32C77F2F1CBE36000A882E /* BB counter */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-				CE52ED402F9FDA5D00D0B373 /* Exceptions for "BB counter" folder in "BB counter" target */,
-			);
 			path = "BB counter";
 			sourceTree = "<group>";
 		};

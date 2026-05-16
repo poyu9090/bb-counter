@@ -14,6 +14,7 @@ func liveActivityStackBBHealthTier(bbCount: Double) -> Int {
 @MainActor
 func syncLiveActivityPayload(
 	chips: Int,
+	smallBlind: Int,
 	bigBlind: Int,
 	blindSession: BlindTimerSession,
 	timerEnabled: Bool
@@ -28,8 +29,8 @@ func syncLiveActivityPayload(
 	let stackBBNumeric = nf.string(from: NSNumber(value: bbCount)) ?? String(format: "%.1f", bbCount)
 	let tier = liveActivityStackBBHealthTier(bbCount: bbCount)
 	let blindsText: String = {
-		guard bigBlind > 0 else { return "—" }
-		return "\(bigBlind / 2)/\(bigBlind)"
+		guard smallBlind > 0, bigBlind > 0 else { return "—" }
+		return "\(smallBlind)/\(bigBlind)"
 	}()
 	let rem = blindSession.remainingSeconds
 	let timeText = String(format: "%02d:%02d", rem / 60, rem % 60)
