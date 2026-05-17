@@ -105,9 +105,7 @@ struct TimerConfigSheet: View {
 									title: labelForDuration(sec),
 									isSelected: timerDurationSec == sec,
 									action: {
-										timerDurationSec = sec
-										clampRemainingToDuration()
-										customMinutesText = ""
+										applyDuration(seconds: sec)
 									}
 								)
 							}
@@ -291,6 +289,8 @@ struct TimerConfigSheet: View {
 								showCustomEditSheet = true
 							} label: {
 								Label("timer.custom_add_levels", systemImage: "plus.circle.fill")
+									.lineLimit(1)
+									.minimumScaleFactor(0.72)
 									.frame(maxWidth: .infinity)
 									.padding(.vertical, 12)
 							}
@@ -308,6 +308,9 @@ struct TimerConfigSheet: View {
 		}
 		.onAppear {
 			loadCustomStructures()
+			if customMinutesText.isEmpty {
+				customMinutesText = "\(max(1, timerDurationSec / 60))"
+			}
 			if timerRemainingSec <= 0 || timerRemainingSec > timerDurationSec {
 				timerRemainingSec = timerDurationSec
 			}
@@ -428,6 +431,12 @@ struct TimerConfigSheet: View {
 		} else if timerRemainingSec > timerDurationSec {
 			timerRemainingSec = timerDurationSec
 		}
+	}
+
+	private func applyDuration(seconds: Int) {
+		timerDurationSec = seconds
+		customMinutesText = "\(max(1, seconds / 60))"
+		clampRemainingToDuration()
 	}
 
 	private func availableSchemes() -> [TimerBlindScheme] {
@@ -774,6 +783,8 @@ private struct CustomBlindEditSheet: View {
 					// Add row button
 					Button(action: addRow) {
 						Text("timer.add_level")
+							.lineLimit(1)
+							.minimumScaleFactor(0.82)
 							.frame(maxWidth: .infinity)
 							.padding()
 					}

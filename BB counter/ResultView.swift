@@ -222,14 +222,26 @@ struct ResultView: View {
 					.accessibilityIdentifier("result.reset")
 
 					Button(action: onEditChips) {
-						Label("action.edit_chips", systemImage: "square.stack.3d.up.fill")
+						HStack(spacing: 8) {
+							Image(systemName: "square.stack.3d.up.fill")
+								.imageScale(.medium)
+							Text("action.edit_chips")
+								.lineLimit(1)
+								.minimumScaleFactor(0.62)
+						}
 							.frame(maxWidth: .infinity)
 							.padding(.vertical, 13)
 					}
 					.buttonStyle(.bordered)
 					
 					Button(action: onEditBlinds) {
-						Label("action.edit_blinds", systemImage: "rectangle.split.2x1.fill")
+						HStack(spacing: 8) {
+							Image(systemName: "rectangle.split.2x1.fill")
+								.imageScale(.medium)
+							Text("action.edit_blinds")
+								.lineLimit(1)
+								.minimumScaleFactor(0.62)
+						}
 							.frame(maxWidth: .infinity)
 							.padding(.vertical, 13)
 					}
@@ -515,8 +527,9 @@ struct ResultView: View {
 						Text("\(NSLocalizedString("timer.next", comment: "")): \(blindSession.nextDisplayLevelText(for: bigBlind))")
 							.font(.subheadline.weight(.medium))
 							.foregroundStyle(Theme.secondaryText)
-							.lineLimit(1)
-							.minimumScaleFactor(0.75)
+							.lineLimit(2)
+							.minimumScaleFactor(0.82)
+							.fixedSize(horizontal: false, vertical: true)
 						Text(String(format: NSLocalizedString("timer.next_stack", comment: ""), formattedBB(nextLevelBBCount)))
 							.font(.caption.weight(.semibold))
 							.foregroundStyle(nextLevelBBColor)

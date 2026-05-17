@@ -289,7 +289,7 @@ private struct HandActionLineEditor: View {
                 .padding(.bottom, 88)
             }
             .onChange(of: selectedStreet) { _, _ in
-                selectedPosition = currentActionPositions.first ?? selectedPosition
+                selectedPosition = currentPendingActionPositions.first ?? currentActionPositions.first ?? selectedPosition
                 selectedBoardCardSlot = 0
             }
             .background(
@@ -612,8 +612,7 @@ private struct HandActionLineEditor: View {
             playerCountControl
             PokerTablePositionPicker(
                 positions: currentActionPositions,
-                selectedPosition: $selectedPosition,
-                chipsText: chipsText
+                selectedPosition: $selectedPosition
             )
             .frame(height: 220)
 
@@ -622,7 +621,7 @@ private struct HandActionLineEditor: View {
                     .font(.caption.weight(.bold))
                     .foregroundStyle(Theme.secondaryText)
 
-                if currentActionPositions.isEmpty {
+                if currentPendingActionPositions.isEmpty {
                     Text("hand.no_active_players")
                         .font(.subheadline.weight(.semibold))
                         .foregroundStyle(Theme.secondaryText)
@@ -647,6 +646,9 @@ private struct HandActionLineEditor: View {
                 } label: {
                     Label(String(format: NSLocalizedString("hand.finish_step", comment: ""), selectedStreet.title, nextStreetTitle), systemImage: "arrow.right.circle")
                         .font(.subheadline.weight(.bold))
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.82)
+                        .multilineTextAlignment(.center)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 11)
                 }
@@ -815,6 +817,7 @@ private struct HandActionLineEditor: View {
         }
         return [
             HandActionChoice(title: "Bet", subtitle: "1/3", action: "Bet", amount: "1/3 pot", tint: Theme.accent),
+            HandActionChoice(title: "Bet", subtitle: "1/2", action: "Bet", amount: "1/2 pot", tint: Theme.accent),
             HandActionChoice(title: "Bet", subtitle: "2/3", action: "Bet", amount: "2/3 pot", tint: Theme.accent),
             HandActionChoice(title: "All-in", subtitle: "", action: "All-in", amount: "", tint: Theme.healthRed),
             HandActionChoice(title: "Check", subtitle: "", action: "Check", amount: "", tint: Theme.healthGreen),
@@ -823,13 +826,11 @@ private struct HandActionLineEditor: View {
     }
 
     private var hasAllInAction: Bool {
-        currentStreetActions.contains { $0.action == "All-in" }
+        latestUnansweredAggressiveAction?.action == "All-in"
     }
 
     private var hasOutstandingBet: Bool {
-        currentStreetActions.contains { action in
-            ["Bet", "Raise", "All-in"].contains(action.action)
-        }
+        latestUnansweredAggressiveAction != nil && !currentPendingActionPositions.isEmpty
     }
 
     private var currentStreetActions: [HandActionRecord] {
@@ -841,8 +842,14 @@ private struct HandActionLineEditor: View {
     }
 
     private var currentPendingActionPositions: [String] {
-        let actedPositions = Set(currentStreetActions.map(\.position))
-        return currentActionPositions.filter { !actedPositions.contains($0) }
+        pendingActionPositions()
+    }
+
+    private var latestUnansweredAggressiveAction: HandActionRecord? {
+        guard currentPendingActionPositions.isEmpty == false else {
+            return nil
+        }
+        return currentStreetActions.last { isAggressiveAction($0.action) }
     }
 
     private var canRecordAction: Bool {
@@ -913,7 +920,7 @@ private struct HandActionLineEditor: View {
         if selectedStreet != .preflop, !hasRequiredBoardCards(for: selectedStreet) {
             return false
         }
-        return currentStreetActions.count >= currentActionPositions.count && !currentActionPositions.isEmpty
+        return !currentStreetActions.isEmpty && currentPendingActionPositions.isEmpty && !currentActionPositions.isEmpty
     }
 
     private func hasConfigured(_ street: HandStreet) -> Bool {
@@ -930,7 +937,7 @@ private struct HandActionLineEditor: View {
             return
         }
         selectedStreet = HandStreet.allCases[index + 1]
-        selectedPosition = actionPositions(for: selectedStreet).first ?? selectedPosition
+        selectedPosition = currentPendingActionPositions.first ?? actionPositions(for: selectedStreet).first ?? selectedPosition
     }
 
     private func moveToPreviousStreet() {
@@ -984,6 +991,45 @@ private struct HandActionLineEditor: View {
             return positions
         }
         return Array(positions[(buttonIndex + 1)...]) + Array(positions[..<(buttonIndex + 1)])
+    }
+
+    private func positionsAfter(_ position: String, in positions: [String]) -> [String] {
+        guard let index = positions.firstIndex(of: position), positions.count > 1 else {
+            return positions
+        }
+        return Array(positions[(index + 1)...]) + Array(positions[..<index])
+    }
+
+    private func isAggressiveAction(_ action: String) -> Bool {
+        ["Bet", "Raise", "All-in"].contains(action)
+    }
+
+    private func pendingActionPositions() -> [String] {
+        let positions = currentActionPositions
+        guard !positions.isEmpty else { return [] }
+
+        let foldedPositions = Set(currentStreetActions.compactMap { action in
+            action.action == "Fold" ? action.position : nil
+        })
+        let allInPositions = Set(currentStreetActions.compactMap { action in
+            action.action == "All-in" ? action.position : nil
+        })
+        let unavailablePositions = foldedPositions.union(allInPositions)
+        let availablePositions = positions.filter { !unavailablePositions.contains($0) }
+
+        guard let lastAggressiveIndex = currentStreetActions.lastIndex(where: { isAggressiveAction($0.action) }) else {
+            let actedPositions = Set(currentStreetActions.map(\.position))
+            return availablePositions.filter { !actedPositions.contains($0) }
+        }
+
+        let lastAggressiveAction = currentStreetActions[lastAggressiveIndex]
+        let respondedAfterAggression = Set(currentStreetActions[(lastAggressiveIndex + 1)...].map(\.position))
+
+        return positionsAfter(lastAggressiveAction.position, in: positions).filter { position in
+            position != lastAggressiveAction.position
+                && !unavailablePositions.contains(position)
+                && !respondedAfterAggression.contains(position)
+        }
     }
 
     private func actions(before street: HandStreet) -> [HandActionRecord] {
@@ -1111,7 +1157,7 @@ private struct HandActionLineEditor: View {
     private func addAction(_ choice: HandActionChoice) {
         guard canRecordAction else { return }
         guard currentActionPositions.contains(selectedPosition) else { return }
-        guard !currentStreetActions.contains(where: { $0.position == selectedPosition }) else { return }
+        guard currentPendingActionPositions.contains(selectedPosition) else { return }
         guard let index = draft.streets.firstIndex(where: { $0.street == selectedStreet }) else { return }
         draft.streets[index].actions.append(
             HandActionRecord(
@@ -1133,10 +1179,14 @@ private struct HandActionLineEditor: View {
             selectedPosition = positions.first ?? "UTG"
             return
         }
-        let actedPositions = Set(currentStreetActions.map(\.position))
+        let pendingPositions = currentPendingActionPositions
         let nextPositions = Array(positions[(index + 1)...]) + Array(positions[..<index])
-        if let nextPosition = nextPositions.first(where: { !actedPositions.contains($0) }) {
+        if let nextPosition = nextPositions.first(where: { pendingPositions.contains($0) }) {
             selectedPosition = nextPosition
+            return
+        }
+        if let nextPendingPosition = pendingPositions.first {
+            selectedPosition = nextPendingPosition
             return
         }
         if selectedStreet != .river, canMoveToNextStreet {
@@ -1210,11 +1260,6 @@ private struct HandActionChoice: Identifiable {
 private struct PokerTablePositionPicker: View {
     let positions: [String]
     @Binding var selectedPosition: String
-    let chipsText: String
-
-    private var displayChips: String {
-        chipsText.isEmpty ? "--" : chipsText
-    }
 
     var body: some View {
         GeometryReader { proxy in
@@ -1245,16 +1290,10 @@ private struct PokerTablePositionPicker: View {
                     Button {
                         selectedPosition = position
                     } label: {
-                        VStack(spacing: 2) {
-                            Text(position)
-                                .font(.caption.weight(.black))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.55)
-                            Text(displayChips)
-                                .font(.caption2.weight(.bold))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.55)
-                        }
+                        Text(position)
+                            .font(.caption.weight(.black))
+                            .lineLimit(1)
+                            .minimumScaleFactor(0.55)
                         .foregroundStyle(selectedPosition == position ? Color.white : Theme.primaryText)
                         .frame(width: seatSize(for: positions.count), height: seatSize(for: positions.count))
                         .background(

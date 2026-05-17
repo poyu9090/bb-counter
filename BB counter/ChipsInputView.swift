@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ChipsInputView: View {
+    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
     @Binding var chipsText: String
     let onNext: () -> Void
     let onBack: (() -> Void)?
@@ -65,6 +66,21 @@ struct ChipsInputView: View {
 
     private var adjustmentPreviewValue: Int {
         Int(chipsText) ?? 0
+    }
+
+    private var isWideLayout: Bool {
+        horizontalSizeClass == .regular
+    }
+
+    private var contentMaxWidth: CGFloat {
+        isWideLayout ? 640 : .infinity
+    }
+
+    private var chipGridColumns: [GridItem] {
+        if isWideLayout {
+            return Array(repeating: GridItem(.flexible(), spacing: 12), count: 3)
+        }
+        return [GridItem(.adaptive(minimum: 96), spacing: 10)]
     }
 
     private func formattedChips(_ value: Int) -> String {
@@ -137,8 +153,9 @@ struct ChipsInputView: View {
                         Text(titleKey)
                             .font(.largeTitle).bold()
                             .foregroundStyle(Theme.primaryText)
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.68)
+                            .lineLimit(2)
+                            .minimumScaleFactor(0.72)
+                            .fixedSize(horizontal: false, vertical: true)
                             .frame(maxWidth: .infinity)
 
                         Color.clear
@@ -201,7 +218,7 @@ struct ChipsInputView: View {
                         .padding(.horizontal)
 
                     if onBack == nil {
-                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 96), spacing: 10)], spacing: 10) {
+                        LazyVGrid(columns: chipGridColumns, spacing: isWideLayout ? 12 : 10) {
                             ForEach(Self.denomValues, id: \.self) { value in
                                 ChipAdjustControl(
                                     label: denominationLabel(value),
@@ -220,6 +237,8 @@ struct ChipsInputView: View {
                             .id(ChipsFocusedInput.increaseAmount)
                     }
                 }
+                .frame(maxWidth: contentMaxWidth)
+                .frame(maxWidth: .infinity)
                 .padding(.bottom, 28)
             }
             .scrollDismissesKeyboard(.interactively)
@@ -248,6 +267,8 @@ struct ChipsInputView: View {
                 .padding(.horizontal)
                 .disabled(!canProceed)
             }
+            .frame(maxWidth: contentMaxWidth)
+            .frame(maxWidth: .infinity)
             .padding(.vertical, 8)
             .background(Theme.background.opacity(0.9))
         }
