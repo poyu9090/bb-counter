@@ -24,6 +24,9 @@
 "chips.adjustment_title" = "Record this chip change";
 "chips.adjustment_subtitle" = "Enter the increase or decrease amount. Your stack updates immediately.";
 "chips.after_adjustment" = "Stack after change";
+"chips.quick_adjust" = "Chip change";
+"chips.quick_adjust_reset" = "Undo";
+"action.save" = "Save";
 "chips.history.title" = "History";
 "chips.history.count" = "%d records";
 "chips.history.empty_short" = "No records";
@@ -71,14 +74,16 @@
 "all_in_range.development_message" = "We recorded your interest in this feature.";
 
 /* Hand Action Line */
-"hand.title" = "Hand notes";
+"hand.title" = "Action line records";
 "hand.entry_subtitle" = "Record action lines quickly and share them after the hand.";
-"hand.create" = "New hand";
-"hand.editor_title" = "Action line";
+"hand.create" = "New record";
+"hand.editor_title" = "Action line record";
 "hand.default_title" = "Hand #%d";
-"hand.empty_title" = "No hand notes yet";
-"hand.empty_body" = "Create a hand, tap position and action buttons, then share a clean action line.";
+"hand.empty_title" = "No action line records yet";
+"hand.empty_body" = "Create a record, tap actions in order, then share a clean action line.";
+"hand.title_label" = "Title";
 "hand.title_placeholder" = "Hand title";
+"hand.big_blind_only" = "BB";
 "hand.hero_cards" = "Hero cards";
 "hand.card_one" = "Card 1";
 "hand.card_two" = "Card 2";
@@ -88,7 +93,7 @@
 "hand.quick_action" = "Quick action";
 "hand.quick_action_subtitle" = "Recording %@ now. Finish this street before moving to the next step.";
 "hand.players" = "Players";
-"hand.table_center" = "Select position";
+"hand.table_center" = "Current position";
 "hand.step_locked" = "Complete board cards and actions for active players before moving to the next step.";
 "hand.no_active_players" = "No active players can act now.";
 "hand.board_required" = "Set the board cards before recording this street.";
@@ -102,13 +107,23 @@
 "hand.current_step_title" = "Current step: %@";
 "hand.timeline" = "Action line";
 "hand.timeline_empty" = "No actions yet. Add the first action above.";
+"hand.share_preview" = "Copy preview";
+"hand.street.preflop" = "Preflop";
+"hand.street.flop" = "Flop";
+"hand.street.turn" = "Turn";
+"hand.street.river" = "River";
+"hand.pot" = "Pot %@";
+"hand.pot_estimated" = "Pot ≈ %@";
+"hand.share.big_blind" = "BB: %@";
+"hand.share.hero" = "Hero: %@";
 "hand.note" = "Note";
 "hand.note_placeholder" = "Decision, read, or result";
+"hand.undo" = "Undo";
 "hand.copy" = "Copy";
 "hand.copied" = "Copied";
 "hand.share" = "Share";
 "hand.more" = "More";
-"hand.card_summary" = "%@ blinds · %d actions";
+"hand.card_summary" = "BB %@ · %d actions";
 "hand.delete_title" = "Delete this hand note?";
 "hand.delete_message" = "This hand note will be removed from local records.";
 

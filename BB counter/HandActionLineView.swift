@@ -228,8 +228,8 @@ private struct HandActionLineCard: View {
     }
 
     private var summaryText: String {
-        let blinds = record.bigBlind > 0 ? "\(record.smallBlind)/\(record.bigBlind)" : "--"
-        return String(format: NSLocalizedString("hand.card_summary", comment: ""), blinds, record.actionCount)
+        let bigBlind = record.bigBlind > 0 ? "\(record.bigBlind)" : "--"
+        return String(format: NSLocalizedString("hand.card_summary", comment: ""), bigBlind, record.actionCount)
     }
 
     private var previewText: String {
@@ -282,7 +282,7 @@ private struct HandActionLineEditor: View {
                     streetTabs
                     currentStreetSection
                     quickActionSection
-                    timelineSection
+                    sharePreviewSection
                     noteSection
                 }
                 .padding(16)
@@ -372,28 +372,21 @@ private struct HandActionLineEditor: View {
 
     private var handMetaSection: some View {
         VStack(alignment: .leading, spacing: 12) {
+            Text("hand.title_label")
+                .font(.caption.weight(.bold))
+                .foregroundStyle(Theme.secondaryText)
             TextField(NSLocalizedString("hand.title_placeholder", comment: ""), text: $draft.title)
                 .font(.title3.weight(.bold))
                 .foregroundStyle(Theme.primaryText)
                 .textInputAutocapitalization(.words)
+                .padding(12)
+                .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Theme.surface))
 
-            HStack(spacing: 10) {
-                HandEditableNumberField(
-                    titleKey: "blinds.small_blind",
-                    text: $smallBlindText,
-                    iconName: "s.circle.fill"
-                )
-                HandEditableNumberField(
-                    titleKey: "blinds.big_blind",
-                    text: $bigBlindText,
-                    iconName: "b.circle.fill"
-                )
-                HandEditableNumberField(
-                    titleKey: "result.chips",
-                    text: $chipsText,
-                    iconName: "square.stack.3d.up.fill"
-                )
-            }
+            HandEditableNumberField(
+                titleKey: "hand.big_blind_only",
+                text: $bigBlindText,
+                iconName: "b.circle.fill"
+            )
 
             heroCardPicker
         }
@@ -410,6 +403,8 @@ private struct HandActionLineEditor: View {
 
             HStack(spacing: 10) {
                 ForEach(0..<2, id: \.self) { index in
+                    // 卡牌以空白分隔存成字串，前一張還沒選就先填後一張會導致索引位移，因此鎖住。
+                    let isLocked = index > 0 && heroCard(at: index - 1) == nil
                     Button {
                         selectedHeroCardSlot = index
                     } label: {
@@ -424,6 +419,8 @@ private struct HandActionLineEditor: View {
                             )
                     }
                     .buttonStyle(.plain)
+                    .disabled(isLocked)
+                    .opacity(isLocked ? 0.45 : 1)
                 }
             }
 
@@ -544,6 +541,7 @@ private struct HandActionLineEditor: View {
 
             HStack(spacing: 10) {
                 ForEach(0..<requiredBoardCardCount, id: \.self) { index in
+                    let isLocked = index > 0 && boardCard(at: index - 1, for: selectedStreet) == nil
                     Button {
                         selectedBoardCardSlot = index
                     } label: {
@@ -558,6 +556,8 @@ private struct HandActionLineEditor: View {
                             )
                     }
                     .buttonStyle(.plain)
+                    .disabled(isLocked)
+                    .opacity(isLocked ? 0.45 : 1)
                 }
             }
 
@@ -600,19 +600,32 @@ private struct HandActionLineEditor: View {
 
     private var quickActionSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("hand.quick_action")
-                    .font(.headline.weight(.bold))
-                    .foregroundStyle(Theme.primaryText)
-                Text(String(format: NSLocalizedString("hand.quick_action_subtitle", comment: ""), selectedStreet.title))
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Theme.secondaryText)
+            HStack(alignment: .top, spacing: 10) {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("hand.quick_action")
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(Theme.primaryText)
+                    Text(String(format: NSLocalizedString("hand.quick_action_subtitle", comment: ""), selectedStreet.title))
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Theme.secondaryText)
+                }
+
+                Spacer(minLength: 0)
+
+                Text(potText)
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(Theme.chipGold)
+                    .lineLimit(1)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Capsule(style: .continuous).fill(Theme.surface))
+                    .accessibilityIdentifier("hand.pot")
             }
 
             playerCountControl
             PokerTablePositionPicker(
                 positions: currentActionPositions,
-                selectedPosition: $selectedPosition
+                selectedPosition: selectedPosition
             )
             .frame(height: 220)
 
@@ -638,6 +651,31 @@ private struct HandActionLineEditor: View {
                             .foregroundStyle(Theme.secondaryText)
                     }
                 }
+            }
+
+            if let lastAction = currentStreetActions.last {
+                HStack(spacing: 10) {
+                    Text(lastAction.displayText)
+                        .font(.caption.weight(.bold))
+                        .foregroundStyle(Theme.secondaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+
+                    Button {
+                        undoLastAction()
+                    } label: {
+                        Label("hand.undo", systemImage: "arrow.uturn.backward")
+                            .font(.caption.weight(.bold))
+                            .padding(.horizontal, 10)
+                            .frame(height: 38)
+                    }
+                    .buttonStyle(.bordered)
+                    .accessibilityIdentifier("hand.undo")
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 6)
+                .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Theme.surface))
             }
 
             if selectedStreet != .river {
@@ -668,49 +706,32 @@ private struct HandActionLineEditor: View {
         .overlay(RoundedRectangle(cornerRadius: 20, style: .continuous).stroke(Theme.surfaceStroke, lineWidth: 1))
     }
 
-    private var timelineSection: some View {
+    private var sharePreviewSection: some View {
         VStack(alignment: .leading, spacing: 14) {
-            Text("hand.timeline")
-                .font(.headline.weight(.bold))
-                .foregroundStyle(Theme.primaryText)
-
-            ForEach(HandStreet.allCases) { street in
-                if let streetRecord = draft.streets.first(where: { $0.street == street }),
-                   !streetRecord.actions.isEmpty || !streetRecord.boardText.isEmpty {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(streetRecord.boardText.isEmpty ? street.title : "\(street.title) \(streetRecord.boardText)")
-                            .font(.subheadline.weight(.bold))
-                            .foregroundStyle(Theme.accent)
-
-                        ForEach(streetRecord.actions) { action in
-                            HStack(spacing: 10) {
-                                Text(action.displayText)
-                                    .font(.subheadline.weight(.semibold))
-                                    .foregroundStyle(Theme.primaryText)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                Button(role: .destructive) {
-                                    removeAction(action.id, from: street)
-                                } label: {
-                                    Image(systemName: "xmark.circle.fill")
-                                        .foregroundStyle(Theme.secondaryText)
-                                }
-                                .buttonStyle(.plain)
-                            }
-                            .padding(10)
-                            .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.surface))
-                        }
-                    }
+            HStack {
+                Text("hand.share_preview")
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(Theme.primaryText)
+                Spacer()
+                Button {
+                    UIPasteboard.general.string = currentShareText
+                    copiedToastVisible = true
+                } label: {
+                    Label("hand.copy", systemImage: "doc.on.doc")
+                        .labelStyle(.iconOnly)
+                        .frame(width: 40, height: 40)
                 }
+                .buttonStyle(.bordered)
+                .accessibilityLabel(Text("hand.copy"))
             }
 
-            if draft.actionCount == 0 {
-                Text("hand.timeline_empty")
-                    .font(.subheadline)
-                    .foregroundStyle(Theme.secondaryText)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(12)
-                    .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Theme.surface))
-            }
+            Text(currentShareText.isEmpty ? NSLocalizedString("hand.timeline_empty", comment: "") : currentShareText)
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(Theme.primaryText.opacity(0.86))
+                .textSelection(.enabled)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(Theme.surface))
         }
         .padding(16)
         .background(RoundedRectangle(cornerRadius: 20, style: .continuous).fill(Theme.surfaceElevated))
@@ -799,31 +820,157 @@ private struct HandActionLineEditor: View {
         }
     }
 
+    /// 依德州撲克規則決定當前可選動作：
+    /// - Preflop 尚無人加注時，面對的是大盲注，所以只有 跟注 1bb / 開池 2~3.5bb / 蓋牌（BB 位本身則是過牌）。
+    /// - Preflop 面對加注時是 3-Bet / 4-Bet，尺寸以「上一個加注量的倍數」換算成 bb。
+    /// - Postflop 沒有人下注時不能跟注也不需要蓋牌，只能過牌或下注（底池比例）。
+    private var potSnapshot: HandPotSnapshot {
+        HandPotMath.snapshot(for: draft, through: selectedStreet)
+    }
+
+    private var potText: String {
+        let snapshot = potSnapshot
+        let key = snapshot.isEstimated ? "hand.pot_estimated" : "hand.pot"
+        return String(format: NSLocalizedString(key, comment: ""), HandPotMath.formatted(snapshot.potBB))
+    }
+
     private var contextualActionChoices: [HandActionChoice] {
+        let snapshot = potSnapshot
+
         if hasAllInAction {
+            // 對手全下的實際金額未知，這裡不硬掰數字。
             return [
                 HandActionChoice(title: "Call", subtitle: "", action: "Call", amount: "", tint: Theme.accent),
                 HandActionChoice(title: "Fold", subtitle: "", action: "Fold", amount: "", tint: Theme.healthRed)
             ]
         }
+
+        if selectedStreet == .preflop {
+            guard latestUnansweredAggressiveAction != nil else {
+                return unopenedPreflopChoices
+            }
+            return preflopRaiseChoices(snapshot: snapshot)
+        }
+
         if hasOutstandingBet {
+            return postflopRaiseChoices(snapshot: snapshot)
+        }
+
+        return postflopOpenChoices(snapshot: snapshot)
+    }
+
+    /// Postflop 無人下注：下注尺寸以目前底池換算成 bb 一併記下來。
+    private func postflopOpenChoices(snapshot: HandPotSnapshot) -> [HandActionChoice] {
+        let sizes: [(label: String, fraction: Double)] = [
+            ("1/3 pot", 1.0 / 3),
+            ("1/2 pot", 0.5),
+            ("2/3 pot", 2.0 / 3),
+            ("pot", 1)
+        ]
+        var choices: [HandActionChoice] = [
+            HandActionChoice(title: "Check", subtitle: "", action: "Check", amount: "", tint: Theme.healthGreen)
+        ]
+        choices += sizes.map { size in
+            let value = snapshot.potBB * size.fraction
+            return HandActionChoice(
+                title: "Bet",
+                subtitle: "\(size.label.replacingOccurrences(of: " pot", with: "")) · \(HandPotMath.formatted(value))",
+                action: "Bet",
+                amount: sizedAmount(value, label: size.label),
+                tint: Theme.accent
+            )
+        }
+        choices.append(HandActionChoice(title: "All-in", subtitle: "", action: "All-in", amount: "", tint: Theme.healthRed))
+        return choices
+    }
+
+    /// Postflop 面對下注：加注倍數同樣換算成「加到多少 bb」。
+    private func postflopRaiseChoices(snapshot: HandPotSnapshot) -> [HandActionChoice] {
+        let currentBet = snapshot.currentBetBB
+        var choices: [HandActionChoice] = [
+            HandActionChoice(title: "Fold", subtitle: "", action: "Fold", amount: "", tint: Theme.healthRed),
+            HandActionChoice(
+                title: "Call",
+                subtitle: HandPotMath.formatted(currentBet),
+                action: "Call",
+                amount: HandPotMath.formatted(currentBet),
+                tint: Theme.accent
+            )
+        ]
+        choices += [2.0, 3.0].map { multiplier in
+            let value = currentBet * multiplier
+            return HandActionChoice(
+                title: "Raise",
+                subtitle: "\(Int(multiplier))x · \(HandPotMath.formatted(value))",
+                action: "Raise",
+                amount: sizedAmount(value, label: "\(Int(multiplier))x"),
+                tint: Theme.healthOrange
+            )
+        }
+        choices.append(HandActionChoice(title: "All-in", subtitle: "", action: "All-in", amount: "", tint: Theme.healthRed))
+        return choices
+    }
+
+    private func sizedAmount(_ value: Double, label: String) -> String {
+        "\(HandPotMath.formatted(value)) (\(label))"
+    }
+
+    /// Preflop 無人加注：BB 位有選擇權（過牌），其餘位置面對 1bb 的大盲注。
+    private var unopenedPreflopChoices: [HandActionChoice] {
+        if selectedPosition == "BB" {
             return [
-                HandActionChoice(title: "Raise", subtitle: "2x", action: "Raise", amount: "2x", tint: Theme.healthOrange),
-                HandActionChoice(title: "Raise", subtitle: "3x", action: "Raise", amount: "3x", tint: Theme.healthOrange),
-                HandActionChoice(title: "Raise", subtitle: "4x", action: "Raise", amount: "4x", tint: Theme.healthOrange),
-                HandActionChoice(title: "Call", subtitle: "", action: "Call", amount: "", tint: Theme.accent),
-                HandActionChoice(title: "Fold", subtitle: "", action: "Fold", amount: "", tint: Theme.healthRed)
+                HandActionChoice(title: "Check", subtitle: "", action: "Check", amount: "", tint: Theme.healthGreen),
+                HandActionChoice(title: "Raise", subtitle: "3bb", action: "Raise", amount: "3bb", tint: Theme.healthOrange),
+                HandActionChoice(title: "Raise", subtitle: "4bb", action: "Raise", amount: "4bb", tint: Theme.healthOrange),
+                HandActionChoice(title: "Raise", subtitle: "5bb", action: "Raise", amount: "5bb", tint: Theme.healthOrange),
+                HandActionChoice(title: "All-in", subtitle: "", action: "All-in", amount: "", tint: Theme.healthRed)
             ]
         }
         return [
-            HandActionChoice(title: "Bet", subtitle: "1/3", action: "Bet", amount: "1/3 pot", tint: Theme.accent),
-            HandActionChoice(title: "Bet", subtitle: "1/2", action: "Bet", amount: "1/2 pot", tint: Theme.accent),
-            HandActionChoice(title: "Bet", subtitle: "2/3", action: "Bet", amount: "2/3 pot", tint: Theme.accent),
-            HandActionChoice(title: "All-in", subtitle: "", action: "All-in", amount: "", tint: Theme.healthRed),
-            HandActionChoice(title: "Check", subtitle: "", action: "Check", amount: "", tint: Theme.healthGreen),
-            HandActionChoice(title: "Fold", subtitle: "", action: "Fold", amount: "", tint: Theme.healthRed)
+            HandActionChoice(title: "Fold", subtitle: "", action: "Fold", amount: "", tint: Theme.healthRed),
+            HandActionChoice(title: "Limp", subtitle: "1bb", action: "Call", amount: "1bb", tint: Theme.accent),
+            HandActionChoice(title: "Open", subtitle: "2bb", action: "Open", amount: "2bb", tint: Theme.healthOrange),
+            HandActionChoice(title: "Open", subtitle: "2.5bb", action: "Open", amount: "2.5bb", tint: Theme.healthOrange),
+            HandActionChoice(title: "Open", subtitle: "3bb", action: "Open", amount: "3bb", tint: Theme.healthOrange),
+            HandActionChoice(title: "Open", subtitle: "3.5bb", action: "Open", amount: "3.5bb", tint: Theme.healthOrange)
         ]
     }
+
+    /// Preflop 面對加注：3-Bet / 4-Bet，尺寸由目前最大注額換算成 bb。
+    private func preflopRaiseChoices(snapshot: HandPotSnapshot) -> [HandActionChoice] {
+        let title = preflopRaiseTitle
+        let base = snapshot.currentBetBB > 0 ? snapshot.currentBetBB : 3
+        var choices: [HandActionChoice] = [
+            HandActionChoice(title: "Fold", subtitle: "", action: "Fold", amount: "", tint: Theme.healthRed),
+            HandActionChoice(
+                title: "Call",
+                subtitle: HandPotMath.formatted(base),
+                action: "Call",
+                amount: HandPotMath.formatted(base),
+                tint: Theme.accent
+            )
+        ]
+        choices += [2.5, 3, 4].map { multiplier in
+            let size = HandPotMath.formatted(base * multiplier)
+            return HandActionChoice(title: title, subtitle: size, action: title, amount: size, tint: Theme.healthOrange)
+        }
+        choices.append(HandActionChoice(title: "All-in", subtitle: "", action: "All-in", amount: "", tint: Theme.healthRed))
+        return choices
+    }
+
+    /// Preflop 第 1 個加注是 Open，之後依序為 3-Bet、4-Bet、5-Bet。
+    private var preflopRaiseTitle: String {
+        let aggressiveCount = currentStreetActions.filter { isAggressiveAction($0.action) }.count
+        switch aggressiveCount {
+        case 0, 1:
+            return "3-Bet"
+        case 2:
+            return "4-Bet"
+        default:
+            return "5-Bet"
+        }
+    }
+
 
     private var hasAllInAction: Bool {
         latestUnansweredAggressiveAction?.action == "All-in"
@@ -1001,7 +1148,7 @@ private struct HandActionLineEditor: View {
     }
 
     private func isAggressiveAction(_ action: String) -> Bool {
-        ["Bet", "Raise", "All-in"].contains(action)
+        ["Open", "Bet", "Raise", "3-Bet", "4-Bet", "5-Bet", "All-in"].contains(action)
     }
 
     private func pendingActionPositions() -> [String] {
@@ -1196,10 +1343,15 @@ private struct HandActionLineEditor: View {
         selectedPosition = positions[(index + 1) % positions.count]
     }
 
-    private func removeAction(_ actionID: UUID, from street: HandStreet) {
-        guard let index = draft.streets.firstIndex(where: { $0.street == street }) else { return }
-        draft.streets[index].actions.removeAll { $0.id == actionID }
+    /// 位置圓桌是唯讀的，所以按錯時用「上一步」回退，回退後把游標移回該位置。
+    private func undoLastAction() {
+        guard let index = draft.streets.firstIndex(where: { $0.street == selectedStreet }),
+              let removed = draft.streets[index].actions.last else {
+            return
+        }
+        draft.streets[index].actions.removeLast()
         draft.updatedAt = Date()
+        selectedPosition = removed.position
     }
 
     private func saveAndDismiss() {
@@ -1213,11 +1365,11 @@ private struct HandActionLineEditor: View {
         let sb = numericValue(from: smallBlindText)
         let bb = numericValue(from: bigBlindText)
         let chips = numericValue(from: chipsText)
-        if sb > 0 {
-            record.smallBlind = sb
-        }
         if bb > 0 {
             record.bigBlind = bb
+            record.smallBlind = sb > 0 ? sb : max(1, bb / 2)
+        } else if sb > 0 {
+            record.smallBlind = sb
         }
         if chips > 0 {
             record.chips = chips
@@ -1259,7 +1411,7 @@ private struct HandActionChoice: Identifiable {
 
 private struct PokerTablePositionPicker: View {
     let positions: [String]
-    @Binding var selectedPosition: String
+    let selectedPosition: String
 
     var body: some View {
         GeometryReader { proxy in
@@ -1287,13 +1439,10 @@ private struct PokerTablePositionPicker: View {
                 .background(Capsule(style: .continuous).fill(Theme.background.opacity(0.52)))
 
                 ForEach(Array(positions.enumerated()), id: \.offset) { index, position in
-                    Button {
-                        selectedPosition = position
-                    } label: {
-                        Text(position)
-                            .font(.caption.weight(.black))
-                            .lineLimit(1)
-                            .minimumScaleFactor(0.55)
+                    Text(position)
+                        .font(.caption.weight(.black))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.55)
                         .foregroundStyle(selectedPosition == position ? Color.white : Theme.primaryText)
                         .frame(width: seatSize(for: positions.count), height: seatSize(for: positions.count))
                         .background(
@@ -1305,9 +1454,8 @@ private struct PokerTablePositionPicker: View {
                                 .stroke(selectedPosition == position ? Theme.chipGold : Theme.surfaceStroke.opacity(0.9), lineWidth: selectedPosition == position ? 2 : 1.5)
                         )
                         .shadow(color: selectedPosition == position ? Theme.accent.opacity(0.32) : .clear, radius: 12, x: 0, y: 5)
-                    }
-                    .buttonStyle(.plain)
-                    .position(seatPosition(index: index, count: positions.count, in: size))
+                        .position(seatPosition(index: index, count: positions.count, in: size))
+                        .accessibilityLabel(Text(position == selectedPosition ? "\(position), current" : position))
                 }
             }
         }

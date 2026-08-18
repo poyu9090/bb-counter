@@ -24,6 +24,9 @@
 "chips.adjustment_title" = "記錄本次籌碼變化";
 "chips.adjustment_subtitle" = "輸入增加或減少數量，上方籌碼會即時更新。";
 "chips.after_adjustment" = "變更後籌碼";
+"chips.quick_adjust" = "籌碼變化";
+"chips.quick_adjust_reset" = "還原";
+"action.save" = "儲存";
 "chips.history.title" = "變更紀錄";
 "chips.history.count" = "%d 筆紀錄";
 "chips.history.empty_short" = "尚無紀錄";
@@ -71,14 +74,16 @@
 "all_in_range.development_message" = "我們已記錄你對此功能有興趣。";
 
 /* 手牌行動線 */
-"hand.title" = "手牌速記";
+"hand.title" = "行動線記錄";
 "hand.entry_subtitle" = "快速記錄行動線，牌局後一鍵分享。";
-"hand.create" = "新增手牌";
-"hand.editor_title" = "行動線";
+"hand.create" = "新增紀錄";
+"hand.editor_title" = "行動線記錄";
 "hand.default_title" = "Hand #%d";
-"hand.empty_title" = "尚無手牌紀錄";
-"hand.empty_body" = "新增一手牌，點位置與動作按鈕，就能整理成可分享的行動線。";
+"hand.empty_title" = "尚無行動線記錄";
+"hand.empty_body" = "新增一筆記錄，依序點選動作，就能整理成可分享的行動線。";
+"hand.title_label" = "標題";
 "hand.title_placeholder" = "手牌標題";
+"hand.big_blind_only" = "BB";
 "hand.hero_cards" = "自己的手牌";
 "hand.card_one" = "第 1 張";
 "hand.card_two" = "第 2 張";
@@ -88,7 +93,7 @@
 "hand.quick_action" = "快速行動";
 "hand.quick_action_subtitle" = "目前正在記錄 %@，先填完這一街再前往下一步。";
 "hand.players" = "人數";
-"hand.table_center" = "選擇位置";
+"hand.table_center" = "目前位置";
 "hand.step_locked" = "請先完成公共牌與目前仍可行動玩家的動作，才能前往下一步。";
 "hand.no_active_players" = "目前沒有可行動玩家。";
 "hand.board_required" = "請先設定公共牌，再記錄本街行動。";
@@ -102,13 +107,23 @@
 "hand.current_step_title" = "目前步驟：%@";
 "hand.timeline" = "行動線";
 "hand.timeline_empty" = "尚未記錄行動，先從上方加入第一筆。";
+"hand.share_preview" = "複製文案預覽";
+"hand.street.preflop" = "翻牌前";
+"hand.street.flop" = "翻牌";
+"hand.street.turn" = "轉牌";
+"hand.street.river" = "河牌";
+"hand.pot" = "底池 %@";
+"hand.pot_estimated" = "底池 ≈ %@";
+"hand.share.big_blind" = "大盲：%@";
+"hand.share.hero" = "手牌：%@";
 "hand.note" = "備註";
 "hand.note_placeholder" = "決策點、讀牌或結果";
+"hand.undo" = "上一步";
 "hand.copy" = "複製";
 "hand.copied" = "已複製";
 "hand.share" = "分享";
 "hand.more" = "更多";
-"hand.card_summary" = "%@ 盲注 · %d 筆行動";
+"hand.card_summary" = "BB %@ · %d 筆行動";
 "hand.delete_title" = "刪除此手牌紀錄？";
 "hand.delete_message" = "這筆手牌會從本機紀錄中移除。";
 

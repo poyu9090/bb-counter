@@ -42,17 +42,11 @@ struct HandActionLineRecord: Identifiable, Codable, Equatable {
     var shareText: String {
         var lines: [String] = []
         lines.append(displayTitle)
-        if smallBlind > 0, bigBlind > 0 {
-            lines.append("Blinds: \(smallBlind) / \(bigBlind)")
-        }
-        if chips > 0 {
-            lines.append("Chips: \(chips)")
-        }
-        if stackBB > 0 {
-            lines.append("Stack: \(formattedBB(stackBB)) BB")
+        if bigBlind > 0 {
+            lines.append(String(format: NSLocalizedString("hand.share.big_blind", comment: ""), "\(bigBlind)"))
         }
         if !heroCards.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            lines.append("Hero: \(heroCards)")
+            lines.append(String(format: NSLocalizedString("hand.share.hero", comment: ""), heroCards))
         }
         lines.append("")
 
@@ -68,7 +62,7 @@ struct HandActionLineRecord: Identifiable, Codable, Equatable {
 
         let trimmedNote = note.trimmingCharacters(in: .whitespacesAndNewlines)
         if !trimmedNote.isEmpty {
-            lines.append("Note")
+            lines.append(NSLocalizedString("hand.note", comment: ""))
             lines.append(trimmedNote)
         }
 
@@ -173,17 +167,132 @@ enum HandStreet: String, CaseIterable, Codable, Identifiable {
 
     var id: String { rawValue }
 
+    /// 街名跟隨 App 語系；位置與動作（UTG、Open、3-Bet…）維持英文，那是牌局筆記的通用寫法。
     var title: String {
-        switch self {
-        case .preflop:
-            return "Preflop"
-        case .flop:
-            return "Flop"
-        case .turn:
-            return "Turn"
-        case .river:
-            return "River"
+        NSLocalizedString("hand.street.\(rawValue)", comment: "")
+    }
+}
+
+/// 依已記錄的動作推算底池與待跟注額（單位：bb）。
+/// 盲注視為 SB 0.5bb、BB 1bb；All-in 以手牌建立時的籌碼深度估算，估算過的結果會標記 `isEstimated`。
+struct HandPotSnapshot: Equatable {
+    var potBB: Double
+    var currentBetBB: Double
+    var contributed: [String: Double]
+    var isEstimated: Bool
+
+    func toCall(for position: String) -> Double {
+        max(0, currentBetBB - (contributed[position] ?? 0))
+    }
+}
+
+enum HandPotMath {
+    static func snapshot(for record: HandActionLineRecord, through street: HandStreet) -> HandPotSnapshot {
+        guard let targetIndex = HandStreet.allCases.firstIndex(of: street) else {
+            return HandPotSnapshot(potBB: 0, currentBetBB: 0, contributed: [:], isEstimated: false)
         }
+
+        var pot: Double = 0
+        var currentBet: Double = 0
+        var contributed: [String: Double] = [:]
+        var isEstimated = false
+        let allInSize = record.stackBB > 0 ? record.stackBB : 100
+
+        for streetCase in HandStreet.allCases.prefix(targetIndex + 1) {
+            if streetCase == .preflop {
+                contributed = ["SB": 0.5, "BB": 1]
+                currentBet = 1
+                pot = 1.5
+            } else {
+                contributed = [:]
+                currentBet = 0
+            }
+
+            let actions = record.streets.first(where: { $0.street == streetCase })?.actions ?? []
+            for action in actions {
+                let already = contributed[action.position] ?? 0
+                guard let target = targetBet(
+                    for: action,
+                    currentBet: currentBet,
+                    pot: pot,
+                    allInSize: allInSize,
+                    isEstimated: &isEstimated
+                ) else {
+                    continue
+                }
+                let delta = max(0, target - already)
+                pot += delta
+                contributed[action.position] = max(already, target)
+                currentBet = max(currentBet, target)
+            }
+        }
+
+        return HandPotSnapshot(potBB: pot, currentBetBB: currentBet, contributed: contributed, isEstimated: isEstimated)
+    }
+
+    /// 回傳這個動作把該玩家本街的投入「加到多少」，nil 代表不用進池（Check / Fold）。
+    private static func targetBet(
+        for action: HandActionRecord,
+        currentBet: Double,
+        pot: Double,
+        allInSize: Double,
+        isEstimated: inout Bool
+    ) -> Double? {
+        switch action.action {
+        case "Check", "Fold":
+            return nil
+        case "All-in":
+            isEstimated = true
+            return max(currentBet, allInSize)
+        case "Call":
+            if let explicit = bbValue(from: action.amount) {
+                return max(currentBet, explicit)
+            }
+            return currentBet
+        default:
+            if let explicit = bbValue(from: action.amount) {
+                return explicit
+            }
+            if let fraction = potFraction(from: action.amount) {
+                return currentBet + fraction * pot
+            }
+            if let multiplier = multiplier(from: action.amount) {
+                return multiplier * currentBet
+            }
+            return currentBet
+        }
+    }
+
+    /// "4.5bb"、"4.5bb (1/2 pot)" → 4.5
+    static func bbValue(from amount: String) -> Double? {
+        guard let range = amount.range(of: "bb") else { return nil }
+        let digits = amount[..<range.lowerBound].filter { $0.isNumber || $0 == "." }
+        return Double(digits)
+    }
+
+    /// "1/2 pot" → 0.5、"pot" → 1
+    static func potFraction(from amount: String) -> Double? {
+        guard amount.contains("pot") else { return nil }
+        let parts = amount.split(separator: " ").first.map(String.init) ?? ""
+        guard parts.contains("/") else { return amount.hasPrefix("pot") ? 1 : nil }
+        let numbers = parts.split(separator: "/").compactMap { Double($0) }
+        guard numbers.count == 2, numbers[1] != 0 else { return nil }
+        return numbers[0] / numbers[1]
+    }
+
+    /// "2x" → 2
+    static func multiplier(from amount: String) -> Double? {
+        guard amount.hasSuffix("x") else { return nil }
+        return Double(amount.dropLast())
+    }
+
+    /// 以 0.5bb 為單位取整後輸出，例如 "4.5bb"、"9bb"。
+    static func formatted(_ value: Double) -> String {
+        let rounded = (value * 2).rounded() / 2
+        if rounded == rounded.rounded() {
+            return "\(Int(rounded))bb"
+        }
+        return String(format: "%.1fbb", rounded)
     }
 }
 
