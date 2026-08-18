@@ -23,6 +23,7 @@ struct TimerConfigSheet: View {
 	@AppStorage("customBlindCurrentIndex") private var customBlindCurrentIndexStored: Int = 0
 	@AppStorage("customBlindStructures") private var customBlindStructuresStored: String = ""
 	@AppStorage("selectedCustomBlindStructureID") private var selectedCustomBlindStructureID: String = ""
+	@AppStorage("selectedTimerBlindSchemeID") private var selectedTimerBlindSchemeID: String = TimerBlindScheme.defaultID
 	@State private var customStructures: [BlindStructure] = []
 
 	private func loadCustomStructures() {
@@ -41,6 +42,32 @@ struct TimerConfigSheet: View {
 		}
 	}
 
+	private func restoreSelectedScheme() {
+		let schemes = availableSchemes()
+		if let index = schemes.firstIndex(where: { $0.id == selectedTimerBlindSchemeID }) {
+			selectedScheme = index
+			return
+		}
+		if selectedTimerBlindSchemeID != TimerBlindScheme.defaultID,
+		   let customIndex = schemes.firstIndex(where: { $0.customStructure?.id == selectedCustomBlindStructureID }) {
+			selectedScheme = customIndex
+			selectedTimerBlindSchemeID = schemes[customIndex].id
+			return
+		}
+		selectedScheme = 0
+		selectedTimerBlindSchemeID = TimerBlindScheme.defaultID
+	}
+
+	private func selectScheme(at index: Int) {
+		let schemes = availableSchemes()
+		guard schemes.indices.contains(index) else { return }
+		selectedScheme = index
+		selectedTimerBlindSchemeID = schemes[index].id
+		if let customID = schemes[index].customStructure?.id {
+			selectedCustomBlindStructureID = customID
+		}
+	}
+
 	private func saveCustomStructure(_ structure: BlindStructure, currentIndex: Int?) {
 		if let existing = customStructures.firstIndex(where: { $0.id == structure.id }) {
 			customStructures[existing] = structure
@@ -52,15 +79,20 @@ struct TimerConfigSheet: View {
 		customBlindStructuresStored = BlindStructureCodec.encodeStructures(customStructures)
 		customBlindStructureStored = BlindStructureCodec.encodeLevels(structure.levels)
 		selectedScheme = idxForCustomStructure(id: structure.id)
+		selectedTimerBlindSchemeID = structure.id
 	}
 
 	private func deleteSelectedCustomStructure() {
 		guard !selectedCustomBlindStructureID.isEmpty else { return }
+		let deletedID = selectedCustomBlindStructureID
 		customStructures.removeAll { $0.id == selectedCustomBlindStructureID }
 		selectedCustomBlindStructureID = customStructures.first?.id ?? ""
 		customBlindStructuresStored = BlindStructureCodec.encodeStructures(customStructures)
 		customBlindStructureStored = customStructures.first.map { BlindStructureCodec.encodeLevels($0.levels) } ?? ""
-		selectedScheme = selectedCustomBlindStructureID.isEmpty ? 0 : idxForCustomStructure(id: selectedCustomBlindStructureID)
+		if selectedTimerBlindSchemeID == deletedID {
+			selectedTimerBlindSchemeID = selectedCustomBlindStructureID.isEmpty ? TimerBlindScheme.defaultID : selectedCustomBlindStructureID
+		}
+		restoreSelectedScheme()
 	}
 
 	var body: some View {
@@ -202,7 +234,7 @@ struct TimerConfigSheet: View {
 							ForEach(Array(availableSchemes().enumerated()), id: \.offset) { (idx, scheme) in
 								VStack(alignment: .leading, spacing: 12) {
 									Button {
-										selectedScheme = idx
+										selectScheme(at: idx)
 									} label: {
 										VStack(alignment: .leading, spacing: 10) {
 											HStack(spacing: 8) {
@@ -253,6 +285,7 @@ struct TimerConfigSheet: View {
 														ForEach(customStructures) { structure in
 															Button(structure.name) {
 																selectedCustomBlindStructureID = structure.id
+																selectedTimerBlindSchemeID = structure.id
 																selectedScheme = idxForCustomStructure(id: structure.id)
 															}
 														}
@@ -318,6 +351,7 @@ struct TimerConfigSheet: View {
 			if selectedScheme >= schemes.count {
 				selectedScheme = 0
 			}
+			restoreSelectedScheme()
 		}
 		.sheet(isPresented: $showBlindStructureDetail) {
 			BlindStructureDetailView(
@@ -361,6 +395,10 @@ struct TimerConfigSheet: View {
 						}
 						let safeIndex = min(selectedScheme, schemes.count - 1)
 						let scheme = schemes[safeIndex]
+						selectedTimerBlindSchemeID = scheme.id
+						if let customID = scheme.customStructure?.id {
+							selectedCustomBlindStructureID = customID
+						}
 						let indices = scheme.indices
 						selectedIndicesSet = Set(indices)
 						let customProg = scheme.customLevels
@@ -458,12 +496,30 @@ struct TimerConfigSheet: View {
 			let start = base + 1
 			let end = total - 1
 			let allUpcoming: [Int] = start <= end && start < total ? Array(start...end) : []
-			schemes.append(TimerBlindScheme(title: NSLocalizedString("timer.scheme_one", comment: ""), indices: allUpcoming, displayText: textFor(allUpcoming, prog: progression), customLevels: nil, customStructure: nil))
+			schemes.append(
+				TimerBlindScheme(
+					id: TimerBlindScheme.defaultID,
+					title: NSLocalizedString("timer.scheme_one", comment: ""),
+					indices: allUpcoming,
+					displayText: textFor(allUpcoming, prog: progression),
+					customLevels: nil,
+					customStructure: nil
+				)
+			)
 		}
 		for structure in customStructures {
 			let levels = structure.levels.map { ($0.sb, $0.bb) }
 			let customIndices = Array(0..<levels.count)
-			schemes.append(TimerBlindScheme(title: structure.name, indices: customIndices, displayText: textFor(customIndices, prog: levels), customLevels: levels, customStructure: structure))
+			schemes.append(
+				TimerBlindScheme(
+					id: structure.id,
+					title: structure.name,
+					indices: customIndices,
+					displayText: textFor(customIndices, prog: levels),
+					customLevels: levels,
+					customStructure: structure
+				)
+			)
 		}
 		return schemes
 	}
@@ -505,6 +561,9 @@ private enum TimerInputField: Hashable {
 }
 
 private struct TimerBlindScheme {
+	static let defaultID = "default"
+
+	let id: String
 	let title: String
 	let indices: [Int]
 	let displayText: String
