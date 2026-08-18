@@ -81,6 +81,19 @@ struct ContentView: View {
             if bigBlindStored > 0 && bigBlindText.isEmpty {
                 bigBlindText = String(bigBlindStored)
             }
+            restoreResultStepIfDataIsComplete()
+        }
+    }
+
+    /// 已經有籌碼與盲注的老用戶重開 App 應該直接回到儀表板，不用再點過籌碼、盲注兩頁。
+    private func restoreResultStepIfDataIsComplete() {
+        guard hasCompletedOnboarding, chipsStored > 0, bigBlindStored > 0, step == .chips else { return }
+        var transaction = Transaction()
+        transaction.disablesAnimations = true
+        withTransaction(transaction) {
+            // 這是還原、不是剛設定完盲注，所以不要套用「初次進入結果頁」的計時器預設。
+            skipApplyFreshTimerDefaultsOnNextResult = true
+            step = .result
         }
     }
 
@@ -156,9 +169,21 @@ struct ContentView: View {
             chipChangeRecords: chipChangeRecords,
             onClearChipHistory: clearChipChangeRecords,
             onEditChips: startEditingChips,
+            onApplyChipChange: applyChipChange,
             onEditBlinds: startEditingBlinds,
             onReset: resetAll
         )
+    }
+
+    /// 結果頁上的快捷籌碼調整：直接寫回籌碼並留下一筆變化紀錄，不用跳去籌碼頁。
+    private func applyChipChange(_ newChips: Int) {
+        let previousChips = chipsStored
+        guard newChips >= 0, newChips != previousChips else { return }
+        chipsStored = newChips
+        chipsText = String(newChips)
+        if previousChips > 0 {
+            appendChipChangeRecord(previousChips: previousChips, newChips: newChips)
+        }
     }
 
     private func commitChipsStep() {

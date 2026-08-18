@@ -10,9 +10,10 @@ struct ResultView: View {
 	let chipChangeRecords: [ChipChangeRecord]
 	let onClearChipHistory: () -> Void
     let onEditChips: () -> Void
+    let onApplyChipChange: (Int) -> Void
     let onEditBlinds: () -> Void
     let onReset: () -> Void
-	
+
 	// Explicit initializer to avoid private memberwise init exposure issues
 	init(
 		chips: Int,
@@ -24,6 +25,7 @@ struct ResultView: View {
 		chipChangeRecords: [ChipChangeRecord],
 		onClearChipHistory: @escaping () -> Void,
 		onEditChips: @escaping () -> Void,
+		onApplyChipChange: @escaping (Int) -> Void,
 		onEditBlinds: @escaping () -> Void,
 		onReset: @escaping () -> Void
 	) {
@@ -36,6 +38,7 @@ struct ResultView: View {
 		self.chipChangeRecords = chipChangeRecords
 		self.onClearChipHistory = onClearChipHistory
 		self.onEditChips = onEditChips
+		self.onApplyChipChange = onApplyChipChange
 		self.onEditBlinds = onEditBlinds
 		self.onReset = onReset
 	}
@@ -88,6 +91,7 @@ struct ResultView: View {
 	@State private var showTimerSheet: Bool = false
 	@State private var showResetConfirmation: Bool = false
 	@State private var showChipHistory: Bool = false
+	@State private var showChipQuickAdjust: Bool = false
 	@State private var showHandActionLines: Bool = false
 	@State private var showAllInDevelopmentAlert: Bool = false
 	@State private var hasTrackedAllInPromptImpression: Bool = false
@@ -118,16 +122,22 @@ struct ResultView: View {
 		ScrollView(.vertical, showsIndicators: false) {
 			VStack(spacing: 16) {
 				stackHero
+				ChipQuickAdjustBar(
+					chipsValueText: formattedChips(chips),
+					bbValueText: "\(formattedBB(bbCount)) BB",
+					onQuickAdjust: { showChipQuickAdjust = true },
+					onEditChips: onEditChips
+				)
 				if shouldShowAllInRangePrompt {
 					allInRangePrompt
 				}
 				HStack(spacing: 12) {
 					DashboardMetricButton(
-						titleKey: "result.chips",
-						valueText: formattedChips(chips),
-						iconName: "square.stack.3d.up.fill",
-						accent: Theme.chipGold,
-						action: onEditChips
+						titleKey: "result.blinds",
+						valueText: blindText,
+						iconName: "rectangle.split.2x1.fill",
+						accent: Theme.accent,
+						action: onEditBlinds
 					)
 					ChipHistoryButton(
 						recordCount: chipChangeRecords.count,
@@ -135,15 +145,8 @@ struct ResultView: View {
 						action: { showChipHistory = true }
 					)
 				}
-				DashboardMetricButton(
-					titleKey: "result.blinds",
-					valueText: blindText,
-					iconName: "rectangle.split.2x1.fill",
-					accent: Theme.accent,
-					action: onEditBlinds
-				)
-				handActionLineButton
 				timerDashboard
+				handActionLineButton
 				if let liveActivityStatusKey {
 					HStack(spacing: 10) {
 						Image(systemName: "exclamationmark.triangle.fill")
@@ -221,18 +224,21 @@ struct ResultView: View {
 					.accessibilityLabel(Text("action.reset"))
 					.accessibilityIdentifier("result.reset")
 
-					Button(action: onEditChips) {
+					Button {
+						showChipQuickAdjust = true
+					} label: {
 						HStack(spacing: 8) {
-							Image(systemName: "square.stack.3d.up.fill")
+							Image(systemName: "plusminus.circle.fill")
 								.imageScale(.medium)
-							Text("action.edit_chips")
+							Text("chips.quick_adjust")
 								.lineLimit(1)
 								.minimumScaleFactor(0.62)
 						}
 							.frame(maxWidth: .infinity)
 							.padding(.vertical, 13)
 					}
-					.buttonStyle(.bordered)
+					.buttonStyle(.borderedProminent)
+					.accessibilityIdentifier("chips.quickAdjust.bottom")
 					
 					Button(action: onEditBlinds) {
 						HStack(spacing: 8) {
@@ -298,6 +304,16 @@ struct ResultView: View {
 			)
 			.presentationDetents([.medium])
 			.presentationDragIndicator(.visible)
+		}
+		.sheet(isPresented: $showChipQuickAdjust) {
+			ChipQuickAdjustSheet(
+				currentChips: chips,
+				onApply: onApplyChipChange
+			)
+			.presentationDetents([.medium, .large])
+			.presentationDragIndicator(.visible)
+			.tint(Theme.accent)
+			.preferredColorScheme(.dark)
 		}
 		.sheet(isPresented: $showChipHistory) {
 			ChipChangeHistorySheet(

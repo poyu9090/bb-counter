@@ -72,6 +72,284 @@ struct DashboardMetricButton: View {
     }
 }
 
+/// 結果頁最常用的操作：贏一手、輸一手後直接改籌碼，所以放在 BB 深度下方第一排。
+struct ChipQuickAdjustBar: View {
+    let chipsValueText: String
+    let bbValueText: String
+    let onQuickAdjust: () -> Void
+    let onEditChips: () -> Void
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Button(action: onEditChips) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Text("result.chips")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(Theme.secondaryText)
+                        Image(systemName: "pencil")
+                            .font(.caption2.weight(.bold))
+                            .foregroundStyle(Theme.secondaryText)
+                    }
+                    Text(chipsValueText)
+                        .font(.title2.weight(.black))
+                        .foregroundStyle(Theme.primaryText)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.6)
+                    Text(bbValueText)
+                        .font(.caption2.weight(.semibold))
+                        .foregroundStyle(Theme.secondaryText)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("chips.edit.open")
+
+            Button(action: onQuickAdjust) {
+                Image(systemName: "plusminus")
+                    .font(.title2.weight(.black))
+                    .foregroundStyle(Color.white)
+                    .frame(width: 56, height: 56)
+                    .background(
+                        Circle()
+                            .fill(Theme.accent)
+                            .shadow(color: Theme.accent.opacity(0.3), radius: 14, x: 0, y: 8)
+                    )
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(Text("chips.quick_adjust"))
+            .accessibilityIdentifier("chips.quickAdjust.open")
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Theme.surfaceElevated)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Theme.surfaceStroke, lineWidth: 1)
+        )
+    }
+}
+
+/// 沿用原本籌碼頁的做法：自行輸入這手要「增加」或「減少」多少籌碼，
+/// 只是改成結果頁上的 sheet，不用整頁跳走。確認後才寫回並留下一筆變化紀錄。
+struct ChipQuickAdjustSheet: View {
+    let currentChips: Int
+    let onApply: (Int) -> Void
+
+    @Environment(\.dismiss) private var dismiss
+    @State private var increaseText: String = ""
+    @State private var decreaseText: String = ""
+    @FocusState private var focusedField: Field?
+
+    private enum Field: Hashable {
+        case increase
+        case decrease
+    }
+
+    private static let maxChipValue: Int = 999_999_999
+
+    private var increaseValue: Int {
+        Int(increaseText) ?? 0
+    }
+
+    private var decreaseValue: Int {
+        Int(decreaseText) ?? 0
+    }
+
+    private var draftChips: Int {
+        min(Self.maxChipValue, max(0, currentChips + increaseValue - decreaseValue))
+    }
+
+    private var delta: Int {
+        draftChips - currentChips
+    }
+
+    private var deltaColor: Color {
+        if delta == 0 { return Theme.secondaryText }
+        return delta > 0 ? Theme.healthGreen : Theme.healthRed
+    }
+
+    var body: some View {
+        NavigationStack {
+            ScrollView(.vertical, showsIndicators: false) {
+                VStack(spacing: 18) {
+                    summaryCard
+                    amountFields
+                }
+                .padding(16)
+                .padding(.bottom, 90)
+            }
+            .background(Theme.background.ignoresSafeArea())
+            .scrollDismissesKeyboard(.interactively)
+            .navigationTitle(Text("chips.quick_adjust"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("action.cancel") {
+                        dismiss()
+                    }
+                }
+            }
+            .onAppear {
+                focusedField = .increase
+            }
+            .keyboardAwareBottomBar {
+                Button {
+                    onApply(draftChips)
+                    dismiss()
+                } label: {
+                    Text("action.save")
+                        .font(.headline.weight(.bold))
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                }
+                .buttonStyle(.borderedProminent)
+                .disabled(delta == 0)
+                .accessibilityIdentifier("chips.quickAdjust.save")
+                .padding(.horizontal, 16)
+                .padding(.vertical, 10)
+                .background(.ultraThinMaterial)
+                .background(Theme.background.opacity(0.78))
+            }
+        }
+        .keyboardConfirmationToolbar()
+    }
+
+    private var summaryCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("chips.after_adjustment")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(Theme.secondaryText)
+
+            Text(formattedChips(draftChips))
+                .font(.system(size: 44, weight: .black, design: .rounded))
+                .foregroundStyle(Theme.primaryText)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
+
+            HStack(spacing: 8) {
+                Text(signedChips(delta))
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(deltaColor)
+                Text("\(formattedChips(currentChips)) →")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(Theme.secondaryText)
+                Spacer(minLength: 0)
+                Button {
+                    increaseText = ""
+                    decreaseText = ""
+                    focusedField = .increase
+                } label: {
+                    Label("chips.quick_adjust_reset", systemImage: "arrow.counterclockwise")
+                        .font(.caption.weight(.bold))
+                }
+                .buttonStyle(.bordered)
+                .disabled(delta == 0)
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Theme.surfaceElevated)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Theme.surfaceStroke, lineWidth: 1)
+        )
+    }
+
+    private var amountFields: some View {
+        VStack(spacing: 10) {
+            amountField(
+                titleKey: "chips.increase_amount",
+                field: .increase,
+                text: $increaseText,
+                iconName: "plus",
+                tint: Theme.healthGreen,
+                accessibilityIdentifier: "chips.quickAdjust.increase"
+            )
+            amountField(
+                titleKey: "chips.decrease_amount",
+                field: .decrease,
+                text: $decreaseText,
+                iconName: "minus",
+                tint: Theme.healthRed,
+                accessibilityIdentifier: "chips.quickAdjust.decrease"
+            )
+        }
+        .padding(16)
+        .background(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .fill(Theme.surfaceElevated)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(Theme.surfaceStroke, lineWidth: 1)
+        )
+    }
+
+    private func amountField(
+        titleKey: String,
+        field: Field,
+        text: Binding<String>,
+        iconName: String,
+        tint: Color,
+        accessibilityIdentifier: String
+    ) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: iconName)
+                .font(.headline.weight(.bold))
+                .foregroundStyle(tint)
+                .frame(width: 38, height: 38)
+                .background(Circle().fill(tint.opacity(0.16)))
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text(LocalizedStringKey(titleKey))
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(Theme.primaryText)
+
+                TextField(LocalizedStringKey("chips.custom_amount_placeholder"), text: Binding(
+                    get: { text.wrappedValue },
+                    set: { text.wrappedValue = $0.filter { $0.isNumber } }
+                ))
+                .keyboardType(.numberPad)
+                .focused($focusedField, equals: field)
+                .textFieldStyle(.plain)
+                .font(.title3.weight(.bold).monospacedDigit())
+                .foregroundStyle(Theme.primaryText)
+                .frame(minHeight: 30)
+                .accessibilityIdentifier(accessibilityIdentifier)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(12)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Theme.background.opacity(0.55))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(focusedField == field ? tint.opacity(0.7) : Theme.surfaceStroke, lineWidth: 1)
+        )
+    }
+
+    private func formattedChips(_ value: Int) -> String {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .decimal
+        return formatter.string(from: NSNumber(value: value)) ?? "\(value)"
+    }
+
+    private func signedChips(_ value: Int) -> String {
+        let formatted = formattedChips(abs(value))
+        return value >= 0 ? "+\(formatted)" : "-\(formatted)"
+    }
+}
+
 struct ChipHistoryButton: View {
     let recordCount: Int
     let latestDeltaText: String
