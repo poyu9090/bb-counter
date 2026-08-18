@@ -37,9 +37,7 @@ final class BB_counterUITests: XCTestCase {
         app.buttons["chip.plus.5k"].tap()
         app.buttons["chips.next"].tap()
 
-        let blindPreset = app.buttons["blind.preset.1000"]
-        XCTAssertTrue(blindPreset.waitForExistence(timeout: 5))
-        blindPreset.tap()
+        selectThousandBlindPreset(in: app)
         app.buttons["blind.showResult"].tap()
 
         XCTAssertTrue(app.scrollViews["result.screen"].waitForExistence(timeout: 5))
@@ -60,9 +58,7 @@ final class BB_counterUITests: XCTestCase {
         addTenK.tap()
         app.buttons["chips.next"].tap()
 
-        let blindPreset = app.buttons["blind.preset.1000"]
-        XCTAssertTrue(blindPreset.waitForExistence(timeout: 5))
-        blindPreset.tap()
+        selectThousandBlindPreset(in: app)
         app.buttons["blind.showResult"].tap()
 
         let configure = app.buttons["timer.configure"]
@@ -76,6 +72,19 @@ final class BB_counterUITests: XCTestCase {
         let timerSwitch = app.switches["timer.toggle"]
         XCTAssertTrue(timerSwitch.waitForExistence(timeout: 5))
         XCTAssertEqual(timerSwitch.value as? String, "1")
+    }
+
+    /// 盲注預設是分頁輪播，只有目前頁的按鈕存在，所以要先用箭頭翻到 500/1000。
+    @MainActor
+    private func selectThousandBlindPreset(in app: XCUIApplication) {
+        let nextPreset = app.buttons["blind.next"]
+        XCTAssertTrue(nextPreset.waitForExistence(timeout: 5))
+        let target = app.buttons["blind.preset.1000"]
+        for _ in 0..<8 where !target.exists {
+            nextPreset.tap()
+        }
+        XCTAssertTrue(target.waitForExistence(timeout: 5))
+        target.tap()
     }
 
     @MainActor
