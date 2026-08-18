@@ -10,6 +10,19 @@ extension Notification.Name {
 @MainActor
 enum BlindTimerLiveActivityController {
     private static var activity: Activity<BlindTimerAttributes>?
+    private static var lastPushedState: BlindTimerAttributes.ContentState?
+
+    /// 倒數中時 Widget 用 `Text(end, style: .timer)` 自己走秒，所以每秒變動的
+    /// `timeRemainingText` 不必推送——ActivityKit 的更新次數有預算，推太密會被系統節流。
+    private static func shouldPush(_ state: BlindTimerAttributes.ContentState) -> Bool {
+        guard let last = lastPushedState else { return true }
+        guard state.countdownPeriodEnd != nil else {
+            return state != last
+        }
+        var normalized = state
+        normalized.timeRemainingText = last.timeRemainingText
+        return normalized != last
+    }
 
     static func sync(
         timerEnabled: Bool,
@@ -52,6 +65,8 @@ enum BlindTimerLiveActivityController {
             islandUpgradeAtClock: islandUpgradeAtClock
         )
 
+        guard shouldPush(state) else { return }
+
         Task {
             await startOrUpdate(using: state)
         }
@@ -61,6 +76,7 @@ enum BlindTimerLiveActivityController {
     private static func startOrUpdate(using state: BlindTimerAttributes.ContentState) async {
         if let existing = activity {
             await existing.update(.init(state: state, staleDate: nil))
+            lastPushedState = state
             postStatus(nil)
             return
         }
@@ -70,9 +86,11 @@ enum BlindTimerLiveActivityController {
                 content: .init(state: state, staleDate: nil),
                 pushType: nil
             )
+            lastPushedState = state
             postStatus(nil)
         } catch {
             activity = nil
+            lastPushedState = nil
             postStatus("live.status.failed")
         }
     }
@@ -82,6 +100,7 @@ enum BlindTimerLiveActivityController {
         guard let existing = activity else { return }
         await existing.end(nil, dismissalPolicy: .immediate)
         activity = nil
+        lastPushedState = nil
         postStatus(nil)
     }
 

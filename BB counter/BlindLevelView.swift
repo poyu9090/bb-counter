@@ -201,7 +201,8 @@ struct BlindLevelView: View {
                         .foregroundStyle(Color.white)
                 }
                 .buttonStyle(.borderedProminent)
-                .accessibilityIdentifier(isEditingFromResult ? "blind.done" : "blind.next")
+                // 不能叫 blind.next，會和上方輪播的「下一個預設」箭頭撞名。
+                .accessibilityIdentifier(isEditingFromResult ? "blind.done" : "blind.showResult")
                 .padding(.horizontal)
                 .disabled(!canProceed)
             }

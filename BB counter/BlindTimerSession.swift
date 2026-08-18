@@ -43,7 +43,8 @@ final class BlindTimerSession: ObservableObject {
     }
 
     func setupNextLevel(bigBlind: Int) {
-        let progression = Self.progression
+        // 自訂盲注結構啟用時要在自訂級距裡找下一級，否則會跳回預設級距。
+        let progression = effectiveProgression()
         if let idx = progression.firstIndex(where: { $0.bb == bigBlind }), idx + 1 < progression.count {
             selectedNextIndex = idx + 1
         } else if let firstHigher = progression.firstIndex(where: { $0.bb > bigBlind }) {
@@ -140,7 +141,8 @@ final class BlindTimerSession: ObservableObject {
     }
 
     private func advanceBlindLevel(smallBlind: inout Int, bigBlind: inout Int) {
-        let progression = Self.progression
+        // 佇列跑完後仍要沿用目前生效的級距表，不能退回預設級距。
+        let progression = effectiveProgression()
         guard selectedNextIndex < progression.count else { return }
         let next = progression[selectedNextIndex]
         smallBlind = next.sb
