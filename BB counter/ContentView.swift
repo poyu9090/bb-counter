@@ -38,6 +38,8 @@ struct ContentView: View {
     @AppStorage("smallBlind") private var smallBlindStored: Int = 0
     @AppStorage("bigBlind") private var bigBlindStored: Int = 0
     @AppStorage("chipChangeRecords") private var chipChangeRecordsStored: String = "[]"
+    /// 本場起始籌碼。0 代表還沒開始一場（或改版前的舊資料，由 SessionSummary 回推）。
+    @AppStorage("sessionStartChips") private var sessionStartChips: Int = 0
     
     // Working text states for inputs
     @State private var chipsText: String = ""
@@ -167,6 +169,7 @@ struct ContentView: View {
             timerEnabled: $timerEnabled,
             timerDurationSec: $timerDurationSec,
             chipChangeRecords: chipChangeRecords,
+            summary: sessionSummary,
             onClearChipHistory: clearChipChangeRecords,
             onEditChips: startEditingChips,
             onApplyChipChange: applyChipChange,
@@ -198,6 +201,9 @@ struct ContentView: View {
             isEditingChipsFromResult = false
             step = .result
         } else {
+            if sessionStartChips <= 0 {
+                sessionStartChips = chips
+            }
             step = .blinds
         }
     }
@@ -278,6 +284,7 @@ struct ContentView: View {
         smallBlindText = ""
         bigBlindText = ""
         clearChipChangeRecords()
+        sessionStartChips = 0
         isEditingChipsFromResult = false
         isEditingBlindsFromResult = false
         timerEnabled = false
@@ -423,6 +430,14 @@ struct ContentView: View {
     private func numericValue(from text: String) -> Int {
         let digits = text.filter { $0.isNumber }
         return Int(digits) ?? 0
+    }
+
+    private var sessionSummary: SessionSummary {
+        SessionSummary.make(
+            currentChips: chipsStored,
+            storedStartChips: sessionStartChips,
+            records: chipChangeRecords
+        )
     }
 
     private var chipChangeRecords: [ChipChangeRecord] {

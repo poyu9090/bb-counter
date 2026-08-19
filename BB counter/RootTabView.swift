@@ -17,6 +17,7 @@ struct RootTabView: View {
     @Binding var timerEnabled: Bool
     @Binding var timerDurationSec: Int
     let chipChangeRecords: [ChipChangeRecord]
+    let summary: SessionSummary
     let onClearChipHistory: () -> Void
     let onEditChips: () -> Void
     let onApplyChipChange: (Int) -> Void
@@ -32,18 +33,18 @@ struct RootTabView: View {
 
     var body: some View {
         TabView(selection: $selection) {
-            ResultView(
+            DashboardView(
                 chips: chips,
                 smallBlind: $smallBlind,
                 bigBlind: $bigBlind,
                 blindSession: blindSession,
                 timerEnabled: $timerEnabled,
                 timerDurationSec: $timerDurationSec,
-                chipChangeRecords: chipChangeRecords,
-                onClearChipHistory: onClearChipHistory,
+                summary: summary,
                 onEditChips: onEditChips,
                 onApplyChipChange: onApplyChipChange,
-                onEditBlinds: onEditBlinds
+                onEditBlinds: onEditBlinds,
+                onOpenHistory: { selection = .history }
             )
             .tabItem {
                 Label("tab.dashboard", systemImage: "gauge.with.needle")

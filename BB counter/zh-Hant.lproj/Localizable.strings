@@ -5,6 +5,14 @@
 "action.back" = "返回";
 "action.edit_chips" = "編輯籌碼";
 "action.edit_blinds" = "編輯盲注";
+"dashboard.session" = "本場 %@";
+"dashboard.win" = "贏";
+"dashboard.lose" = "輸";
+"dashboard.record" = "記錄";
+"dashboard.change_total" = "改總額";
+"dashboard.session_footer" = "%d 筆變化 · 起始 %@";
+"dashboard.after_level_up" = "升盲後 %@ BB";
+"dashboard.last_level" = "已是最後一級";
 "tab.dashboard" = "儀表板";
 "tab.handline" = "行動線";
 "tab.history" = "紀錄";

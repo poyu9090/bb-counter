@@ -5,6 +5,14 @@
 "action.back" = "Back";
 "action.edit_chips" = "Edit chips";
 "action.edit_blinds" = "Edit blinds";
+"dashboard.session" = "Session %@";
+"dashboard.win" = "Win";
+"dashboard.lose" = "Loss";
+"dashboard.record" = "Log";
+"dashboard.change_total" = "Set total";
+"dashboard.session_footer" = "%d changes · started at %@";
+"dashboard.after_level_up" = "%@ BB after next level";
+"dashboard.last_level" = "Last level of the structure";
 "tab.dashboard" = "Dashboard";
 "tab.handline" = "Action line";
 "tab.history" = "History";
