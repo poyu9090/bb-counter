@@ -82,19 +82,17 @@ struct StackStatusCard: View {
         .padding(20)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [Theme.surfaceElevated, Theme.surface],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    )
-                )
+            LinearGradient(
+                colors: [Theme.surfaceElevated, Theme.surface],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            ),
+            in: .rect(cornerRadius: 24)
         )
-        .overlay(
+        .overlay {
             RoundedRectangle(cornerRadius: 24, style: .continuous)
                 .stroke(Theme.surfaceStroke, lineWidth: 1)
-        )
+        }
         .shadow(color: (hasBlinds ? statusColor : .black).opacity(0.18), radius: 30, x: 0, y: 18)
     }
 

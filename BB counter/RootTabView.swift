@@ -13,7 +13,8 @@ struct RootTabView: View {
     let chips: Int
     @Binding var smallBlind: Int
     @Binding var bigBlind: Int
-    @ObservedObject var blindSession: BlindTimerSession
+    /// 同 DashboardView：分頁殼不觀察每秒變動的 session，交給真正要顯示倒數的卡片。
+    let blindSession: BlindTimerSession
     @Binding var timerEnabled: Bool
     @Binding var timerDurationSec: Int
     let chipChangeRecords: [ChipChangeRecord]

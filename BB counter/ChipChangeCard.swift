@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 /// 籌碼變化卡：這一頁的主角。輸入、結果、歷史收在同一張卡裡閉環。
 /// 快捷金額是「填進輸入框、可累加」，按下記錄才寫入——誤觸不會直接改到籌碼。
@@ -11,6 +10,7 @@ struct ChipChangeCard: View {
 
     @State private var isWinning: Bool = true
     @State private var amountText: String = ""
+    @State private var recordedTrigger: Int = 0
     @FocusState private var isAmountFocused: Bool
 
     private static let quickAmounts = [1_000, 5_000, 10_000]
@@ -36,14 +36,12 @@ struct ChipChangeCard: View {
             footer
         }
         .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Theme.surfaceElevated)
-        )
-        .overlay(
+        .background(Theme.surfaceElevated, in: .rect(cornerRadius: 20))
+        .overlay {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(Theme.accent.opacity(0.35), lineWidth: 1)
-        )
+        }
+        .sensoryFeedback(.success, trigger: recordedTrigger)
     }
 
     private var header: some View {
@@ -69,21 +67,24 @@ struct ChipChangeCard: View {
             .frame(width: 100)
             .accessibilityIdentifier("dashboard.direction")
 
-            TextField(LocalizedStringKey("chips.custom_amount_placeholder"), text: Binding(
-                get: { amountText },
-                set: { amountText = String($0.filter(\.isNumber).prefix(9)) }
-            ))
+            TextField(LocalizedStringKey("chips.custom_amount_placeholder"), text: $amountText)
             .keyboardType(.numberPad)
+            .onChange(of: amountText) { _, newValue in
+                let digits = String(newValue.filter(\.isNumber).prefix(9))
+                if digits != newValue {
+                    amountText = digits
+                }
+            }
             .focused($isAmountFocused)
             .font(.title3.weight(.bold).monospacedDigit())
             .foregroundStyle(Theme.primaryText)
             .padding(.horizontal, 12)
             .frame(height: 44)
-            .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(Theme.background.opacity(0.6)))
-            .overlay(
+            .background(Theme.background.opacity(0.6), in: .rect(cornerRadius: 12))
+            .overlay {
                 RoundedRectangle(cornerRadius: 12, style: .continuous)
                     .stroke(isAmountFocused ? Theme.accent.opacity(0.7) : Theme.surfaceStroke, lineWidth: 1)
-            )
+            }
             .accessibilityIdentifier("dashboard.amount")
 
             Button(action: record) {
@@ -136,8 +137,8 @@ struct ChipChangeCard: View {
     private var footer: some View {
         Button(action: onOpenHistory) {
             HStack(spacing: 10) {
-                SessionSparkline(points: summary.sparkline, isPositive: summary.delta >= 0)
-                    .frame(width: 68, height: 22)
+                SessionSparkline(points: summary.sparkline, height: 22, isPositive: summary.delta >= 0)
+                    .frame(width: 68)
                 Spacer(minLength: 0)
                 Text(
                     String(
@@ -173,7 +174,7 @@ struct ChipChangeCard: View {
         onApplyChipChange(next)
         amountText = ""
         isAmountFocused = false
-        UINotificationFeedbackGenerator().notificationOccurred(.success)
+        recordedTrigger += 1
     }
 
     private func shortAmount(_ value: Int) -> String {
@@ -189,32 +190,5 @@ struct ChipChangeCard: View {
     private func signedChips(_ value: Int) -> String {
         let formatted = formattedChips(abs(value))
         return value >= 0 ? "+\(formatted)" : "-\(formatted)"
-    }
-}
-
-/// 本場籌碼走勢的迷你長條圖，只表達起伏，不標數字。
-private struct SessionSparkline: View {
-    let points: [Int]
-    let isPositive: Bool
-
-    var body: some View {
-        GeometryReader { proxy in
-            let values = points.count > 1 ? points : []
-            let minValue = values.min() ?? 0
-            let maxValue = values.max() ?? 1
-            let span = max(1, maxValue - minValue)
-            let barWidth = values.isEmpty ? 0 : max(2, (proxy.size.width - CGFloat(values.count - 1) * 3) / CGFloat(values.count))
-
-            HStack(alignment: .bottom, spacing: 3) {
-                ForEach(Array(values.enumerated()), id: \.offset) { _, value in
-                    let ratio = Double(value - minValue) / Double(span)
-                    RoundedRectangle(cornerRadius: 1.5, style: .continuous)
-                        .fill((isPositive ? Theme.healthGreen : Theme.healthRed).opacity(0.55))
-                        .frame(width: barWidth, height: max(3, proxy.size.height * (0.25 + 0.75 * ratio)))
-                }
-            }
-            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomLeading)
-        }
-        .accessibilityHidden(true)
     }
 }

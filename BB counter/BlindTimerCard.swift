@@ -39,14 +39,11 @@ struct BlindTimerCard: View {
             }
         }
         .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .fill(Theme.surfaceElevated)
-        )
-        .overlay(
+        .background(Theme.surfaceElevated, in: .rect(cornerRadius: 20))
+        .overlay {
             RoundedRectangle(cornerRadius: 20, style: .continuous)
                 .stroke(Theme.surfaceStroke, lineWidth: 1)
-        )
+        }
     }
 
     private var header: some View {
