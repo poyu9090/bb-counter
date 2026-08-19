@@ -44,6 +44,7 @@
 "chips.quick_adjust" = "Chip change";
 "chips.quick_adjust_reset" = "Undo";
 "action.save" = "Save";
+"chips.depth_preview" = "%@ BB at blinds of %@";
 "chips.history.title" = "History";
 "chips.history.count" = "%d records";
 "chips.history.empty_short" = "No records";

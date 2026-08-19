@@ -7,14 +7,13 @@ struct ChipsInputView: View {
     let onBack: (() -> Void)?
     let onAppear: () -> Void
     let buttonLabelKey: String
+    /// 只用來換算深度預覽；為 0 時不顯示。
+    let bigBlind: Int
     
     /// 各面额枚数 [5万, 1万, 5千, 1千, 500, 100]，不自动换算（5 个 1 千不合并成 1 个 5 千）
     @State private var breakdown: [Int] = [0, 0, 0, 0, 0, 0]
     /// 由按钮更新 chipsText 时设为 true，避免 onChange 里用贪心覆盖 breakdown
     @State private var skipSyncFromText: Bool = false
-    @State private var increaseAmountText: String = ""
-    @State private var decreaseAmountText: String = ""
-    @State private var adjustmentBaseChips: Int?
     @FocusState private var focusedInput: ChipsFocusedInput?
     @AppStorage("chipBreakdown") private var chipBreakdownStored: String = "0,0,0,0,0,0"
     
@@ -26,13 +25,15 @@ struct ChipsInputView: View {
         onNext: @escaping () -> Void,
         onBack: (() -> Void)? = nil,
         onAppear: @escaping () -> Void,
-        buttonLabelKey: String = "action.next"
+        buttonLabelKey: String = "action.next",
+        bigBlind: Int = 0
     ) {
         self._chipsText = chipsText
         self.onNext = onNext
         self.onBack = onBack
         self.onAppear = onAppear
         self.buttonLabelKey = buttonLabelKey
+        self.bigBlind = bigBlind
     }
     
     private func total(from b: [Int]) -> Int {
@@ -66,6 +67,15 @@ struct ChipsInputView: View {
 
     private var adjustmentPreviewValue: Int {
         Int(chipsText) ?? 0
+    }
+
+    /// 改總額時最想確認的其實是「這樣是幾個 BB」，直接寫在數字底下省得回去看。
+    private var depthPreview: String? {
+        guard bigBlind > 0, let chips = parsedChips, chips > 0 else { return nil }
+        let formatter = NumberFormatter()
+        formatter.maximumFractionDigits = 1
+        let value = formatter.string(from: NSNumber(value: Double(chips) / Double(bigBlind))) ?? "0"
+        return String(format: NSLocalizedString("chips.depth_preview", comment: ""), value, "\(bigBlind)")
     }
 
     private var isWideLayout: Bool {
@@ -190,11 +200,6 @@ struct ChipsInputView: View {
                             if filtered != newValue {
                                 chipsText = filtered
                             } else if !skipSyncFromText {
-                                if focusedInput == .chips {
-                                    increaseAmountText = ""
-                                    decreaseAmountText = ""
-                                    adjustmentBaseChips = Int(filtered) ?? 0
-                                }
                                 syncBreakdownFromText()
                             } else {
                                 skipSyncFromText = false
@@ -203,8 +208,14 @@ struct ChipsInputView: View {
                         .onAppear {
                             onAppear()
                             restoreOrSyncBreakdown()
-                            adjustmentBaseChips = Int(chipsText) ?? 0
                         }
+                    if let depthPreview {
+                        Text(depthPreview)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(Theme.secondaryText)
+                            .frame(maxWidth: .infinity)
+                    }
+
                     if let inputErrorKey {
                         Text(LocalizedStringKey(inputErrorKey))
                             .font(.caption.weight(.semibold))
@@ -217,25 +228,17 @@ struct ChipsInputView: View {
                         .frame(height: 120)
                         .padding(.horizontal)
 
-                    if onBack == nil {
-                        LazyVGrid(columns: chipGridColumns, spacing: isWideLayout ? 12 : 10) {
-                            ForEach(Self.denomValues, id: \.self) { value in
-                                ChipAdjustControl(
-                                    label: denominationLabel(value),
-                                    isSubtractDisabled: total(from: breakdown) == 0,
-                                    addAction: { addByDenomination(value) },
-                                    subtractAction: { subtractByDenomination(value) }
-                                )
-                            }
+                    LazyVGrid(columns: chipGridColumns, spacing: isWideLayout ? 12 : 10) {
+                        ForEach(Self.denomValues, id: \.self) { value in
+                            ChipAdjustControl(
+                                label: denominationLabel(value),
+                                isSubtractDisabled: total(from: breakdown) == 0,
+                                addAction: { addByDenomination(value) },
+                                subtractAction: { subtractByDenomination(value) }
+                            )
                         }
-                        .padding(.horizontal)
                     }
-
-                    if onBack != nil {
-                        customAmountControl
-                            .padding(.horizontal)
-                            .id(ChipsFocusedInput.increaseAmount)
-                    }
+                    .padding(.horizontal)
                 }
                 .frame(maxWidth: contentMaxWidth)
                 .frame(maxWidth: .infinity)
@@ -246,8 +249,7 @@ struct ChipsInputView: View {
                 guard let input else { return }
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
                     withAnimation(.easeOut(duration: 0.2)) {
-                        let target = input == .decreaseAmount ? ChipsFocusedInput.increaseAmount : input
-                        proxy.scrollTo(target, anchor: .center)
+                        proxy.scrollTo(input, anchor: .center)
                     }
                 }
             }
@@ -294,168 +296,15 @@ struct ChipsInputView: View {
         skipSyncFromText = true
         chipsText = String(total(from: breakdown))
         saveBreakdown()
-        if focusedInput != .increaseAmount && focusedInput != .decreaseAmount {
-            adjustmentBaseChips = Int(chipsText) ?? 0
-            increaseAmountText = ""
-            decreaseAmountText = ""
-        }
-    }
-
-    private func applyAdjustmentChange() {
-        let base = adjustmentBaseChips ?? Int(chipsText) ?? 0
-        let increase = Int(increaseAmountText) ?? 0
-        let decrease = Int(decreaseAmountText) ?? 0
-        let nextTotal = min(Self.maxChipValue, max(0, base + increase - decrease))
-        applyGreedyBreakdown(to: nextTotal)
-        updateTextFromAdjustment(total: nextTotal)
-    }
-
-    private func updateTextFromAdjustment(total: Int) {
-        skipSyncFromText = true
-        chipsText = String(total)
-        saveBreakdown()
-    }
-
-    private func beginAdjustmentEditing() {
-        if adjustmentBaseChips == nil || (increaseAmountText.isEmpty && decreaseAmountText.isEmpty) {
-            adjustmentBaseChips = Int(chipsText) ?? 0
-        }
     }
 
 	private func denominationLabel(_ value: Int) -> String {
 		value >= 1000 ? "\(value / 1000)k" : "\(value)"
 	}
-
-    private var customAmountControl: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .center, spacing: 10) {
-                Image(systemName: "clock.arrow.circlepath")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Theme.accent)
-                    .frame(width: 28, height: 28)
-                    .background(Circle().fill(Theme.accent.opacity(0.16)))
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("chips.adjustment_title")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(Theme.primaryText)
-                    Text("chips.adjustment_subtitle")
-                        .font(.caption)
-                        .foregroundStyle(Theme.secondaryText)
-                }
-
-                Spacer(minLength: 0)
-            }
-
-            VStack(spacing: 10) {
-                adjustmentField(
-                    titleKey: "chips.increase_amount",
-                    placeholderKey: "chips.custom_amount_placeholder",
-                    text: $increaseAmountText,
-                    focus: .increaseAmount,
-                    accessibilityIdentifier: "chips.increaseAmount",
-                    iconName: "plus",
-                    tint: Theme.healthGreen
-                )
-                adjustmentField(
-                    titleKey: "chips.decrease_amount",
-                    placeholderKey: "chips.custom_amount_placeholder",
-                    text: $decreaseAmountText,
-                    focus: .decreaseAmount,
-                    accessibilityIdentifier: "chips.decreaseAmount",
-                    iconName: "minus",
-                    tint: Theme.healthRed
-                )
-            }
-
-            HStack {
-                Text("chips.after_adjustment")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Theme.secondaryText)
-                Spacer(minLength: 8)
-                Text(formattedChips(adjustmentPreviewValue))
-                    .font(.subheadline.weight(.bold).monospacedDigit())
-                    .foregroundStyle(Theme.primaryText)
-            }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Theme.background.opacity(0.45))
-            )
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Theme.surfaceElevated)
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .stroke(Theme.surfaceStroke, lineWidth: 1)
-        )
-    }
-
-    private func adjustmentField(
-        titleKey: String,
-        placeholderKey: String,
-        text: Binding<String>,
-        focus: ChipsFocusedInput,
-        accessibilityIdentifier: String,
-        iconName: String,
-        tint: Color
-    ) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: iconName)
-                .font(.headline.weight(.bold))
-                .foregroundStyle(tint)
-                .frame(width: 38, height: 38)
-                .background(Circle().fill(tint.opacity(0.16)))
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text(LocalizedStringKey(titleKey))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Theme.primaryText)
-
-                TextField(LocalizedStringKey(placeholderKey), text: Binding(
-                    get: { text.wrappedValue },
-                    set: { newValue in
-                        text.wrappedValue = newValue.filter { $0.isNumber }
-                        applyAdjustmentChange()
-                    }
-                ))
-                .keyboardType(.numberPad)
-                .focused($focusedInput, equals: focus)
-                .textFieldStyle(.plain)
-                .font(.title3.weight(.bold).monospacedDigit())
-                .foregroundStyle(Theme.primaryText)
-                .multilineTextAlignment(.leading)
-                .frame(minHeight: 30)
-                .accessibilityIdentifier(accessibilityIdentifier)
-                .onChange(of: focusedInput) { _, input in
-                    if input == focus {
-                        beginAdjustmentEditing()
-                    }
-                }
-            }
-
-            Spacer(minLength: 0)
-        }
-        .padding(12)
-        .background(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .fill(Theme.background.opacity(0.55))
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(focusedInput == focus ? tint.opacity(0.7) : Theme.surfaceStroke, lineWidth: 1)
-        )
-    }
 }
 
 private enum ChipsFocusedInput: Hashable {
     case chips
-    case increaseAmount
-    case decreaseAmount
 }
 
 // MARK: - Chip Stack (堆叠筹码，按实际操作面额显示，不自动换算)

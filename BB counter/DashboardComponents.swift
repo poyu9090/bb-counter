@@ -24,9 +24,7 @@ struct HealthBadge: View {
 struct ChipChangeHistoryView: View {
     let records: [ChipChangeRecord]
     let onClear: () -> Void
-    /// 當成分頁使用時不需要「完成」。
-    var showsDoneButton: Bool = true
-    @Environment(\.dismiss) private var dismiss
+
     @State private var showClearConfirmation: Bool = false
 
     var body: some View {
@@ -48,13 +46,6 @@ struct ChipChangeHistoryView: View {
             .navigationTitle(Text("chips.history.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    if showsDoneButton {
-                        Button("action.done") {
-                            dismiss()
-                        }
-                    }
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     if !records.isEmpty {
                         Button(role: .destructive) {

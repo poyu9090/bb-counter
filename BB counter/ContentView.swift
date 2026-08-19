@@ -144,7 +144,8 @@ struct ContentView: View {
             onNext: commitChipsStep,
             onBack: isEditingChipsFromResult ? leaveChipsStep : nil,
             onAppear: restoreChipsText,
-            buttonLabelKey: isEditingChipsFromResult ? "action.done" : "action.next"
+            buttonLabelKey: isEditingChipsFromResult ? "action.done" : "action.next",
+            bigBlind: bigBlindStored
         )
     }
 

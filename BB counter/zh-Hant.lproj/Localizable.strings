@@ -44,6 +44,7 @@
 "chips.quick_adjust" = "籌碼變化";
 "chips.quick_adjust_reset" = "還原";
 "action.save" = "儲存";
+"chips.depth_preview" = "在大盲 %2$@ 下是 %1$@ BB";
 "chips.history.title" = "變更紀錄";
 "chips.history.count" = "%d 筆紀錄";
 "chips.history.empty_short" = "尚無紀錄";

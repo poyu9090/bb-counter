@@ -5,10 +5,7 @@ struct HandActionLineListView: View {
     let smallBlind: Int
     let bigBlind: Int
     let stackBB: Double
-    /// 當成分頁使用時不需要「完成」，只有以 sheet 開啟時才要收起來的入口。
-    var showsDoneButton: Bool = true
 
-    @Environment(\.dismiss) private var dismiss
     @AppStorage("handActionLineRecords") private var recordsStored: String = "[]"
     @State private var records: [HandActionLineRecord] = []
     @State private var editingRecord: HandActionLineRecord?
@@ -35,7 +32,7 @@ struct HandActionLineListView: View {
                             }
                         }
                         .padding(16)
-                        .padding(.bottom, 92)
+                        .padding(.bottom, 24)
                     }
                     .background(Theme.background)
                 }
@@ -43,13 +40,6 @@ struct HandActionLineListView: View {
             .navigationTitle(Text("hand.title"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    if showsDoneButton {
-                        Button("action.done") {
-                            dismiss()
-                        }
-                    }
-                }
                 ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         createRecord()
@@ -59,21 +49,6 @@ struct HandActionLineListView: View {
                     .accessibilityLabel(Text("hand.create"))
                     .accessibilityIdentifier("hand.create")
                 }
-            }
-            .keyboardAwareBottomBar {
-                Button {
-                    createRecord()
-                } label: {
-                    Label("hand.create", systemImage: "square.and.pencil")
-                        .font(.headline.weight(.bold))
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 15)
-                }
-                .buttonStyle(.borderedProminent)
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
-                .background(.ultraThinMaterial)
-                .background(Theme.background.opacity(0.78))
             }
             .confirmationDialog(
                 Text("hand.delete_title"),

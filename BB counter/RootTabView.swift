@@ -55,8 +55,7 @@ struct RootTabView: View {
             HandActionLineListView(
                 smallBlind: smallBlind > 0 ? smallBlind : bigBlind / 2,
                 bigBlind: bigBlind,
-                stackBB: stackBB,
-                showsDoneButton: false
+                stackBB: stackBB
             )
             .tabItem {
                 Label("tab.handline", systemImage: "point.3.connected.trianglepath.dotted")
@@ -65,8 +64,7 @@ struct RootTabView: View {
 
             ChipChangeHistoryView(
                 records: chipChangeRecords,
-                onClear: onClearChipHistory,
-                showsDoneButton: false
+                onClear: onClearChipHistory
             )
             .tabItem {
                 Label("tab.history", systemImage: "clock.arrow.circlepath")

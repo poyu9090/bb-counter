@@ -59,12 +59,12 @@ struct ChipChangeCard: View {
 
     private var inputRow: some View {
         HStack(spacing: 8) {
-            Picker("", selection: $isWinning) {
-                Text("dashboard.win").tag(true)
-                Text("dashboard.lose").tag(false)
+            HStack(spacing: 4) {
+                directionButton(isWin: true, titleKey: "dashboard.win", tint: Theme.healthGreen)
+                directionButton(isWin: false, titleKey: "dashboard.lose", tint: Theme.healthRed)
             }
-            .pickerStyle(.segmented)
-            .frame(width: 100)
+            .padding(3)
+            .background(Theme.background.opacity(0.6), in: .rect(cornerRadius: 12))
             .accessibilityIdentifier("dashboard.direction")
 
             TextField(LocalizedStringKey("chips.custom_amount_placeholder"), text: $amountText)
@@ -92,13 +92,33 @@ struct ChipChangeCard: View {
                     .font(.subheadline.weight(.bold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                    .padding(.horizontal, 14)
+                    .foregroundStyle(canRecord ? Color.white : Theme.secondaryText)
+                    .padding(.horizontal, 16)
                     .frame(height: 44)
+                    .background(canRecord ? Theme.accent : Color.clear, in: .rect(cornerRadius: 12))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .stroke(canRecord ? Color.clear : Theme.surfaceStroke, lineWidth: 1)
+                    }
             }
-            .buttonStyle(.borderedProminent)
+            .buttonStyle(.plain)
             .disabled(!canRecord)
             .accessibilityIdentifier("dashboard.record")
         }
+    }
+
+    private func directionButton(isWin: Bool, titleKey: String, tint: Color) -> some View {
+        Button {
+            isWinning = isWin
+        } label: {
+            Text(LocalizedStringKey(titleKey))
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(isWinning == isWin ? Color.white : Theme.secondaryText)
+                .frame(width: 46, height: 38)
+                .background(isWinning == isWin ? tint : Color.clear, in: .rect(cornerRadius: 9))
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(isWinning == isWin ? .isSelected : [])
     }
 
     private var quickRow: some View {
@@ -122,14 +142,15 @@ struct ChipChangeCard: View {
             }
 
             Button(action: onEditChips) {
-                Text("dashboard.change_total")
+                Label("dashboard.change_total", systemImage: "square.stack.3d.up")
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
-                    .frame(maxWidth: .infinity)
+                    .foregroundStyle(Theme.secondaryText)
+                    .padding(.horizontal, 10)
                     .frame(height: 44)
             }
-            .buttonStyle(.bordered)
+            .buttonStyle(.plain)
             .accessibilityIdentifier("dashboard.changeTotal")
         }
     }
