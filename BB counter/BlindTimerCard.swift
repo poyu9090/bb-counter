@@ -28,7 +28,9 @@ struct BlindTimerCard: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
             header
-            if timerEnabled {
+            if bigBlind <= 0 {
+                missingBlindsBody
+            } else if timerEnabled {
                 runningBody
             } else {
                 idleBody
@@ -65,6 +67,8 @@ struct BlindTimerCard: View {
             }
             .labelsHidden()
             .toggleStyle(.switch)
+            // 沒有盲注就沒有級距可升，開了也只會空轉。
+            .disabled(bigBlind <= 0)
             .accessibilityIdentifier("timer.toggle")
         }
     }
@@ -132,6 +136,20 @@ struct BlindTimerCard: View {
             Text("dashboard.last_level")
                 .font(.subheadline.weight(.medium))
                 .foregroundStyle(Theme.secondaryText)
+        }
+    }
+
+    private var missingBlindsBody: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "exclamationmark.circle")
+                .font(.title)
+                .foregroundStyle(Theme.healthYellow)
+                .frame(width: 44, height: 44)
+            Text("dashboard.set_blinds_first")
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(Theme.secondaryText)
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
         }
     }
 

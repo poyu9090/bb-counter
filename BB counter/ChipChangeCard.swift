@@ -14,7 +14,6 @@ struct ChipChangeCard: View {
     @FocusState private var isAmountFocused: Bool
 
     private static let quickAmounts = [1_000, 5_000, 10_000]
-    private static let maxChipValue = 999_999_999
 
     private var amount: Int {
         Int(amountText) ?? 0
@@ -67,7 +66,7 @@ struct ChipChangeCard: View {
                 Text("dashboard.lose").tag(false)
             }
             .pickerStyle(.segmented)
-            .frame(width: 108)
+            .frame(width: 100)
             .accessibilityIdentifier("dashboard.direction")
 
             TextField(LocalizedStringKey("chips.custom_amount_placeholder"), text: Binding(
@@ -90,6 +89,8 @@ struct ChipChangeCard: View {
             Button(action: record) {
                 Text("dashboard.record")
                     .font(.subheadline.weight(.bold))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
                     .padding(.horizontal, 14)
                     .frame(height: 44)
             }
@@ -103,10 +104,12 @@ struct ChipChangeCard: View {
         HStack(spacing: 6) {
             ForEach(Self.quickAmounts, id: \.self) { value in
                 Button {
-                    amountText = String(min(Self.maxChipValue, amount + value))
+                    amountText = String(min(SessionSummary.maxChipValue, amount + value))
                 } label: {
                     Text("+\(shortAmount(value))")
                         .font(.subheadline.weight(.bold))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.5)
                         .frame(maxWidth: .infinity)
                         .frame(height: 36)
                 }
@@ -118,7 +121,7 @@ struct ChipChangeCard: View {
                 Text("dashboard.change_total")
                     .font(.subheadline.weight(.semibold))
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.5)
                     .frame(maxWidth: .infinity)
                     .frame(height: 36)
             }
@@ -160,8 +163,7 @@ struct ChipChangeCard: View {
 
     private func record() {
         guard canRecord else { return }
-        let signed = isWinning ? amount : -amount
-        let next = min(Self.maxChipValue, max(0, summary.currentChips + signed))
+        let next = SessionSummary.chips(after: amount, isWinning: isWinning, from: summary.currentChips)
         onApplyChipChange(next)
         amountText = ""
         isAmountFocused = false

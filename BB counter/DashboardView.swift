@@ -71,6 +71,8 @@ struct DashboardView: View {
             .padding(.horizontal, 16)
             .padding(.top, 18)
             .padding(.bottom, 24)
+            .frame(maxWidth: 640)
+            .frame(maxWidth: .infinity)
         }
         .accessibilityIdentifier("result.screen")
         .scrollDismissesKeyboard(.interactively)

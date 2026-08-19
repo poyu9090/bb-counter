@@ -40,6 +40,15 @@ struct SessionSummary: Equatable {
         )
     }
 
+    /// 籌碼上限，和籌碼輸入頁同一個值。
+    static let maxChipValue = 999_999_999
+
+    /// 記下一手輸贏之後的籌碼量。輸超過手上籌碼時夾到 0，不會出現負籌碼。
+    static func chips(after amount: Int, isWinning: Bool, from current: Int) -> Int {
+        let signed = isWinning ? amount : -amount
+        return min(maxChipValue, max(0, current + signed))
+    }
+
     /// 舊使用者沒有起始值，用最早一筆紀錄的「變更前籌碼」回推；連紀錄都沒有就從這一刻開始算。
     static func resolvedStartChips(currentChips: Int, storedStartChips: Int, records: [ChipChangeRecord]) -> Int {
         if storedStartChips > 0 {

@@ -5,6 +5,8 @@
 "action.back" = "返回";
 "action.edit_chips" = "編輯籌碼";
 "action.edit_blinds" = "編輯盲注";
+"dashboard.set_blinds_first" = "先設定盲注，倒數才有級距可以升。";
+"settings.timer_row" = "計時器與盲注結構";
 "dashboard.session" = "本場 %@";
 "dashboard.win" = "贏";
 "dashboard.lose" = "輸";

@@ -28,7 +28,7 @@ struct SettingsView: View {
                         blindSession.prepareTimerSheetDefaults(bigBlind: bigBlind)
                         showTimerSheet = true
                     } label: {
-                        Label("timer.configure", systemImage: "timer")
+                        Label("settings.timer_row", systemImage: "timer")
                             .foregroundStyle(Theme.primaryText)
                     }
                     .accessibilityIdentifier("settings.timer")

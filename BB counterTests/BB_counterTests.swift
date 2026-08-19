@@ -120,6 +120,17 @@ struct BB_counterTests {
         #expect(summary.sparkline.last == 42_000)
     }
 
+    @Test func recordingClampsLossesAndCeiling() async throws {
+        #expect(SessionSummary.chips(after: 6_500, isWinning: true, from: 34_000) == 40_500)
+        #expect(SessionSummary.chips(after: 6_500, isWinning: false, from: 34_000) == 27_500)
+        // 輸超過手上籌碼只會歸零，不會變負數
+        #expect(SessionSummary.chips(after: 90_000, isWinning: false, from: 34_000) == 0)
+        #expect(
+            SessionSummary.chips(after: 5_000, isWinning: true, from: SessionSummary.maxChipValue)
+                == SessionSummary.maxChipValue
+        )
+    }
+
     // MARK: - Blind outlook
 
     private let sampleProgression = [

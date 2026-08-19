@@ -5,6 +5,8 @@
 "action.back" = "Back";
 "action.edit_chips" = "Edit chips";
 "action.edit_blinds" = "Edit blinds";
+"dashboard.set_blinds_first" = "Set the blinds first, then the countdown can track level-ups.";
+"settings.timer_row" = "Timer and blind structure";
 "dashboard.session" = "Session %@";
 "dashboard.win" = "Win";
 "dashboard.lose" = "Loss";
