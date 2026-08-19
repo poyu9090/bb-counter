@@ -13,3 +13,6 @@ Package.resolved
 # Derived/build outputs
 DerivedData/
 build/
+
+# Brainstorm visual companion
+.superpowers/
