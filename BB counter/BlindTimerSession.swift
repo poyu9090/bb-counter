@@ -122,6 +122,34 @@ final class BlindTimerSession: ObservableObject {
         syncFromWallClock(timerEnabled: timerEnabled, timerDurationSec: timerDurationSec, smallBlind: &smallBlind, bigBlind: &bigBlind)
     }
 
+    /// 套用計時器設定頁的結果：排定升盲佇列，若選的是自訂結構就把盲注切到該結構的當前級距。
+    /// 儀表板與設定分頁都會開設定頁，所以這段邏輯放在 session 上共用。
+    func applyConfiguration(
+        orderedIndices: [Int],
+        customProgression: [(sb: Int, bb: Int)]?,
+        customCurrentIndex: Int?,
+        timerDurationSec: Int,
+        smallBlind: inout Int,
+        bigBlind: inout Int
+    ) {
+        activeCustomProgression = customProgression
+        if let custom = customProgression, let current = customCurrentIndex, current >= 0, current < custom.count {
+            smallBlind = custom[current].sb
+            bigBlind = custom[current].bb
+            queuedIndices = Array((current + 1)..<custom.count)
+        } else {
+            queuedIndices = orderedIndices
+        }
+        invalidateCountdownAnchor()
+        isPaused = false
+        remainingSeconds = min(max(1, remainingSeconds), timerDurationSec)
+        if let first = queuedIndices.first {
+            selectedNextIndex = first
+        } else {
+            setupNextLevel(bigBlind: bigBlind)
+        }
+    }
+
     func applyFreshResultDefaults(timerDurationSec: Int, bigBlind: Int) {
         invalidateCountdownAnchor()
         isPaused = false

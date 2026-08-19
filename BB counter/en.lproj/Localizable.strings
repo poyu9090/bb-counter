@@ -5,6 +5,12 @@
 "action.back" = "Back";
 "action.edit_chips" = "Edit chips";
 "action.edit_blinds" = "Edit blinds";
+"tab.dashboard" = "Dashboard";
+"tab.handline" = "Action line";
+"tab.history" = "History";
+"tab.settings" = "Settings";
+"settings.version" = "Version";
+"settings.reset_footer" = "Clears chips, blinds, change history and timer state, then starts a new session.";
 "action.reset" = "Reset";
 "action.confirm" = "Confirm";
 "action.cancel" = "Cancel";

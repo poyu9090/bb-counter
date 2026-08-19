@@ -74,6 +74,40 @@ final class BB_counterUITests: XCTestCase {
         XCTAssertEqual(timerSwitch.value as? String, "1")
     }
 
+    @MainActor
+    func testTabsReachEveryMainSection() throws {
+        let app = XCUIApplication()
+        app.launchArguments = ["-uiTestingResetDefaults"]
+        app.launch()
+
+        app.buttons["onboarding.continue"].tap()
+
+        let addTenK = app.buttons["chip.plus.10k"]
+        XCTAssertTrue(addTenK.waitForExistence(timeout: 5))
+        addTenK.tap()
+        app.buttons["chips.next"].tap()
+
+        selectThousandBlindPreset(in: app)
+        app.buttons["blind.showResult"].tap()
+
+        XCTAssertTrue(app.scrollViews["result.screen"].waitForExistence(timeout: 5))
+
+        let tabs = app.tabBars.buttons
+        XCTAssertEqual(tabs.count, 4)
+
+        // 行動線分頁
+        tabs.element(boundBy: 1).tap()
+        XCTAssertTrue(app.buttons["hand.create"].waitForExistence(timeout: 5))
+
+        // 設定分頁：重置搬到這裡了
+        tabs.element(boundBy: 3).tap()
+        XCTAssertTrue(app.buttons["settings.reset"].waitForExistence(timeout: 5))
+
+        // 回到儀表板
+        tabs.element(boundBy: 0).tap()
+        XCTAssertTrue(app.scrollViews["result.screen"].waitForExistence(timeout: 5))
+    }
+
     /// 盲注預設是分頁輪播，只有目前頁的按鈕存在，所以要先用箭頭翻到 500/1000。
     @MainActor
     private func selectThousandBlindPreset(in app: XCUIApplication) {

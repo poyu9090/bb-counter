@@ -5,6 +5,12 @@
 "action.back" = "返回";
 "action.edit_chips" = "編輯籌碼";
 "action.edit_blinds" = "編輯盲注";
+"tab.dashboard" = "儀表板";
+"tab.handline" = "行動線";
+"tab.history" = "紀錄";
+"tab.settings" = "設定";
+"settings.version" = "版本";
+"settings.reset_footer" = "會清空籌碼、盲注、變更紀錄與計時器狀態，並重新開始一場。";
 "action.reset" = "重設";
 "action.confirm" = "確認";
 "action.cancel" = "取消";

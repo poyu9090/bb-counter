@@ -406,9 +406,11 @@ struct ChipHistoryButton: View {
     }
 }
 
-struct ChipChangeHistorySheet: View {
+struct ChipChangeHistoryView: View {
     let records: [ChipChangeRecord]
     let onClear: () -> Void
+    /// 當成分頁使用時不需要「完成」。
+    var showsDoneButton: Bool = true
     @Environment(\.dismiss) private var dismiss
     @State private var showClearConfirmation: Bool = false
 
@@ -432,8 +434,10 @@ struct ChipChangeHistorySheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("action.done") {
-                        dismiss()
+                    if showsDoneButton {
+                        Button("action.done") {
+                            dismiss()
+                        }
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {

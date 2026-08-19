@@ -12,7 +12,6 @@ struct ResultView: View {
     let onEditChips: () -> Void
     let onApplyChipChange: (Int) -> Void
     let onEditBlinds: () -> Void
-    let onReset: () -> Void
 
 	// Explicit initializer to avoid private memberwise init exposure issues
 	init(
@@ -26,8 +25,7 @@ struct ResultView: View {
 		onClearChipHistory: @escaping () -> Void,
 		onEditChips: @escaping () -> Void,
 		onApplyChipChange: @escaping (Int) -> Void,
-		onEditBlinds: @escaping () -> Void,
-		onReset: @escaping () -> Void
+		onEditBlinds: @escaping () -> Void
 	) {
 		self.chips = chips
 		self._smallBlind = smallBlind
@@ -40,7 +38,6 @@ struct ResultView: View {
 		self.onEditChips = onEditChips
 		self.onApplyChipChange = onApplyChipChange
 		self.onEditBlinds = onEditBlinds
-		self.onReset = onReset
 	}
     
     private var bbCount: Double {
@@ -89,7 +86,6 @@ struct ResultView: View {
 	}
 	
 	@State private var showTimerSheet: Bool = false
-	@State private var showResetConfirmation: Bool = false
 	@State private var showChipHistory: Bool = false
 	@State private var showChipQuickAdjust: Bool = false
 	@State private var showHandActionLines: Bool = false
@@ -166,7 +162,7 @@ struct ResultView: View {
 			}
 			.padding(.horizontal, 16)
 			.padding(.top, 18)
-			.padding(.bottom, 96)
+			.padding(.bottom, 24)
 		}
 		.accessibilityIdentifier("result.screen")
 		.background(
@@ -208,102 +204,16 @@ struct ResultView: View {
 		.onChange(of: shouldShowAllInRangePrompt) { _, _ in
 			trackAllInPromptImpressionIfNeeded()
 		}
-		.keyboardAwareBottomBar {
-			VStack(spacing: 10) {
-				HStack(spacing: 12) {
-					Button(role: .destructive) {
-						showResetConfirmation = true
-					} label: {
-						Label("action.reset", systemImage: "arrow.counterclockwise")
-							.labelStyle(.iconOnly)
-							.frame(width: 44, height: 44)
-					}
-					.buttonStyle(.bordered)
-					.controlSize(.regular)
-					.tint(Theme.healthRed)
-					.accessibilityLabel(Text("action.reset"))
-					.accessibilityIdentifier("result.reset")
-
-					Button {
-						showChipQuickAdjust = true
-					} label: {
-						HStack(spacing: 8) {
-							Image(systemName: "plusminus.circle.fill")
-								.imageScale(.medium)
-							Text("chips.quick_adjust")
-								.lineLimit(1)
-								.minimumScaleFactor(0.62)
-						}
-							.frame(maxWidth: .infinity)
-							.padding(.vertical, 13)
-					}
-					.buttonStyle(.borderedProminent)
-					.accessibilityIdentifier("chips.quickAdjust.bottom")
-					
-					Button(action: onEditBlinds) {
-						HStack(spacing: 8) {
-							Image(systemName: "rectangle.split.2x1.fill")
-								.imageScale(.medium)
-							Text("action.edit_blinds")
-								.lineLimit(1)
-								.minimumScaleFactor(0.62)
-						}
-							.frame(maxWidth: .infinity)
-							.padding(.vertical, 13)
-					}
-					.buttonStyle(.bordered)
-				}
-				.padding(.horizontal)
-			}
-			.padding(.vertical, 10)
-			.background(.ultraThinMaterial)
-			.background(Theme.background.opacity(0.76))
-		}
 		.sheet(isPresented: $showTimerSheet) {
-			TimerConfigSheet(
+			TimerConfigLauncher(
 				isPresented: $showTimerSheet,
+				blindSession: blindSession,
+				smallBlind: $smallBlind,
+				bigBlind: $bigBlind,
 				timerEnabled: $timerEnabled,
 				timerDurationSec: $timerDurationSec,
-				timerRemainingSec: $blindSession.remainingSeconds,
-				progression: BlindTimerSession.progression,
-					currentIndex: blindSession.currentIndex(for: bigBlind),
-					selectedIndicesSet: $blindSession.selectedIndicesSet,
-					onStart: { orderedIndices, customProgression, customCurrentIndex in
-						blindSession.activeCustomProgression = customProgression
-						if let custom = customProgression, let cur = customCurrentIndex, cur >= 0, cur < custom.count {
-							smallBlind = custom[cur].sb
-							bigBlind = custom[cur].bb
-						blindSession.queuedIndices = Array((cur + 1)..<custom.count)
-					} else {
-						blindSession.queuedIndices = orderedIndices
-					}
-					timerEnabled = true
-					blindSession.invalidateCountdownAnchor()
-					blindSession.isPaused = false
-					blindSession.remainingSeconds = min(max(1, blindSession.remainingSeconds), timerDurationSec)
-					if let first = blindSession.queuedIndices.first {
-						blindSession.selectedNextIndex = first
-					} else {
-						blindSession.setupNextLevel(bigBlind: bigBlind)
-					}
-					syncLiveActivityFromCurrentState()
-				}
+				chips: chips
 			)
-			.presentationDetents([.large])
-			.presentationDragIndicator(.visible)
-			.tint(Theme.accent)
-			.preferredColorScheme(.dark)
-			.background(Theme.background)
-		}
-		.sheet(isPresented: $showResetConfirmation) {
-			ResetConfirmationSheet(
-				isPresented: $showResetConfirmation,
-				onConfirm: {
-					onReset()
-				}
-			)
-			.presentationDetents([.medium])
-			.presentationDragIndicator(.visible)
 		}
 		.sheet(isPresented: $showChipQuickAdjust) {
 			ChipQuickAdjustSheet(
@@ -316,7 +226,7 @@ struct ResultView: View {
 			.preferredColorScheme(.dark)
 		}
 		.sheet(isPresented: $showChipHistory) {
-			ChipChangeHistorySheet(
+			ChipChangeHistoryView(
 				records: chipChangeRecords,
 				onClear: onClearChipHistory
 			)
@@ -326,7 +236,7 @@ struct ResultView: View {
 			.preferredColorScheme(.dark)
 		}
 		.sheet(isPresented: $showHandActionLines) {
-			HandActionLineSheet(
+			HandActionLineListView(
 				smallBlind: smallBlind > 0 ? smallBlind : bigBlind / 2,
 				bigBlind: bigBlind,
 				stackBB: bbCount

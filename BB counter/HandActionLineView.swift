@@ -1,10 +1,12 @@
 import SwiftUI
 import UIKit
 
-struct HandActionLineSheet: View {
+struct HandActionLineListView: View {
     let smallBlind: Int
     let bigBlind: Int
     let stackBB: Double
+    /// 當成分頁使用時不需要「完成」，只有以 sheet 開啟時才要收起來的入口。
+    var showsDoneButton: Bool = true
 
     @Environment(\.dismiss) private var dismiss
     @AppStorage("handActionLineRecords") private var recordsStored: String = "[]"
@@ -42,8 +44,10 @@ struct HandActionLineSheet: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("action.done") {
-                        dismiss()
+                    if showsDoneButton {
+                        Button("action.done") {
+                            dismiss()
+                        }
                     }
                 }
                 ToolbarItem(placement: .topBarTrailing) {
@@ -53,6 +57,7 @@ struct HandActionLineSheet: View {
                         Image(systemName: "plus")
                     }
                     .accessibilityLabel(Text("hand.create"))
+                    .accessibilityIdentifier("hand.create")
                 }
             }
             .keyboardAwareBottomBar {

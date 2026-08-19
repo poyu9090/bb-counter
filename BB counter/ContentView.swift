@@ -159,7 +159,7 @@ struct ContentView: View {
     }
 
     private var resultStepView: some View {
-        ResultView(
+        RootTabView(
             chips: chipsStored,
             smallBlind: $smallBlindStored,
             bigBlind: $bigBlindStored,
