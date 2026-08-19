@@ -111,9 +111,12 @@ struct ChipChangeCard: View {
                         .lineLimit(1)
                         .minimumScaleFactor(0.5)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 36)
+                        .frame(height: 44)
                 }
                 .buttonStyle(.bordered)
+                .accessibilityLabel(
+                    Text(String(format: NSLocalizedString("dashboard.quick_add_a11y", comment: ""), formattedChips(value)))
+                )
                 .accessibilityIdentifier("dashboard.quick.\(value)")
             }
 
@@ -123,7 +126,7 @@ struct ChipChangeCard: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 36)
+                    .frame(height: 44)
             }
             .buttonStyle(.bordered)
             .accessibilityIdentifier("dashboard.changeTotal")
@@ -152,12 +155,15 @@ struct ChipChangeCard: View {
                     .foregroundStyle(Theme.secondaryText)
             }
             .padding(.top, 10)
+            .frame(minHeight: 44)
             .overlay(alignment: .top) {
                 Rectangle().fill(Theme.surfaceStroke).frame(height: 1)
             }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isButton)
         .accessibilityIdentifier("dashboard.openHistory")
     }
 

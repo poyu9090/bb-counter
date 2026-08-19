@@ -10,6 +10,7 @@
 "dashboard.session" = "Session %@";
 "dashboard.win" = "Win";
 "dashboard.lose" = "Loss";
+"dashboard.quick_add_a11y" = "Add %@";
 "dashboard.record" = "Log";
 "dashboard.change_total" = "Set total";
 "dashboard.session_footer" = "%d changes · started at %@";

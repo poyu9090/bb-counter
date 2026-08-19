@@ -10,6 +10,8 @@ struct BlindTimerCard: View {
     let bigBlind: Int
     let onConfigure: () -> Void
 
+    @ScaledMetric(relativeTo: .largeTitle) private var clockFontSize: CGFloat = 46
+
     private var outlook: BlindOutlook {
         BlindOutlook.make(
             chips: chips,
@@ -26,7 +28,7 @@ struct BlindTimerCard: View {
     }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 16) {
             header
             if bigBlind <= 0 {
                 missingBlindsBody
@@ -76,9 +78,9 @@ struct BlindTimerCard: View {
     private var runningBody: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack(alignment: .center, spacing: 16) {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: 6) {
                     Text(formattedTime(blindSession.remainingSeconds))
-                        .font(.system(size: 46, weight: .black, design: .rounded))
+                        .font(.system(size: min(clockFontSize, 64), weight: .black, design: .rounded))
                         .monospacedDigit()
                         .foregroundStyle(Theme.primaryText)
                         .minimumScaleFactor(0.6)
@@ -113,6 +115,8 @@ struct BlindTimerCard: View {
 
             ProgressView(value: progress)
                 .tint(Theme.healthOrange)
+                .accessibilityLabel(Text("timer.title"))
+                .accessibilityValue(Text(formattedTime(blindSession.remainingSeconds)))
         }
     }
 

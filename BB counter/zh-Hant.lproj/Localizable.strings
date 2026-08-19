@@ -10,6 +10,7 @@
 "dashboard.session" = "本場 %@";
 "dashboard.win" = "贏";
 "dashboard.lose" = "輸";
+"dashboard.quick_add_a11y" = "增加 %@";
 "dashboard.record" = "記錄";
 "dashboard.change_total" = "改總額";
 "dashboard.session_footer" = "%d 筆變化 · 起始 %@";

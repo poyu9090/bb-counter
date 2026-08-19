@@ -8,6 +8,9 @@ struct StackStatusCard: View {
     let onEditChips: () -> Void
     let onEditBlinds: () -> Void
 
+    /// 固定 78pt 會完全無視動態字級；綁在 largeTitle 上讓它跟著放大，但設上限免得撐爆卡片。
+    @ScaledMetric(relativeTo: .largeTitle) private var bbFontSize: CGFloat = 78
+
     private var bbCount: Double {
         guard bigBlind > 0 else { return 0 }
         return Double(chips) / Double(bigBlind)
@@ -54,7 +57,7 @@ struct StackStatusCard: View {
 
             HStack(alignment: .lastTextBaseline, spacing: 8) {
                 Text(hasBlinds ? formattedBB(bbCount) : "--")
-                    .font(.system(size: 78, weight: .black, design: .rounded))
+                    .font(.system(size: min(bbFontSize, 104), weight: .black, design: .rounded))
                     .foregroundStyle(hasBlinds ? statusColor : Theme.secondaryText)
                     .minimumScaleFactor(0.45)
                     .lineLimit(1)
@@ -112,7 +115,7 @@ struct StackStatusCard: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.6)
             }
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .frame(maxWidth: .infinity, minHeight: 44, alignment: .leading)
             .padding(.leading, 12)
             .contentShape(Rectangle())
         }
