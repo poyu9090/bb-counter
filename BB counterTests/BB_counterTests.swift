@@ -59,6 +59,131 @@ struct BB_counterTests {
         #expect(session.remainingSeconds > 0)
     }
 
+    // MARK: - Session summary
+
+    private func chipRecords(_ pairs: [(previous: Int, new: Int)]) -> [ChipChangeRecord] {
+        // 實際儲存是最新的排最前面，所以這裡把時間序反過來。
+        pairs.reversed().enumerated().map { offset, pair in
+            ChipChangeRecord(
+                id: UUID(),
+                previousChips: pair.previous,
+                newChips: pair.new,
+                changedAt: Date(timeIntervalSince1970: 1_700_000_000 - Double(offset * 60))
+            )
+        }
+    }
+
+    @Test func sessionDeltaComparesCurrentAgainstStart() async throws {
+        let records = chipRecords([(30_000, 32_000), (32_000, 34_000)])
+
+        let summary = SessionSummary.make(currentChips: 34_000, storedStartChips: 30_000, records: records)
+
+        #expect(summary.startChips == 30_000)
+        #expect(summary.delta == 4_000)
+        #expect(summary.recordCount == 2)
+        #expect(summary.sparkline == [30_000, 32_000, 34_000])
+    }
+
+    @Test func sessionDeltaSurvivesATotalRewrite() async throws {
+        // 改總額不是增減，所以只有「目前 − 起始」算得對。
+        let records = chipRecords([(30_000, 32_000), (32_000, 12_000)])
+
+        let summary = SessionSummary.make(currentChips: 12_000, storedStartChips: 30_000, records: records)
+
+        #expect(summary.delta == -18_000)
+    }
+
+    @Test func sessionStartFallsBackToOldestRecord() async throws {
+        let records = chipRecords([(30_000, 32_000), (32_000, 34_000)])
+
+        let summary = SessionSummary.make(currentChips: 34_000, storedStartChips: 0, records: records)
+
+        #expect(summary.startChips == 30_000)
+        #expect(summary.delta == 4_000)
+    }
+
+    @Test func sessionStartsFlatWithoutAnyHistory() async throws {
+        let summary = SessionSummary.make(currentChips: 34_000, storedStartChips: 0, records: [])
+
+        #expect(summary.startChips == 34_000)
+        #expect(summary.delta == 0)
+        #expect(summary.sparkline == [34_000])
+    }
+
+    @Test func sparklineCapsPointsAndEndsAtCurrentChips() async throws {
+        let pairs = (0..<12).map { (previous: 30_000 + $0 * 1_000, new: 31_000 + $0 * 1_000) }
+        let records = chipRecords(pairs)
+
+        let summary = SessionSummary.make(currentChips: 42_000, storedStartChips: 30_000, records: records)
+
+        #expect(summary.sparkline.count == SessionSummary.sparklinePointLimit)
+        #expect(summary.sparkline.last == 42_000)
+    }
+
+    // MARK: - Blind outlook
+
+    private let sampleProgression = [
+        BlindLevel(sb: 100, bb: 200),
+        BlindLevel(sb: 200, bb: 400),
+        BlindLevel(sb: 300, bb: 600)
+    ]
+
+    @Test func blindOutlookPrefersTheQueuedLevel() async throws {
+        let outlook = BlindOutlook.make(
+            chips: 34_000,
+            currentBigBlind: 200,
+            progression: sampleProgression,
+            queuedIndices: [2],
+            selectedNextIndex: 1
+        )
+
+        #expect(outlook.nextLevel == BlindLevel(sb: 300, bb: 600))
+        #expect(outlook.stackAfterNextLevel == 34_000.0 / 600.0)
+    }
+
+    @Test func blindOutlookFallsBackToSelectedNextIndex() async throws {
+        let outlook = BlindOutlook.make(
+            chips: 34_000,
+            currentBigBlind: 200,
+            progression: sampleProgression,
+            queuedIndices: [],
+            selectedNextIndex: 1
+        )
+
+        #expect(outlook.nextLevel == BlindLevel(sb: 200, bb: 400))
+        #expect(outlook.stackAfterNextLevel == 85)
+        #expect(outlook.healthTier == 3)
+    }
+
+    @Test func blindOutlookHasNothingAfterTheLastLevel() async throws {
+        let outlook = BlindOutlook.make(
+            chips: 34_000,
+            currentBigBlind: 600,
+            progression: sampleProgression,
+            queuedIndices: [],
+            selectedNextIndex: 2
+        )
+
+        #expect(outlook.hasNextLevel == false)
+        #expect(outlook.stackAfterNextLevel == nil)
+        #expect(outlook.healthTier == nil)
+    }
+
+    @Test func blindOutlookFollowsACustomStructure() async throws {
+        let custom = [BlindLevel(sb: 25, bb: 50), BlindLevel(sb: 50, bb: 100)]
+
+        let outlook = BlindOutlook.make(
+            chips: 3_400,
+            currentBigBlind: 50,
+            progression: custom,
+            queuedIndices: [],
+            selectedNextIndex: 1
+        )
+
+        #expect(outlook.nextLevel == BlindLevel(sb: 50, bb: 100))
+        #expect(outlook.stackAfterNextLevel == 34)
+    }
+
     // MARK: - Hand pot math
 
     private func record(with actions: [(HandStreet, String, String, String)], stackBB: Double = 100) -> HandActionLineRecord {
