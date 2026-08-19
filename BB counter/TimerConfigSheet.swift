@@ -68,6 +68,18 @@ struct TimerConfigSheet: View {
 		}
 	}
 
+	/// 「自訂結構」「自訂結構 2」…，避免同名。
+	private func suggestedStructureName() -> String {
+		let base = NSLocalizedString("timer.default_custom_name", comment: "")
+		let existing = Set(customStructures.map(\.name))
+		guard existing.contains(base) else { return base }
+		var index = 2
+		while existing.contains("\(base) \(index)") {
+			index += 1
+		}
+		return "\(base) \(index)"
+	}
+
 	private func saveCustomStructure(_ structure: BlindStructure, currentIndex: Int?) {
 		if let existing = customStructures.firstIndex(where: { $0.id == structure.id }) {
 			customStructures[existing] = structure
@@ -369,11 +381,13 @@ struct TimerConfigSheet: View {
 				isPresented: $showCustomEditSheet,
 				initialStructure: isCreatingCustomStructure ? nil : (editingCustomStructure ?? selectedCustomStructure()),
 				initialCurrentIndex: isCreatingCustomStructure ? nil : currentIndexForSelectedCustomStructure(),
+				suggestedName: suggestedStructureName(),
 				onSave: { structure, currentIndex in
 					saveCustomStructure(structure, currentIndex: currentIndex)
 					isCreatingCustomStructure = false
 				}
 			)
+			.interactiveDismissDisabled()
 		}
 		.keyboardAwareBottomBar {
 			VStack(spacing: 8) {
@@ -630,6 +644,8 @@ private struct CustomBlindEditSheet: View {
 	@Binding var isPresented: Bool
 	let initialStructure: BlindStructure?
 	let initialCurrentIndex: Int?
+	/// 新建時的預設名稱，避免每個都叫「自訂結構」而分不出來。
+	let suggestedName: String
 	let onSave: (BlindStructure, Int?) -> Void
 
 	private struct LevelRow: Identifiable {
@@ -647,7 +663,7 @@ private struct CustomBlindEditSheet: View {
 
 	private func loadRowsIfNeeded() {
 		if rows.isEmpty {
-			nameText = initialStructure?.name ?? NSLocalizedString("timer.default_custom_name", comment: "")
+			nameText = initialStructure?.name ?? suggestedName
 			let initialLevels = initialStructure?.levels ?? []
 			if initialLevels.isEmpty {
 				rows = (0..<defaultCustomLevelCount).map { _ in LevelRow(sb: "", bb: "") }
@@ -683,7 +699,7 @@ private struct CustomBlindEditSheet: View {
 			return BlindLevel(sb: sb, bb: bb)
 		}
 		if cleaned.isEmpty {
-			isPresented = false
+			validationMessage = NSLocalizedString("timer.validation_levels_required", comment: "")
 			return
 		}
 		if let error = BlindStructureValidation.validate(name: nameText, levels: cleaned) {
