@@ -29,8 +29,8 @@ func syncLiveActivityPayload(
 	let stackBBNumeric = nf.string(from: NSNumber(value: bbCount)) ?? String(format: "%.1f", bbCount)
 	let tier = liveActivityStackBBHealthTier(bbCount: bbCount)
 	let blindsText: String = {
-		guard smallBlind > 0, bigBlind > 0 else { return "—" }
-		return "\(smallBlind)/\(bigBlind)"
+		guard bigBlind > 0 else { return "—" }
+		return "\(bigBlind)"
 	}()
 	let rem = blindSession.remainingSeconds
 	let timeText = String(format: "%02d:%02d", rem / 60, rem % 60)

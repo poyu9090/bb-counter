@@ -121,7 +121,7 @@ struct BlindTimerCard: View {
     private var nextLevelLine: some View {
         if let next = outlook.nextLevel {
             VStack(alignment: .leading, spacing: 3) {
-                Text("\(NSLocalizedString("timer.next", comment: "")): \(next.sb)/\(next.bb)")
+                Text("\(NSLocalizedString("timer.next", comment: "")): \(next.bb)")
                     .font(.subheadline.weight(.medium))
                     .foregroundStyle(Theme.secondaryText)
                     .lineLimit(1)

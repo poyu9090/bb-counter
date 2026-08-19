@@ -1,24 +1,22 @@
 import SwiftUI
 
 struct BlindLevelView: View {
-    @Binding var smallBlindText: String
     @Binding var bigBlindText: String
-    let selectPreset: (Int, Int) -> Void
+    /// 只回報大盲；小盲一律由大盲推導，介面上不再出現。
+    let selectPreset: (Int) -> Void
     let onShowResult: () -> Void
     let onBack: () -> Void
     let onAppear: () -> Void
     let isEditingFromResult: Bool
     
     init(
-        smallBlindText: Binding<String>,
         bigBlindText: Binding<String>,
-        selectPreset: @escaping (Int, Int) -> Void,
+        selectPreset: @escaping (Int) -> Void,
         onShowResult: @escaping () -> Void,
         onBack: @escaping () -> Void,
         onAppear: @escaping () -> Void,
         isEditingFromResult: Bool = false
     ) {
-        self._smallBlindText = smallBlindText
         self._bigBlindText = bigBlindText
         self.selectPreset = selectPreset
         self.onShowResult = onShowResult
@@ -27,10 +25,7 @@ struct BlindLevelView: View {
         self.isEditingFromResult = isEditingFromResult
     }
     
-    private let presets: [(sb: Int, bb: Int)] = [
-        (100, 200), (200, 400), (300, 600), (500, 1000), (1000, 2000),
-        (1500, 3000), (2000, 4000), (3000, 6000), (5000, 10000)
-    ]
+    private let presets: [Int] = [200, 400, 600, 1000, 2000, 3000, 4000, 6000, 10000]
     private let maxBlindValue: Int = 99_999_999
     @State private var selectedPresetBB: Int = 200
     @FocusState private var focusedInput: BlindFocusedInput?
@@ -39,22 +34,17 @@ struct BlindLevelView: View {
         Int(bigBlindText)
     }
 
-    private var parsedSmallBlind: Int? {
-        Int(smallBlindText)
-    }
-
     private var inputErrorKey: String? {
-        guard !smallBlindText.isEmpty || !bigBlindText.isEmpty else { return nil }
-        guard let sb = parsedSmallBlind, let bb = parsedBigBlind else { return "input.error_too_large" }
-        if sb <= 0 || bb <= 0 { return "input.error_required" }
-        if sb > maxBlindValue || bb > maxBlindValue { return "input.error_too_large" }
-        if bb < sb { return "timer.validation_bb_lt_sb_plain" }
+        guard !bigBlindText.isEmpty else { return nil }
+        guard let bb = parsedBigBlind else { return "input.error_too_large" }
+        if bb <= 0 { return "input.error_required" }
+        if bb > maxBlindValue { return "input.error_too_large" }
         return nil
     }
 
     private var canProceed: Bool {
-        guard let sb = parsedSmallBlind, let bb = parsedBigBlind else { return false }
-        return sb > 0 && bb > 0 && sb <= maxBlindValue && bb <= maxBlindValue && bb >= sb
+        guard let bb = parsedBigBlind else { return false }
+        return bb > 0 && bb <= maxBlindValue
     }
     
     var body: some View {
@@ -118,24 +108,24 @@ struct BlindLevelView: View {
                         .padding(.horizontal, 8)
 
                         TabView(selection: $selectedPresetBB) {
-                            ForEach(presets, id: \.bb) { level in
+                            ForEach(presets, id: \.self) { bigBlind in
                                 Button {
-                                    applyPreset(level)
+                                    applyPreset(bigBlind)
                                 } label: {
-                                    currentBlindSelection(level)
+                                    currentBlindSelection(bigBlind)
                                         .frame(maxWidth: .infinity, minHeight: 128)
                                         .contentShape(Rectangle())
                                 }
                                 .buttonStyle(.plain)
-                                .tag(level.bb)
-                                .accessibilityIdentifier("blind.preset.\(level.bb)")
+                                .tag(bigBlind)
+                                .accessibilityIdentifier("blind.preset.\(bigBlind)")
                             }
                         }
                         .tabViewStyle(.page(indexDisplayMode: .always))
                         .frame(height: 168)
                         .onChange(of: selectedPresetBB) { _, newValue in
-                            if let level = presets.first(where: { $0.bb == newValue }) {
-                                applyPreset(level)
+                            if presets.contains(newValue) {
+                                applyPreset(newValue)
                             }
                         }
                     }
@@ -145,25 +135,16 @@ struct BlindLevelView: View {
                         Text("blinds.enter")
                             .font(.subheadline)
                             .foregroundStyle(Theme.secondaryText)
-                        HStack(spacing: 10) {
-                            blindInputField(
-                                titleKey: "blinds.small_blind",
-                                placeholderKey: "blinds.small_placeholder",
-                                text: $smallBlindText,
-                                identifier: "blind.small.input",
-                                focus: .smallBlind
-                            )
-                            blindInputField(
-                                titleKey: "blinds.big_blind",
-                                placeholderKey: "blinds.big_placeholder",
-                                text: $bigBlindText,
-                                identifier: "blind.input",
-                                focus: .bigBlind
-                            )
-                        }
+                        blindInputField(
+                            titleKey: "blinds.big_blind",
+                            placeholderKey: "blinds.big_placeholder",
+                            text: $bigBlindText,
+                            identifier: "blind.input",
+                            focus: .bigBlind
+                        )
                         .onAppear {
                             onAppear()
-                            if smallBlindText.isEmpty, bigBlindText.isEmpty, let first = presets.first {
+                            if bigBlindText.isEmpty, let first = presets.first {
                                 applyPreset(first)
                             } else {
                                 syncPresetSelectionFromText()
@@ -212,17 +193,9 @@ struct BlindLevelView: View {
     }
     
     @ViewBuilder
-    private func currentBlindSelection(_ level: (sb: Int, bb: Int)) -> some View {
-        VStack(spacing: 10) {
-            HStack(alignment: .firstTextBaseline, spacing: 14) {
-                blindValueColumn(title: "SB", value: level.sb)
-                Rectangle()
-                    .fill(Theme.surfaceStroke)
-                    .frame(width: 1, height: 44)
-                blindValueColumn(title: "BB", value: level.bb)
-            }
-        }
-        .padding(.horizontal, 24)
+    private func currentBlindSelection(_ bigBlind: Int) -> some View {
+        blindValueColumn(title: "BB", value: bigBlind)
+            .padding(.horizontal, 24)
     }
 
     private func blindValueColumn(title: String, value: Int) -> some View {
@@ -291,45 +264,44 @@ struct BlindLevelView: View {
         }
     }
 
-    private func applyPreset(_ level: (sb: Int, bb: Int)) {
-        if smallBlindText != String(level.sb) || bigBlindText != String(level.bb) {
-            selectPreset(level.sb, level.bb)
+    private func applyPreset(_ bigBlind: Int) {
+        if bigBlindText != String(bigBlind) {
+            selectPreset(bigBlind)
         }
     }
 
     private func syncPresetSelectionFromText() {
         guard let value = Int(bigBlindText),
-              presets.contains(where: { $0.bb == value }),
+              presets.contains(value),
               selectedPresetBB != value
         else { return }
         selectedPresetBB = value
     }
 
     private func currentPresetPosition() -> Int {
-        guard let index = presets.firstIndex(where: { $0.bb == selectedPresetBB }) else { return 1 }
+        guard let index = presets.firstIndex(of: selectedPresetBB) else { return 1 }
         return index + 1
     }
 
     private func movePreset(delta: Int) {
-        guard let currentIndex = presets.firstIndex(where: { $0.bb == selectedPresetBB }) else { return }
+        guard let currentIndex = presets.firstIndex(of: selectedPresetBB) else { return }
         let nextIndex = currentIndex + delta
         guard presets.indices.contains(nextIndex) else { return }
-        selectedPresetBB = presets[nextIndex].bb
+        selectedPresetBB = presets[nextIndex]
     }
 
-    private func previousPreset(before bb: Int) -> (sb: Int, bb: Int)? {
-        guard let index = presets.firstIndex(where: { $0.bb == bb }), index > 0 else { return nil }
+    private func previousPreset(before bb: Int) -> Int? {
+        guard let index = presets.firstIndex(of: bb), index > 0 else { return nil }
         return presets[index - 1]
     }
 
-    private func nextPreset(after bb: Int) -> (sb: Int, bb: Int)? {
-        guard let index = presets.firstIndex(where: { $0.bb == bb }), index + 1 < presets.count else { return nil }
+    private func nextPreset(after bb: Int) -> Int? {
+        guard let index = presets.firstIndex(of: bb), index + 1 < presets.count else { return nil }
         return presets[index + 1]
     }
 }
 
 private enum BlindFocusedInput: Hashable {
-    case smallBlind
     case bigBlind
     case inputGroup
 }

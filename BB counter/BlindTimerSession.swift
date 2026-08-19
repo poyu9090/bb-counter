@@ -73,12 +73,12 @@ final class BlindTimerSession: ObservableObject {
         let prog = effectiveProgression()
         if let first = queuedIndices.first, first < prog.count {
             let level = prog[first]
-            return "\(level.sb)/\(level.bb)"
+            return "\(level.bb)"
         }
         let idx = min(max(0, selectedNextIndex), max(0, prog.count - 1))
         guard idx >= 0, idx < prog.count else { return "" }
         let level = prog[idx]
-        return "\(level.sb)/\(level.bb)"
+        return "\(level.bb)"
     }
 
     func invalidateCountdownAnchor() {

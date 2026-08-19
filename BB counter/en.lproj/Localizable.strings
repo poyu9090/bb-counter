@@ -70,9 +70,7 @@
 "blinds.title" = "What's the current blind level?";
 "blinds.subtitle" = "Current blind level";
 "blinds.enter" = "Or enter blinds manually";
-"blinds.small_blind" = "Small Blind";
 "blinds.big_blind" = "Big Blind";
-"blinds.small_placeholder" = "SB";
 "blinds.big_placeholder" = "BB";
 "blinds.placeholder" = "Big Blind (BB)";
 
@@ -194,7 +192,6 @@
 "timer.validation_levels_required" = "Add at least one blind level.";
 "timer.validation_positive" = "SB and BB must be greater than zero.";
 "timer.validation_bb_lt_sb" = "Level %d has BB lower than SB.";
-"timer.validation_bb_lt_sb_plain" = "BB cannot be lower than SB.";
 "timer.validation_not_increasing" = "Level %d must have a higher BB than the previous level.";
 "timer.validation_duplicate" = "Level %d duplicates the previous level.";
 

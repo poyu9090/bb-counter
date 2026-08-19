@@ -228,7 +228,6 @@ private struct HandActionLineEditor: View {
     @State private var draft: HandActionLineRecord
     @State private var selectedStreet: HandStreet = .preflop
     @State private var selectedPosition: String = "UTG"
-    @State private var smallBlindText: String
     @State private var bigBlindText: String
     @State private var chipsText: String
     @State private var selectedPlayerCount: Int
@@ -247,7 +246,6 @@ private struct HandActionLineEditor: View {
     init(record: HandActionLineRecord, onSave: @escaping (HandActionLineRecord) -> Void) {
         self._draft = State(initialValue: record)
         self._selectedStreet = State(initialValue: .preflop)
-        self._smallBlindText = State(initialValue: record.smallBlind > 0 ? String(record.smallBlind) : "")
         self._bigBlindText = State(initialValue: record.bigBlind > 0 ? String(record.bigBlind) : "")
         self._chipsText = State(initialValue: record.chips > 0 ? String(record.chips) : "")
         self._selectedPlayerCount = State(initialValue: min(max(record.playerCount, 6), 9))
@@ -1342,14 +1340,11 @@ private struct HandActionLineEditor: View {
     }
 
     private func applyEditableMeta(to record: inout HandActionLineRecord) {
-        let sb = numericValue(from: smallBlindText)
         let bb = numericValue(from: bigBlindText)
         let chips = numericValue(from: chipsText)
         if bb > 0 {
             record.bigBlind = bb
-            record.smallBlind = sb > 0 ? sb : max(1, bb / 2)
-        } else if sb > 0 {
-            record.smallBlind = sb
+            record.smallBlind = max(1, bb / 2)
         }
         if chips > 0 {
             record.chips = chips

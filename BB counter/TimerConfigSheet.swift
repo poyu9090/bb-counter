@@ -500,7 +500,7 @@ struct TimerConfigSheet: View {
 			let pairs = indices.compactMap { i -> String? in
 				guard i >= 0 && i < prog.count else { return nil }
 				let l = prog[i]
-				return "\(l.sb)/\(l.bb)"
+				return "\(l.bb)"
 			}
 			return pairs.isEmpty ? NSLocalizedString("timer.no_levels", comment: "No levels") : pairs.joined(separator: "  ·  ")
 		}
@@ -547,7 +547,7 @@ struct TimerConfigSheet: View {
 		return nextThree.compactMap { i -> String? in
 			guard i >= 0 && i < prog.count else { return nil }
 			let l = prog[i]
-			return "\(l.sb) / \(l.bb)"
+			return "\(l.bb)"
 		}
 	}
 
@@ -650,7 +650,6 @@ private struct CustomBlindEditSheet: View {
 
 	private struct LevelRow: Identifiable {
 		let id = UUID()
-		var sb: String
 		var bb: String
 	}
 
@@ -666,16 +665,16 @@ private struct CustomBlindEditSheet: View {
 			nameText = initialStructure?.name ?? suggestedName
 			let initialLevels = initialStructure?.levels ?? []
 			if initialLevels.isEmpty {
-				rows = (0..<defaultCustomLevelCount).map { _ in LevelRow(sb: "", bb: "") }
+				rows = (0..<defaultCustomLevelCount).map { _ in LevelRow(bb: "") }
 			} else {
-				rows = initialLevels.map { LevelRow(sb: "\($0.sb)", bb: "\($0.bb)") }
+				rows = initialLevels.map { LevelRow(bb: "\($0.bb)") }
 			}
 			selectedCurrentIndex = initialCurrentIndex
 		}
 	}
 
 	private func addRow() {
-		rows.append(LevelRow(sb: "", bb: ""))
+		rows.append(LevelRow(bb: ""))
 	}
 
 	private func removeRow(at index: Int) {
@@ -687,16 +686,16 @@ private struct CustomBlindEditSheet: View {
 			selectedCurrentIndex = s - 1
 		}
 		if rows.isEmpty {
-			rows.append(LevelRow(sb: "", bb: ""))
+			rows.append(LevelRow(bb: ""))
 		}
 	}
 
 	private func commitAndClose() {
 		let cleaned: [BlindLevel] = rows.compactMap { row in
-			let sb = Int(row.sb.filter { $0.isNumber }) ?? 0
 			let bb = Int(row.bb.filter { $0.isNumber }) ?? 0
-			guard sb > 0, bb > 0 else { return nil }
-			return BlindLevel(sb: sb, bb: bb)
+			guard bb > 0 else { return nil }
+			// 介面只問大盲，小盲固定取一半。
+			return BlindLevel(sb: max(1, bb / 2), bb: bb)
 		}
 		if cleaned.isEmpty {
 			validationMessage = NSLocalizedString("timer.validation_levels_required", comment: "")
@@ -819,24 +818,14 @@ private struct CustomBlindEditSheet: View {
 									.buttonStyle(.plain)
 								}
 
-								HStack(spacing: 10) {
-									CustomBlindLevelField(
-										title: "SB",
-										placeholder: idx == 0 ? "500" : "",
-										text: Binding(
-											get: { rows[idx].sb },
-											set: { rows[idx].sb = $0.filter { $0.isNumber } }
-										)
+								CustomBlindLevelField(
+									title: "BB",
+									placeholder: idx == 0 ? "1000" : "",
+									text: Binding(
+										get: { rows[idx].bb },
+										set: { rows[idx].bb = $0.filter { $0.isNumber } }
 									)
-									CustomBlindLevelField(
-										title: "BB",
-										placeholder: idx == 0 ? "1000" : "",
-										text: Binding(
-											get: { rows[idx].bb },
-											set: { rows[idx].bb = $0.filter { $0.isNumber } }
-										)
-									)
-								}
+								)
 							}
 							.padding(14)
 							.background(
@@ -947,7 +936,7 @@ private struct BlindStructureDetailView: View {
 									.frame(width: 40, alignment: .leading)
 
 								// Blinds
-								Text("\(level.sb) / \(level.bb)")
+								Text("\(level.bb)")
 									.font(.body)
 									.foregroundStyle(Theme.primaryText)
 

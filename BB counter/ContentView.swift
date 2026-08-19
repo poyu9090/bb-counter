@@ -43,7 +43,6 @@ struct ContentView: View {
     
     // Working text states for inputs
     @State private var chipsText: String = ""
-    @State private var smallBlindText: String = ""
     @State private var bigBlindText: String = ""
     
     var body: some View {
@@ -74,11 +73,8 @@ struct ContentView: View {
             if chipsStored > 0 && chipsText.isEmpty {
                 chipsText = String(chipsStored)
             }
-            if smallBlindStored == 0, bigBlindStored > 0 {
-                smallBlindStored = bigBlindStored / 2
-            }
-            if smallBlindStored > 0 && smallBlindText.isEmpty {
-                smallBlindText = String(smallBlindStored)
+            if bigBlindStored > 0 {
+                smallBlindStored = max(1, bigBlindStored / 2)
             }
             if bigBlindStored > 0 && bigBlindText.isEmpty {
                 bigBlindText = String(bigBlindStored)
@@ -151,7 +147,6 @@ struct ContentView: View {
 
     private var blindsStepView: some View {
         BlindLevelView(
-            smallBlindText: $smallBlindText,
             bigBlindText: $bigBlindText,
             selectPreset: applyBlindPreset,
             onShowResult: commitBlindsStep,
@@ -225,19 +220,18 @@ struct ContentView: View {
         chipsText = chipsStored > 0 ? String(chipsStored) : ""
     }
 
-    private func applyBlindPreset(_ smallBlind: Int, _ bigBlind: Int) {
-        smallBlindStored = smallBlind
+    /// 只設定大盲；小盲固定是大盲的一半，介面上不再出現。
+    private func applyBlindPreset(_ bigBlind: Int) {
         bigBlindStored = bigBlind
-        smallBlindText = String(smallBlind)
+        smallBlindStored = max(1, bigBlind / 2)
         bigBlindText = String(bigBlind)
     }
 
     private func commitBlindsStep() {
-        let sb = numericValue(from: smallBlindText)
         let bb = numericValue(from: bigBlindText)
-        guard sb > 0, bb > 0, bb >= sb else { return }
-        smallBlindStored = sb
+        guard bb > 0 else { return }
         bigBlindStored = bb
+        smallBlindStored = max(1, bb / 2)
         if isEditingBlindsFromResult {
             isEditingBlindsFromResult = false
         }
@@ -254,14 +248,11 @@ struct ContentView: View {
     }
 
     private func restoreBlindTexts() {
-        if smallBlindStored == 0, bigBlindStored > 0 {
-            smallBlindStored = bigBlindStored / 2
-        }
-        if smallBlindStored > 0 && smallBlindText.isEmpty {
-            smallBlindText = String(smallBlindStored)
-        }
-        if bigBlindStored > 0 && bigBlindText.isEmpty {
-            bigBlindText = String(bigBlindStored)
+        if bigBlindStored > 0 {
+            smallBlindStored = max(1, bigBlindStored / 2)
+            if bigBlindText.isEmpty {
+                bigBlindText = String(bigBlindStored)
+            }
         }
     }
 
@@ -282,7 +273,6 @@ struct ContentView: View {
         smallBlindStored = 0
         bigBlindStored = 0
         chipsText = ""
-        smallBlindText = ""
         bigBlindText = ""
         clearChipChangeRecords()
         sessionStartChips = 0
@@ -362,9 +352,6 @@ struct ContentView: View {
         blindTimerSession.syncFromWallClock(timerEnabled: timerEnabled, timerDurationSec: timerDurationSec, smallBlind: &sb, bigBlind: &bb)
         if sb != smallBlindStored {
             smallBlindStored = sb
-            if step == .blinds {
-                smallBlindText = String(sb)
-            }
         }
         if bb != bigBlindStored {
             bigBlindStored = bb

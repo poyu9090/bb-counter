@@ -39,8 +39,7 @@ struct StackStatusCard: View {
     }
 
     private var blindText: String {
-        guard hasBlinds else { return "—" }
-        return "\(smallBlind > 0 ? smallBlind : bigBlind / 2)/\(bigBlind)"
+        hasBlinds ? "\(bigBlind)" : "—"
     }
 
     var body: some View {

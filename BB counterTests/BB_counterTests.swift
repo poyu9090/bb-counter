@@ -17,7 +17,8 @@ struct BB_counterTests {
         session.setupNextLevel(bigBlind: 200)
 
         #expect(session.selectedNextIndex == 2)
-        #expect(session.nextDisplayLevelText(for: 200) == "200/300")
+        // 介面已不顯示小盲，下一級只報大盲
+        #expect(session.nextDisplayLevelText(for: 200) == "300")
     }
 
     @Test func queuedBlindLevelsAdvanceBeforeDefaultProgression() async throws {

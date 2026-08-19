@@ -70,9 +70,7 @@
 "blinds.title" = "目前盲注等級？";
 "blinds.subtitle" = "目前的盲注等級";
 "blinds.enter" = "或手動輸入盲注";
-"blinds.small_blind" = "小盲";
 "blinds.big_blind" = "大盲";
-"blinds.small_placeholder" = "SB";
 "blinds.big_placeholder" = "BB";
 "blinds.placeholder" = "大盲（BB）";
 
@@ -194,7 +192,6 @@
 "timer.validation_levels_required" = "至少需要一個盲注級別。";
 "timer.validation_positive" = "SB 與 BB 必須大於 0。";
 "timer.validation_bb_lt_sb" = "第 %d 級的 BB 不可小於 SB。";
-"timer.validation_bb_lt_sb_plain" = "大盲不可小於小盲。";
 "timer.validation_not_increasing" = "第 %d 級的 BB 必須高於上一級。";
 "timer.validation_duplicate" = "第 %d 級與上一級重複。";
 
@@ -222,7 +219,7 @@
 "onboarding.step1.title" = "1. 輸入你的籌碼";
 "onboarding.step1.description" = "可直接輸入總籌碼，或用快速按鈕依面額加減。";
 "onboarding.step2.title" = "2. 設定目前盲注";
-"onboarding.step2.description" = "可選擇預設盲注，或手動輸入目前小盲與大盲。";
+"onboarding.step2.description" = "可選擇預設盲注，或手動輸入目前大盲。";
 "onboarding.step3.title" = "3. 查看 BB 並啟用計時";
 "onboarding.step3.description" = "立即看到你的 BB 深度，需要時可開啟盲注計時器。";
 "onboarding.continue" = "開始使用 App";
