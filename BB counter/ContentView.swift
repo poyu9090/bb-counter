@@ -364,7 +364,6 @@ struct ContentView: View {
     private func syncLiveActivityFromContent() {
         syncLiveActivityPayload(
             chips: chipsStored,
-            smallBlind: smallBlindStored,
             bigBlind: bigBlindStored,
             blindSession: blindTimerSession,
             timerEnabled: timerEnabled

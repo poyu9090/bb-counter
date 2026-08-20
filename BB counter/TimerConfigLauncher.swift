@@ -36,7 +36,6 @@ struct TimerConfigLauncher: View {
                 timerEnabled = true
                 syncLiveActivityPayload(
                     chips: chips,
-                    smallBlind: nextSmallBlind > 0 ? nextSmallBlind : nextBigBlind / 2,
                     bigBlind: nextBigBlind,
                     blindSession: blindSession,
                     timerEnabled: true

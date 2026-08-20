@@ -3,7 +3,6 @@ import SwiftUI
 /// 狀態卡：BB 深度是主角，籌碼與盲注在下面一行，各自可以點進去編輯。
 struct StackStatusCard: View {
     let chips: Int
-    let smallBlind: Int
     let bigBlind: Int
     let onEditChips: () -> Void
     let onEditBlinds: () -> Void

@@ -24,7 +24,6 @@ struct DashboardLiveActivitySync: ViewModifier {
     private func sync() {
         syncLiveActivityPayload(
             chips: chips,
-            smallBlind: smallBlind > 0 ? smallBlind : bigBlind / 2,
             bigBlind: bigBlind,
             blindSession: blindSession,
             timerEnabled: timerEnabled

@@ -37,7 +37,6 @@ struct DashboardView: View {
             VStack(spacing: 16) {
                 StackStatusCard(
                     chips: chips,
-                    smallBlind: smallBlind,
                     bigBlind: bigBlind,
                     onEditChips: onEditChips,
                     onEditBlinds: onEditBlinds
@@ -174,7 +173,6 @@ struct DashboardView: View {
     private func syncLiveActivity() {
         syncLiveActivityPayload(
             chips: chips,
-            smallBlind: smallBlind > 0 ? smallBlind : bigBlind / 2,
             bigBlind: bigBlind,
             blindSession: blindSession,
             timerEnabled: timerEnabled

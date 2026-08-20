@@ -14,7 +14,6 @@ func liveActivityStackBBHealthTier(bbCount: Double) -> Int {
 @MainActor
 func syncLiveActivityPayload(
 	chips: Int,
-	smallBlind: Int,
 	bigBlind: Int,
 	blindSession: BlindTimerSession,
 	timerEnabled: Bool
