@@ -23,14 +23,8 @@ struct ChipChangeCard: View {
         amount > 0
     }
 
-    private var deltaColor: Color {
-        if summary.delta == 0 { return Theme.secondaryText }
-        return summary.delta > 0 ? Theme.healthGreen : Theme.healthRed
-    }
-
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            header
             inputRow
             quickRow
             footer
@@ -42,17 +36,6 @@ struct ChipChangeCard: View {
                 .stroke(Theme.accent.opacity(0.35), lineWidth: 1)
         }
         .sensoryFeedback(.success, trigger: recordedTrigger)
-    }
-
-    /// 卡片本身就是輸入區，不需要再標一次「籌碼變化」；標題列讓給本場輸贏。
-    private var header: some View {
-        HStack {
-            Text(String(format: NSLocalizedString("dashboard.session", comment: ""), signedChips(summary.delta)))
-                .font(.headline.weight(.bold))
-                .foregroundStyle(deltaColor)
-                .accessibilityIdentifier("dashboard.sessionDelta")
-            Spacer(minLength: 0)
-        }
     }
 
     private var inputRow: some View {
