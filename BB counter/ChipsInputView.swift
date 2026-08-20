@@ -78,7 +78,7 @@ struct ChipsInputView: View {
         let formatter = NumberFormatter()
         formatter.maximumFractionDigits = 1
         let value = formatter.string(from: NSNumber(value: Double(chips) / Double(bigBlind))) ?? "0"
-        return String(format: NSLocalizedString("chips.depth_preview", comment: ""), value, "\(bigBlind)")
+        return String(format: NSLocalizedString("chips.depth_preview", comment: ""), value, formattedChips(bigBlind))
     }
 
     private var isWideLayout: Bool {
@@ -365,21 +365,23 @@ struct ChipsInputView: View {
                 )
             }
 
-            HStack {
-                Text("chips.after_adjustment")
-                    .font(.caption.weight(.semibold))
-                    .foregroundStyle(Theme.secondaryText)
-                Spacer(minLength: 8)
-                Text(formattedChips(adjustmentPreviewValue))
-                    .font(.subheadline.weight(.bold).monospacedDigit())
-                    .foregroundStyle(Theme.primaryText)
+            if !increaseAmountText.isEmpty || !decreaseAmountText.isEmpty {
+                HStack {
+                    Text("chips.after_adjustment")
+                        .font(.caption.weight(.semibold))
+                        .foregroundStyle(Theme.secondaryText)
+                    Spacer(minLength: 8)
+                    Text(formattedChips(adjustmentPreviewValue))
+                        .font(.subheadline.weight(.bold).monospacedDigit())
+                        .foregroundStyle(Theme.primaryText)
+                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 10)
+                .background(
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(Theme.background.opacity(0.45))
+                )
             }
-            .padding(.horizontal, 12)
-            .padding(.vertical, 10)
-            .background(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(Theme.background.opacity(0.45))
-            )
         }
         .padding(16)
         .background(

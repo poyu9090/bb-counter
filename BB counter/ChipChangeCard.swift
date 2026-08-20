@@ -44,16 +44,14 @@ struct ChipChangeCard: View {
         .sensoryFeedback(.success, trigger: recordedTrigger)
     }
 
+    /// 卡片本身就是輸入區，不需要再標一次「籌碼變化」；標題列讓給本場輸贏。
     private var header: some View {
         HStack {
-            Text("chips.quick_adjust")
-                .font(.headline.weight(.bold))
-                .foregroundStyle(Theme.primaryText)
-            Spacer()
             Text(String(format: NSLocalizedString("dashboard.session", comment: ""), signedChips(summary.delta)))
-                .font(.subheadline.weight(.bold))
+                .font(.headline.weight(.bold))
                 .foregroundStyle(deltaColor)
                 .accessibilityIdentifier("dashboard.sessionDelta")
+            Spacer(minLength: 0)
         }
     }
 

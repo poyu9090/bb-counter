@@ -38,7 +38,7 @@ struct StackStatusCard: View {
     }
 
     private var blindText: String {
-        hasBlinds ? "\(bigBlind)" : "—"
+        hasBlinds ? formattedChips(bigBlind) : "—"
     }
 
     var body: some View {
