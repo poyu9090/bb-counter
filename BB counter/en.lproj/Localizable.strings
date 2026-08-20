@@ -18,7 +18,6 @@
 "dashboard.last_level" = "Last level of the structure";
 "tab.dashboard" = "Dashboard";
 "tab.handline" = "Action line";
-"tab.history" = "History";
 "tab.settings" = "Settings";
 "settings.version" = "Version";
 "settings.reset_footer" = "Clears chips, blinds, change history and timer state, then starts a new session.";
@@ -38,8 +37,6 @@
 "chips.custom_amount_placeholder" = "Amount";
 "chips.increase_amount" = "Increase chips";
 "chips.decrease_amount" = "Decrease chips";
-"chips.adjustment_title" = "Record this chip change";
-"chips.adjustment_subtitle" = "Enter the increase or decrease amount. Your stack updates immediately.";
 "chips.after_adjustment" = "Stack after change";
 "chips.quick_adjust" = "Chip change";
 "chips.quick_adjust_reset" = "Undo";

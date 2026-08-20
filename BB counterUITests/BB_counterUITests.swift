@@ -106,14 +106,14 @@ final class BB_counterUITests: XCTestCase {
         XCTAssertTrue(app.scrollViews["result.screen"].waitForExistence(timeout: 5))
 
         let tabs = app.tabBars.buttons
-        XCTAssertEqual(tabs.count, 4)
+        XCTAssertEqual(tabs.count, 3)
 
         // 行動線分頁
         tabs.element(boundBy: 1).tap()
         XCTAssertTrue(app.buttons["hand.create"].waitForExistence(timeout: 5))
 
         // 設定分頁：重置搬到這裡了
-        tabs.element(boundBy: 3).tap()
+        tabs.element(boundBy: 2).tap()
         XCTAssertTrue(app.buttons["settings.reset"].waitForExistence(timeout: 5))
 
         // 回到儀表板

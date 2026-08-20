@@ -18,7 +18,6 @@
 "dashboard.last_level" = "已是最後一級";
 "tab.dashboard" = "儀表板";
 "tab.handline" = "行動線";
-"tab.history" = "紀錄";
 "tab.settings" = "設定";
 "settings.version" = "版本";
 "settings.reset_footer" = "會清空籌碼、盲注、變更紀錄與計時器狀態，並重新開始一場。";
@@ -38,8 +37,6 @@
 "chips.custom_amount_placeholder" = "輸入數字";
 "chips.increase_amount" = "增加籌碼";
 "chips.decrease_amount" = "減少籌碼";
-"chips.adjustment_title" = "記錄本次籌碼變化";
-"chips.adjustment_subtitle" = "輸入增加或減少數量，上方籌碼會即時更新。";
 "chips.after_adjustment" = "變更後籌碼";
 "chips.quick_adjust" = "籌碼變化";
 "chips.quick_adjust_reset" = "還原";

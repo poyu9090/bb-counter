@@ -6,7 +6,6 @@ struct RootTabView: View {
     enum Tab: Hashable {
         case dashboard
         case handLine
-        case history
         case settings
     }
 
@@ -42,10 +41,11 @@ struct RootTabView: View {
                 timerEnabled: $timerEnabled,
                 timerDurationSec: $timerDurationSec,
                 summary: summary,
+                chipChangeRecords: chipChangeRecords,
+                onClearChipHistory: onClearChipHistory,
                 onEditChips: onEditChips,
                 onApplyChipChange: onApplyChipChange,
-                onEditBlinds: onEditBlinds,
-                onOpenHistory: { selection = .history }
+                onEditBlinds: onEditBlinds
             )
             .tabItem {
                 Label("tab.dashboard", systemImage: "gauge.with.needle")
@@ -61,15 +61,6 @@ struct RootTabView: View {
                 Label("tab.handline", systemImage: "point.3.connected.trianglepath.dotted")
             }
             .tag(Tab.handLine)
-
-            ChipChangeHistoryView(
-                records: chipChangeRecords,
-                onClear: onClearChipHistory
-            )
-            .tabItem {
-                Label("tab.history", systemImage: "clock.arrow.circlepath")
-            }
-            .tag(Tab.history)
 
             SettingsView(
                 blindSession: blindSession,

@@ -346,29 +346,9 @@ struct ChipsInputView: View {
 
     private var customAmountControl: some View {
         VStack(alignment: .leading, spacing: 14) {
-            HStack(alignment: .center, spacing: 10) {
-                Image(systemName: "clock.arrow.circlepath")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Theme.accent)
-                    .frame(width: 28, height: 28)
-                    .background(Circle().fill(Theme.accent.opacity(0.16)))
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("chips.adjustment_title")
-                        .font(.headline.weight(.semibold))
-                        .foregroundStyle(Theme.primaryText)
-                    Text("chips.adjustment_subtitle")
-                        .font(.caption)
-                        .foregroundStyle(Theme.secondaryText)
-                }
-
-                Spacer(minLength: 0)
-            }
-
             VStack(spacing: 10) {
                 adjustmentField(
-                    titleKey: "chips.increase_amount",
-                    placeholderKey: "chips.custom_amount_placeholder",
+                    placeholderKey: "chips.increase_amount",
                     text: $increaseAmountText,
                     focus: .increaseAmount,
                     accessibilityIdentifier: "chips.increaseAmount",
@@ -376,8 +356,7 @@ struct ChipsInputView: View {
                     tint: Theme.healthGreen
                 )
                 adjustmentField(
-                    titleKey: "chips.decrease_amount",
-                    placeholderKey: "chips.custom_amount_placeholder",
+                    placeholderKey: "chips.decrease_amount",
                     text: $decreaseAmountText,
                     focus: .decreaseAmount,
                     accessibilityIdentifier: "chips.decreaseAmount",
@@ -414,7 +393,6 @@ struct ChipsInputView: View {
     }
 
     private func adjustmentField(
-        titleKey: String,
         placeholderKey: String,
         text: Binding<String>,
         focus: ChipsFocusedInput,
@@ -430,10 +408,6 @@ struct ChipsInputView: View {
                 .background(Circle().fill(tint.opacity(0.16)))
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(LocalizedStringKey(titleKey))
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Theme.primaryText)
-
                 TextField(LocalizedStringKey(placeholderKey), text: Binding(
                     get: { text.wrappedValue },
                     set: { newValue in
@@ -448,6 +422,7 @@ struct ChipsInputView: View {
                 .foregroundStyle(Theme.primaryText)
                 .multilineTextAlignment(.leading)
                 .frame(minHeight: 30)
+                .accessibilityLabel(Text(LocalizedStringKey(placeholderKey)))
                 .accessibilityIdentifier(accessibilityIdentifier)
                 .onChange(of: focusedInput) { _, input in
                     if input == focus {

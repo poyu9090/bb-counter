@@ -12,12 +12,14 @@ struct DashboardView: View {
     @Binding var timerEnabled: Bool
     @Binding var timerDurationSec: Int
     let summary: SessionSummary
+    let chipChangeRecords: [ChipChangeRecord]
+    let onClearChipHistory: () -> Void
     let onEditChips: () -> Void
     let onApplyChipChange: (Int) -> Void
     let onEditBlinds: () -> Void
-    let onOpenHistory: () -> Void
 
     @State private var showTimerSheet: Bool = false
+    @State private var showHistorySheet: Bool = false
     @State private var showAllInDevelopmentAlert: Bool = false
     @State private var hasTrackedAllInPromptImpression: Bool = false
     @State private var liveActivityStatusKey: String?
@@ -46,7 +48,7 @@ struct DashboardView: View {
                     summary: summary,
                     onApplyChipChange: onApplyChipChange,
                     onEditChips: onEditChips,
-                    onOpenHistory: onOpenHistory
+                    onOpenHistory: { showHistorySheet = true }
                 )
 
                 if shouldShowAllInRangePrompt {
@@ -127,6 +129,16 @@ struct DashboardView: View {
                 timerDurationSec: $timerDurationSec,
                 chips: chips
             )
+        }
+        .sheet(isPresented: $showHistorySheet) {
+            ChipChangeHistoryView(
+                records: chipChangeRecords,
+                onClear: onClearChipHistory
+            )
+            .presentationDetents([.medium, .large])
+            .presentationDragIndicator(.visible)
+            .tint(Theme.accent)
+            .preferredColorScheme(.dark)
         }
         .alert("all_in_range.development_title", isPresented: $showAllInDevelopmentAlert) {
             Button("action.confirm", role: .cancel) {}
