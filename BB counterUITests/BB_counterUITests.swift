@@ -65,13 +65,26 @@ final class BB_counterUITests: XCTestCase {
         XCTAssertTrue(configure.waitForExistence(timeout: 5))
         configure.tap()
 
-        XCTAssertTrue(app.buttons["timer.scheme.0"].waitForExistence(timeout: 5))
-        app.buttons["timer.scheme.0"].tap()
-        app.buttons["timer.start"].tap()
+        let scheme = app.buttons["timer.scheme.0"]
+        XCTAssertTrue(scheme.waitForExistence(timeout: 5))
+        scheme.tap()
+
+        // sheet 還在動畫時「開始」雖然存在卻點不到，等它可命中再按。
+        let start = app.buttons["timer.start"]
+        XCTAssertTrue(start.waitForExistence(timeout: 5))
+        XCTAssertTrue(
+            start.waitForExistence(timeout: 5) && waitUntilHittable(start, timeout: 5),
+            "timer.start 一直沒有變成可點狀態"
+        )
+        start.tap()
 
         let timerSwitch = app.switches["timer.toggle"]
         XCTAssertTrue(timerSwitch.waitForExistence(timeout: 5))
-        XCTAssertEqual(timerSwitch.value as? String, "1")
+        // 關閉 sheet 後畫面還要一小段時間才把開關切成開啟。
+        XCTAssertTrue(
+            waitUntil(timeout: 5) { timerSwitch.value as? String == "1" },
+            "計時器開關沒有變成啟用"
+        )
     }
 
     @MainActor
@@ -106,6 +119,21 @@ final class BB_counterUITests: XCTestCase {
         // 回到儀表板
         tabs.element(boundBy: 0).tap()
         XCTAssertTrue(app.scrollViews["result.screen"].waitForExistence(timeout: 5))
+    }
+
+    @MainActor
+    private func waitUntilHittable(_ element: XCUIElement, timeout: TimeInterval) -> Bool {
+        waitUntil(timeout: timeout) { element.isHittable }
+    }
+
+    @MainActor
+    private func waitUntil(timeout: TimeInterval, condition: () -> Bool) -> Bool {
+        let deadline = Date().addingTimeInterval(timeout)
+        while Date() < deadline {
+            if condition() { return true }
+            _ = XCUIApplication().wait(for: .runningForeground, timeout: 0.2)
+        }
+        return condition()
     }
 
     /// 盲注預設是分頁輪播，只有目前頁的按鈕存在，所以要先用箭頭翻到 500/1000。
