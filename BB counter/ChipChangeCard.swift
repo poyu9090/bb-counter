@@ -145,8 +145,7 @@ struct ChipChangeCard: View {
                 Text(
                     String(
                         format: NSLocalizedString("dashboard.session_footer", comment: ""),
-                        summary.recordCount,
-                        formattedChips(summary.startChips)
+                        summary.recordCount
                     )
                 )
                 .font(.caption.weight(.semibold))

@@ -13,7 +13,7 @@
 "dashboard.quick_add_a11y" = "Add %@";
 "dashboard.record" = "Log";
 "dashboard.change_total" = "Set total";
-"dashboard.session_footer" = "%d changes · started at %@";
+"dashboard.session_footer" = "%d changes";
 "dashboard.after_level_up" = "%@ BB after next level";
 "dashboard.last_level" = "Last level of the structure";
 "tab.dashboard" = "Dashboard";

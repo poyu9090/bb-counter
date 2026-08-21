@@ -13,7 +13,7 @@
 "dashboard.quick_add_a11y" = "增加 %@";
 "dashboard.record" = "記錄";
 "dashboard.change_total" = "改總額";
-"dashboard.session_footer" = "%d 筆變化 · 起始 %@";
+"dashboard.session_footer" = "%d 筆變化";
 "dashboard.after_level_up" = "升盲後 %@ BB";
 "dashboard.last_level" = "已是最後一級";
 "tab.dashboard" = "儀表板";
