@@ -7,13 +7,11 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 ROOT = Path("/Users/user/Desktop/BB counter/marketing-preview")
 RAW_DIR = ROOT / "raw" / "check-scenarios"
 OUT_DIR = ROOT / "final"
-ICON_PATH = Path("/Users/user/Desktop/BB counter/BB counter/Assets.xcassets/AppIcon.appiconset/Group 5.png")
 
 WIDTH = 1320
 HEIGHT = 2868
 
 ZH_FONT = "/System/Library/Fonts/STHeiti Medium.ttc"
-EN_FONT = "/System/Library/Fonts/HelveticaNeue.ttc"
 
 
 SCENARIOS = [
@@ -22,36 +20,27 @@ SCENARIOS = [
         "source": "chips.png",
         "headline": "快速記錄籌碼",
         "subtitle": "面額按鈕直接累加，不用心算。",
-        "badge": "STACK",
         "headline_size": 152,
         "main_y": 660,
         "colors": ((28, 27, 33), (61, 36, 54), (242, 111, 170), (255, 198, 75)),
-        "crop": (60, 1290, 1270, 1930),
-        "crop_pos": (820, 600),
     },
     {
         "slug": "02-blinds",
         "source": "blinds.png",
         "headline": "一鍵設定盲注",
         "subtitle": "只問大盲，預設等級滑一下就好。",
-        "badge": "BLINDS",
         "headline_size": 152,
         "main_y": 664,
         "colors": ((26, 28, 39), (32, 47, 86), (104, 155, 255), (188, 219, 255)),
-        "crop": (150, 1120, 1170, 1520),
-        "crop_pos": (820, 620),
     },
     {
         "slug": "03-result",
         "source": "result.png",
         "headline": "升盲後還剩幾 BB",
         "subtitle": "記一手輸贏，深度與倒數同時更新。",
-        "badge": "TIMER",
         "headline_size": 126,
         "main_y": 752,
         "colors": ((16, 27, 23), (21, 55, 44), (110, 218, 137), (255, 214, 95)),
-        "crop": (40, 1680, 1285, 2375),
-        "crop_pos": (820, 600),
     },
 ]
 
@@ -135,37 +124,22 @@ def build_card(source: Image.Image, width: int, crop_box: tuple[int, int, int, i
 
 def add_title_block(canvas: Image.Image, scenario: dict) -> None:
     draw = ImageDraw.Draw(canvas)
-    headline_font = font(ZH_FONT, scenario.get("headline_size", 152))
+    headline_size = scenario.get("headline_size", 152)
+    headline_font = font(ZH_FONT, headline_size)
     subtitle_font = font(ZH_FONT, 54)
-    badge_font = font(EN_FONT, 34)
 
     x = 106
-    y = 150
-
-    icon = Image.open(ICON_PATH).convert("RGBA").resize((130, 130), Image.Resampling.LANCZOS)
-    canvas.alpha_composite(icon, (x, y + 18))
-
-    badge_w = 236
-    badge_h = 64
-    badge_x = x + 156
-    badge_y = y + 42
-    badge = Image.new("RGBA", (badge_w, badge_h), (255, 255, 255, 0))
-    badge_draw = ImageDraw.Draw(badge)
-    badge_draw.rounded_rectangle(
-        (0, 0, badge_w, badge_h),
-        radius=32,
-        fill=(255, 255, 255, 30),
-        outline=(255, 255, 255, 48),
-        width=2,
-    )
-    canvas.alpha_composite(badge, (badge_x, badge_y))
-    draw.text((badge_x + 32, badge_y + 14), scenario["badge"], font=badge_font, fill=(255, 255, 255, 220))
-
+    line_height = int(headline_size * 1.05)
     lines = wrap_text(draw, scenario["headline"], headline_font, 1050)
-    text_y = y + 220
+
+    # 沒有圖示與角標後上方會空一大塊，把文字塊往下靠、離手機上緣留一段固定的呼吸空間。
+    block_height = line_height * len(lines) + 90
+    phone_top = scenario.get("main_y", 660) + 64
+    text_y = max(200, phone_top - block_height - 120)
+
     for line in lines:
         draw.text((x, text_y), line, font=headline_font, fill=(247, 247, 250))
-        text_y += 160
+        text_y += line_height
 
     draw.text((x, text_y + 10), scenario["subtitle"], font=subtitle_font, fill=(232, 233, 239, 180))
 
@@ -182,9 +156,6 @@ def create_preview(scenario: dict) -> None:
     main_x = (WIDTH - main_card.width) // 2
     main_y = scenario.get("main_y", 660)
     canvas.alpha_composite(main_card, (main_x, main_y))
-
-    crop_card = build_card(source, width=360, crop_box=scenario["crop"])
-    canvas.alpha_composite(crop_card, scenario["crop_pos"])
 
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     canvas.save(OUT_DIR / f"{scenario['slug']}.png")
