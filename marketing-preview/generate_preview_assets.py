@@ -42,6 +42,15 @@ SCENARIOS = [
         "main_y": 752,
         "colors": ((16, 27, 23), (21, 55, 44), (110, 218, 137), (255, 214, 95)),
     },
+    {
+        "slug": "04-handline",
+        "source": "handline.png",
+        "headline": "照規則記下這手牌",
+        "subtitle": "3-Bet、4-Bet 尺寸自動換算成 bb。",
+        "headline_size": 126,
+        "main_y": 752,
+        "colors": ((20, 20, 32), (46, 34, 74), (152, 128, 255), (255, 188, 232)),
+    },
 ]
 
 
