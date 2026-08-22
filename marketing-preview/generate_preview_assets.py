@@ -12,6 +12,8 @@ WIDTH = 1320
 HEIGHT = 2868
 
 ZH_FONT = "/System/Library/Fonts/STHeiti Medium.ttc"
+EN_FONT_BOLD = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
+EN_FONT = "/System/Library/Fonts/Supplemental/Arial.ttf"
 
 
 SCENARIOS = [
@@ -54,6 +56,56 @@ SCENARIOS = [
 ]
 
 
+# 英文版：畫面是同一組流程，但 App 語系與行銷文案都換成英文。
+EN_BASE = {
+    "raw_dir": "raw-en",
+    "out_dir": "final-en",
+    "headline_font": EN_FONT_BOLD,
+    "subtitle_font": EN_FONT,
+    "headline_size": 118,
+    "subtitle_size": 48,
+}
+
+EN_SCENARIOS = [
+    {
+        **EN_BASE,
+        "slug": "01-chips",
+        "source": "chips.png",
+        "headline": "Count your stack in seconds",
+        "subtitle": "Tap the denominations — no mental math.",
+        "main_y": 660,
+        "colors": ((28, 27, 33), (61, 36, 54), (242, 111, 170), (255, 198, 75)),
+    },
+    {
+        **EN_BASE,
+        "slug": "02-blinds",
+        "source": "blinds.png",
+        "headline": "Set the blinds in one tap",
+        "subtitle": "Only the big blind, presets a swipe away.",
+        "main_y": 664,
+        "colors": ((26, 28, 39), (32, 47, 86), (104, 155, 255), (188, 219, 255)),
+    },
+    {
+        **EN_BASE,
+        "slug": "03-result",
+        "source": "result.png",
+        "headline": "How deep after the next level?",
+        "subtitle": "Log a hand — depth and countdown move together.",
+        "main_y": 752,
+        "colors": ((16, 27, 23), (21, 55, 44), (110, 218, 137), (255, 214, 95)),
+    },
+    {
+        **EN_BASE,
+        "slug": "04-handline",
+        "source": "handline.png",
+        "headline": "Record the hand by the rules",
+        "subtitle": "3-Bet and 4-Bet sizes converted to bb.",
+        "main_y": 752,
+        "colors": ((20, 20, 32), (46, 34, 74), (152, 128, 255), (255, 188, 232)),
+    },
+]
+
+
 def font(path: str, size: int) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(path, size=size)
 
@@ -85,6 +137,21 @@ def add_blobs(base: Image.Image, colors: tuple[tuple[int, int, int], ...]) -> Im
 
 
 def wrap_text(draw: ImageDraw.ImageDraw, text: str, text_font: ImageFont.FreeTypeFont, max_width: int) -> list[str]:
+    # 英文得照單字斷行，中文才是一字一斷。
+    if " " in text:
+        lines: list[str] = []
+        current = ""
+        for word in text.split(" "):
+            trial = f"{current} {word}".strip()
+            if draw.textbbox((0, 0), trial, font=text_font)[2] <= max_width or not current:
+                current = trial
+            else:
+                lines.append(current)
+                current = word
+        if current:
+            lines.append(current)
+        return lines
+
     words = list(text)
     lines: list[str] = []
     current = ""
@@ -134,8 +201,8 @@ def build_card(source: Image.Image, width: int, crop_box: tuple[int, int, int, i
 def add_title_block(canvas: Image.Image, scenario: dict) -> None:
     draw = ImageDraw.Draw(canvas)
     headline_size = scenario.get("headline_size", 152)
-    headline_font = font(ZH_FONT, headline_size)
-    subtitle_font = font(ZH_FONT, 54)
+    headline_font = font(scenario.get("headline_font", ZH_FONT), headline_size)
+    subtitle_font = font(scenario.get("subtitle_font", ZH_FONT), scenario.get("subtitle_size", 54))
 
     x = 106
     line_height = int(headline_size * 1.05)
@@ -160,18 +227,21 @@ def create_preview(scenario: dict) -> None:
 
     add_title_block(canvas, scenario)
 
-    source = Image.open(RAW_DIR / scenario["source"]).convert("RGBA")
+    raw_dir = ROOT / scenario["raw_dir"] if scenario.get("raw_dir") else RAW_DIR
+    source = Image.open(raw_dir / scenario["source"]).convert("RGBA")
     main_card = build_card(source, width=932)
     main_x = (WIDTH - main_card.width) // 2
     main_y = scenario.get("main_y", 660)
     canvas.alpha_composite(main_card, (main_x, main_y))
 
-    OUT_DIR.mkdir(parents=True, exist_ok=True)
-    canvas.save(OUT_DIR / f"{scenario['slug']}.png")
+    out_dir = ROOT / scenario["out_dir"] if scenario.get("out_dir") else OUT_DIR
+    out_dir.mkdir(parents=True, exist_ok=True)
+    # App Store 不收帶 alpha 的截圖，存檔前先壓平。
+    canvas.convert("RGB").save(out_dir / f"{scenario['slug']}.png")
 
 
 def main() -> None:
-    for scenario in SCENARIOS:
+    for scenario in SCENARIOS + EN_SCENARIOS:
         create_preview(scenario)
 
 

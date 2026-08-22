@@ -74,17 +74,34 @@ For questions, suggestions, or bug reports, use the contact details on the suppo
 
 ---
 
-## 截圖
+## 截圖（已上傳到 ASC 1.3）
 
-- **iPhone 6.9"（1320×2868）**：`marketing-preview/final/01-chips.png` ~ `04-handline.png`，4 張，加了行動線那張。
-- **iPad 13"（2064×2752）**：`marketing-preview/ipad/01-chips.png`、`02-blinds.png`、`03-dashboard.png`，3 張，1.3 的新畫面（原生截圖，跟舊版一樣不套外框）。
+繁體中文與英文（美國）兩個語系各一套，**都已經傳進 App Store Connect 的 1.3 版本**：
 
-## 送審前還要人工確認的事
+| 語系 | iPhone 6.9"（1320×2868） | iPad 13"（2064×2752） |
+| --- | --- | --- |
+| 繁體中文 | `final/01-chips` ~ `04-handline` | `ipad/01-chips`、`02-blinds`、`03-dashboard` |
+| 英文（美國） | `final-en/01-chips` ~ `04-handline` | `ipad-en/01-chips`、`02-blinds`、`03-dashboard` |
 
-1. **支援 URL 與隱私權 URL**：`https://poyu9090.github.io/bb-counter/*` 目前 404（repo 是 private，GitHub Pages 沒生效）。到 GitHub 把 repo 設成 public → Settings → Pages → Source 選 `main` + `/docs`，等幾分鐘後確認這三個網址用無痕視窗打得開，再回 App Store Connect 對一次那兩欄填的網址：
-   - `https://poyu9090.github.io/bb-counter/`
-   - `https://poyu9090.github.io/bb-counter/app-support.html`
-   - `https://poyu9090.github.io/bb-counter/privacy-policy.html`
-2. **iPad 的重複分頁列**：分頁列偶爾會在畫面上下各出現一次（下面那條點不動），換頁重繪後就消失。用 10 行的原生 SwiftUI TabView 也能重現，屬於系統／模擬器層級，不是這個 App 的程式問題；沒有實機 iPad 可驗。上面那 3 張 iPad 截圖都挑了乾淨的畫面。
-3. **iOS 17**：部署門檻從 18.5 降到 17.0，但本機沒有 17.x 模擬器可跑（17.5 runtime 下載到 88% 被斷線中斷）。
-4. **實機跑一場牌**：Live Activity 升盲、自訂結構、暗場可讀性。
+- 舊的 6.5" 截圖已刪除，改成「使用 6.9 吋顯示器的檔案」，所有 iPhone 尺寸都吃同一套新圖。1.2 的舊素材備份在 `archive-1.2-iphone65/`、`archive-1.2-en/`。
+- **截圖不能帶 alpha**：PIL 產出的 PNG 預設是 RGBA，傳上去 ASC 會顯示紅色錯誤方塊。`generate_preview_assets.py` 現在存檔前會 `convert("RGB")`；自己補圖時記得也要壓平。
+
+## 送審前的狀態
+
+**已完成**
+
+- 支援頁與隱私權頁：repo 轉 public、開啟 GitHub Pages（main + `/docs`），三個網址都回 200；ASC 的支援 URL 已經是 `https://poyu9090.github.io/bb-counter/app-support.html`。
+- ASC 1.3 版本已建立，繁中／英文兩套截圖（iPhone 6.9" 各 4 張、iPad 13" 各 3 張）都上傳完成，舊的 6.5" 素材已清掉改為沿用 6.9"。
+- 兩個語系的「此版本的新增功能」已填入並儲存。
+- iOS 17.5 模擬器實測：單元 + UI 測試全過（18.5 也重跑過，26.5 手動走過主流程）。
+
+**還沒做（需要你）**
+
+1. **上傳 build**：1.3 (5) 還沒 Archive 上傳到 App Store Connect。沒有 build 就送不了審——這步要你的簽章與 ASC 帳號。
+2. **年齡分級問卷**：ASC 橫幅提示「需回覆社群媒體的新年齡分級問題」，在「App 資訊」頁回答。
+3. **App 說明**：現行描述仍沒提到行動線，上面有寫好的新版可直接貼。
+4. **實機跑一場牌**：Live Activity 升盲、自訂盲注結構、暗場可讀性。
+
+**已知但不影響送審**
+
+- iPad 上分頁列偶爾會上下各出現一次（下面那條點不動），換頁重繪就消失。用 10 行的原生 SwiftUI TabView 也能重現，屬系統／模擬器層級；沒有實機 iPad 可驗，上傳的 iPad 截圖都挑了乾淨的畫面。
