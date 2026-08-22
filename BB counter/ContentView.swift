@@ -569,6 +569,7 @@ private struct OnboardingView: View {
                 )
             }
             .padding(.horizontal, 16)
+            .readableColumn()
 
             Spacer(minLength: 0)
         }
@@ -585,6 +586,7 @@ private struct OnboardingView: View {
             .buttonStyle(.borderedProminent)
             .accessibilityIdentifier("onboarding.continue")
             .padding(.horizontal)
+            .readableColumn()
             .padding(.bottom, 8)
             .background(Theme.background.opacity(0.95))
         }

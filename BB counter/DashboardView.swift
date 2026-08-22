@@ -30,8 +30,12 @@ struct DashboardView: View {
         return Double(chips) / Double(bigBlind)
     }
 
+    /// All-in 範圍還沒做，點下去只會跳「開發中」。審核把這種假門當成 placeholder 功能，
+    /// 所以先不顯示；功能做好（或要再量一次需求）時把這裡改回 true 即可。
+    private static let showsAllInRangePrompt = false
+
     private var shouldShowAllInRangePrompt: Bool {
-        bbCount > 0 && bbCount < 15
+        Self.showsAllInRangePrompt && bbCount > 0 && bbCount < 15
     }
 
     var body: some View {

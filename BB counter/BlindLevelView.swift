@@ -160,6 +160,7 @@ struct BlindLevelView: View {
                     .id(BlindFocusedInput.inputGroup)
                 }
                 .padding(.bottom, 28)
+                .readableColumn()
             }
             .scrollDismissesKeyboard(.interactively)
             .onChange(of: focusedInput) { _, input in
@@ -187,6 +188,7 @@ struct BlindLevelView: View {
                 .padding(.horizontal)
                 .disabled(!canProceed)
             }
+            .readableColumn()
             .padding(.vertical, 8)
             .background(Theme.background.opacity(0.9))
         }
