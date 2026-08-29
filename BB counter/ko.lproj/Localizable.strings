@@ -1,0 +1,222 @@
+/* General Actions */
+"action.next" = "다음";
+"action.done" = "완료";
+"action.show_result" = "결과 보기";
+"action.back" = "뒤로";
+"action.edit_chips" = "칩 수정";
+"action.edit_blinds" = "블라인드 수정";
+"dashboard.set_blinds_first" = "블라인드를 먼저 설정하면 카운트다운이 블라인드 상승을 따라갑니다.";
+"settings.timer_row" = "타이머와 블라인드 구조";
+"dashboard.session" = "이번 세션 %@";
+"dashboard.win" = "승";
+"dashboard.lose" = "패";
+"dashboard.quick_add_a11y" = "%@ 추가";
+"dashboard.record" = "기록";
+"dashboard.change_total" = "총액 변경";
+"dashboard.session_footer" = "변동 %d건";
+"dashboard.after_level_up" = "블라인드 상승 후 %@ BB";
+"dashboard.last_level" = "구조의 마지막 레벨입니다";
+"tab.dashboard" = "대시보드";
+"tab.handline" = "액션 라인";
+"tab.settings" = "설정";
+"settings.version" = "버전";
+"settings.reset_footer" = "칩, 블라인드, 변동 기록, 타이머 상태를 모두 지우고 새 세션을 시작합니다.";
+"action.reset" = "초기화";
+"action.confirm" = "확인";
+"action.cancel" = "취소";
+"action.delete" = "삭제";
+"reset.confirm_title" = "초기화 확인";
+"reset.confirm_message" = "초기화할까요? 현재 칩과 블라인드 기록이 사라집니다.";
+
+/* Chips Screen */
+"chips.title" = "칩이 얼마나 있나요?";
+"chips.current_title" = "현재 칩";
+"chips.subtitle" = "칩 수량을 입력하세요";
+"chips.placeholder" = "칩";
+"chips.custom_amount" = "직접 입력";
+"chips.custom_amount_placeholder" = "숫자 입력";
+"chips.increase_amount" = "칩 늘리기";
+"chips.decrease_amount" = "칩 줄이기";
+"chips.after_adjustment" = "변경 후 칩";
+"chips.quick_adjust" = "칩 변동";
+"chips.quick_adjust_reset" = "되돌리기";
+"action.save" = "저장";
+"chips.depth_preview" = "빅블라인드 %2$@ 기준 %1$@ BB";
+"chips.history.title" = "변동 기록";
+"chips.history.count" = "기록 %d건";
+"chips.history.empty_short" = "기록 없음";
+"chips.history.empty_title" = "아직 칩 변동이 없습니다";
+"chips.history.empty_body" = "대시보드에서 칩 변동을 기록하면 반영된 내역이 여기에 쌓입니다.";
+"chips.history.clear" = "기록 지우기";
+"chips.history.clear_title" = "칩 변동 기록을 지울까요?";
+"chips.history.clear_message" = "기록만 지워지며 현재 칩은 그대로입니다.";
+
+/* Quick add */
+"quick.add100" = "+100";
+"quick.add500" = "+500";
+"quick.add1k" = "+1k";
+"quick.add5k" = "+5k";
+"quick.add10k" = "+10k";
+"quick.sub100" = "-100";
+"quick.sub500" = "-500";
+"quick.sub1k" = "-1k";
+"quick.sub5k" = "-5k";
+"quick.sub10k" = "-10k";
+
+/* Blinds Screen */
+"blinds.title" = "현재 블라인드 레벨은?";
+"blinds.subtitle" = "현재 블라인드 레벨";
+"blinds.enter" = "직접 입력하기";
+"blinds.big_blind" = "빅블라인드";
+"blinds.big_placeholder" = "BB";
+"blinds.placeholder" = "빅블라인드(BB)";
+
+/* Result Screen */
+"result.title" = "보유 스택";
+"result.chips" = "칩";
+"result.blinds" = "블라인드";
+"result.stack_depth" = "스택 깊이";
+"result.stack_pressure" = "다음 블라인드 후";
+"result.status.danger" = "위험 구간";
+"result.status.short" = "숏스택";
+"result.status.playable" = "플레이 가능";
+"result.status.healthy" = "여유 있음";
+"all_in_range.title" = "올인 레인지";
+"all_in_range.subtitle" = "15BB 아래에서 푸시 레인지 확인";
+"all_in_range.development_title" = "이 기능은 아직 개발 중입니다";
+"all_in_range.development_message" = "관심을 기록했습니다.";
+
+/* 핸드 액션 라인 */
+"hand.title" = "액션 라인 기록";
+"hand.entry_subtitle" = "액션 라인을 빠르게 기록하고 핸드가 끝나면 공유하세요.";
+"hand.create" = "새 기록";
+"hand.editor_title" = "액션 라인 기록";
+"hand.default_title" = "Hand #%d";
+"hand.empty_title" = "아직 액션 라인 기록이 없습니다";
+"hand.empty_body" = "기록을 만들고 액션을 순서대로 누르면 그대로 공유할 수 있는 액션 라인이 됩니다.";
+"hand.title_label" = "제목";
+"hand.title_placeholder" = "핸드 제목";
+"hand.big_blind_only" = "BB";
+"hand.hero_cards" = "내 핸드";
+"hand.card_one" = "첫 번째 카드";
+"hand.card_two" = "두 번째 카드";
+"hand.board_placeholder" = "보드, 예: A89";
+"hand.board_card_count" = "보드 %d장을 설정하세요";
+"hand.amount_placeholder" = "사이즈 입력";
+"hand.quick_action" = "빠른 액션";
+"hand.quick_action_subtitle" = "%@를 기록하는 중입니다. 이 스트리트를 끝내고 다음으로 넘어가세요.";
+"hand.players" = "인원";
+"hand.table_center" = "현재 포지션";
+"hand.step_locked" = "보드와 액션이 가능한 플레이어를 모두 입력해야 다음으로 넘어갑니다.";
+"hand.no_active_players" = "지금 액션할 수 있는 플레이어가 없습니다.";
+"hand.board_required" = "보드를 먼저 설정한 뒤 이 스트리트를 기록하세요.";
+"hand.current_position_action" = "%@ 액션 차례";
+"hand.add_action" = "액션 추가";
+"hand.add_action_to" = "%@에 추가";
+"hand.finish_step" = "%@ 종료, %@(으)로 이동";
+"hand.previous_step" = "이전 단계";
+"hand.next_step" = "다음 단계";
+"hand.step_hint" = "현재 스트리트를 순서대로 기록하세요";
+"hand.current_step_title" = "현재 단계: %@";
+"hand.timeline" = "액션 라인";
+"hand.timeline_empty" = "아직 액션이 없습니다. 위에서 첫 액션을 추가하세요.";
+"hand.share_preview" = "복사용 미리보기";
+"hand.street.preflop" = "프리플랍";
+"hand.street.flop" = "플랍";
+"hand.street.turn" = "턴";
+"hand.street.river" = "리버";
+"hand.pot" = "팟 %@";
+"hand.pot_estimated" = "팟 ≈ %@";
+"hand.share.big_blind" = "BB: %@";
+"hand.share.hero" = "핸드: %@";
+"hand.note" = "메모";
+"hand.note_placeholder" = "판단, 리드 또는 결과";
+"hand.undo" = "실행 취소";
+"hand.copy" = "복사";
+"hand.copied" = "복사됨";
+"hand.share" = "공유";
+"hand.more" = "더 보기";
+"hand.card_summary" = "BB %@ · 액션 %d개";
+"hand.delete_title" = "이 핸드 기록을 삭제할까요?";
+"hand.delete_message" = "이 핸드는 기기 내 기록에서 삭제됩니다.";
+
+/* Timer */
+"timer.title" = "블라인드 타이머";
+"timer.5m" = "5분";
+"timer.10m" = "10분";
+"timer.15m" = "15분";
+"timer.20m" = "20분";
+"timer.25m" = "25분";
+"timer.30m" = "30분";
+"timer.60m" = "60분";
+"timer.next" = "다음 블라인드";
+"timer.configure" = "설정";
+"timer.duration" = "레벨당 시간";
+"timer.current_blind_remaining" = "현재 레벨 남은 시간";
+"timer.current_blind_remaining_short" = "남음";
+"timer.remaining_minutes_placeholder" = "남은 분";
+"timer.duration_summary" = "현재 레벨 %@ 남음, 이후 레벨은 %@";
+"timer.select_levels" = "앞으로 진행할 레벨 선택";
+"timer.selected_count" = "%d개 선택됨";
+"timer.start" = "시작";
+"timer.pause" = "일시정지";
+"timer.resume" = "계속";
+"timer.enable" = "켜기";
+"timer.custom" = "레벨당 시간 직접 입력";
+"timer.min_unit" = "분";
+"timer.plans" = "블라인드 구조";
+"timer.blind_structure" = "블라인드 구조";
+"timer.blind_structure_desc" = "토너먼트 블라인드 구조, 총 28레벨";
+"timer.blind_structure_detail" = "블라인드 구조 상세";
+"timer.scheme_one" = "구조 1";
+"timer.scheme_custom" = "사용자 지정 구조";
+"timer.default_custom_name" = "사용자 지정 구조";
+"timer.structure_name" = "구조 이름";
+"timer.structure_name_placeholder" = "내 블라인드 구조";
+"timer.custom_switch_structure" = "구조 전환";
+"timer.custom_edit_levels" = "레벨 편집";
+"timer.custom_add_levels" = "레벨 직접 추가";
+"timer.add_level" = "레벨 추가";
+"timer.next_levels" = "다음 레벨:";
+"timer.no_more_levels" = "더 이상 레벨이 없습니다";
+"timer.current_level" = "현재";
+"timer.current" = "현재";
+"timer.no_levels" = "사용할 수 있는 레벨이 없습니다";
+"timer.next_stack" = "블라인드 상승 후 %@ BB";
+"timer.off_title" = "타이머가 꺼져 있습니다";
+"timer.off_body" = "켜면 앱과 실시간 액티비티에서 블라인드 상승까지 남은 시간을 볼 수 있습니다.";
+"timer.validation_name_required" = "구조 이름을 입력하세요.";
+"timer.validation_levels_required" = "레벨을 하나 이상 추가하세요.";
+"timer.validation_positive" = "SB와 BB는 0보다 커야 합니다.";
+"timer.validation_bb_lt_sb" = "%d레벨의 BB가 SB보다 작습니다.";
+"timer.validation_not_increasing" = "%d레벨의 BB는 이전 레벨보다 커야 합니다.";
+"timer.validation_duplicate" = "%d레벨이 이전 레벨과 중복됩니다.";
+
+/* Input validation */
+"input.error_required" = "0보다 큰 값을 입력하세요.";
+"input.error_too_large" = "값이 너무 큽니다.";
+
+/* Notifications */
+"notification.reminder_title" = "곧 블라인드가 오릅니다";
+"notification.reminder_body" = "다음 블라인드: %@, 1분 남음.";
+"notification.advance_title" = "블라인드 상승";
+"notification.advance_body" = "%@(으)로 올리세요.";
+
+/* 실시간 액티비티 — 다이나믹 아일랜드 요약(앱에서 생성) */
+"live.island.chips_bb" = "스택: %1$@(%2$@bb)";
+"live.island.upgrade_at" = "블라인드 상승: %1$@";
+"live.island.upgrade_paused" = "블라인드 상승: —";
+"live.status.unsupported" = "실시간 액티비티는 iOS 16.2 이상이 필요합니다.";
+"live.status.disabled" = "시스템 설정에서 실시간 액티비티가 꺼져 있습니다.";
+"live.status.failed" = "실시간 액티비티를 시작하지 못했습니다. 앱 안의 타이머는 계속 작동합니다.";
+
+/* Onboarding */
+"onboarding.title" = "BB Counter를 시작합니다";
+"onboarding.subtitle" = "스택을 빠르게 입력하고 블라인드 속도를 따라가세요.";
+"onboarding.step1.title" = "1. 칩 입력";
+"onboarding.step1.description" = "총액을 직접 입력하거나 액면가 버튼으로 더하고 뺄 수 있습니다.";
+"onboarding.step2.title" = "2. 현재 블라인드 설정";
+"onboarding.step2.description" = "프리셋을 고르거나 현재 빅블라인드를 직접 입력하세요.";
+"onboarding.step3.title" = "3. BB 확인하고 타이머 켜기";
+"onboarding.step3.description" = "스택 깊이가 바로 보이고, 필요하면 블라인드 타이머를 켜세요.";
+"onboarding.continue" = "앱 시작하기";

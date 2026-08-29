@@ -1,0 +1,14 @@
+"live.chips" = "チップ";
+"live.level" = "現在のブラインド";
+"live.stack" = "スタック";
+"live.bb_unit" = "BB";
+"live.countdown" = "ブラインドアップまで";
+"live.next_level" = "次のブラインド";
+"live.next_short" = "次";
+"live.current_short" = "現在";
+"live.up_at" = "アップ";
+
+/* ダイナミックアイランド — コンパクト（狭い表示） */
+"live.compact.chips_caption" = "チップ";
+"live.compact.blinds_caption" = "アップ";
+"live.compact.blinds_paused" = "停止中";
