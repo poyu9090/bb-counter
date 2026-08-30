@@ -165,6 +165,19 @@ BB Counter는 계정이 필요 없습니다. 칩, 블라인드, 타이머 설정
 英文：1. Added Simplified Chinese, Japanese and Korean.
 ```
 
-## 截圖怎麼處理
+## 截圖
 
-三個新語系**不必**另外準備截圖——ASC 沒有該語系的圖時會自動沿用主要語言（英文）那套，媒體管理裡會顯示「使用英文（美國）的檔案」。之後想再本地化截圖，用 `generate_preview_assets.py` 加對應語系的 SCENARIOS，App 端用 `xcrun simctl launch <udid> PaulChiang.BB-counter -AppleLanguages "(ja)"` 就能抓到該語系的畫面。
+三個語系各有一套 iPhone 6.9"（1320×2868）截圖，App 畫面與行銷文案都是該語系：
+
+| 語系 | 檔案 | ASC 上傳狀態 |
+| --- | --- | --- |
+| 简体中文 | `final-zh-Hans/01-chips` ~ `04-handline` | ⏳ 待上傳 |
+| 日本語 | `final-ja/01-chips` ~ `04-handline` | ✅ 已上傳 |
+| 한국어 | `final-ko/01-chips` ~ `04-handline` | ⏳ 待上傳 |
+
+原始畫面在 `raw-ja/`、`raw-ko/`、`raw-zh-Hans/`，用 `xcrun simctl launch <udid> PaulChiang.BB-counter -AppleLanguages "(ja)"` 切語系後截的。
+文案排版在 `generate_preview_assets.py` 的 `JA_SCENARIOS` / `KO_SCENARIOS` / `ZH_HANS_SCENARIOS`，日文用 ヒラギノ角ゴ W6、韓文用 Apple SD Gothic Neo、簡中用 STHeiti。
+
+上傳方式：媒體管理 → 選該語系 → 6.9 吋顯示器那格點「編輯」（脫離「使用英文的檔案」）→ 一張一張傳（一次傳多張順序會亂）。
+
+iPad 13" 三個語系仍沿用英文那套，需要的話再補。

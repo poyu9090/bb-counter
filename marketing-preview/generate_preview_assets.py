@@ -14,6 +14,8 @@ HEIGHT = 2868
 ZH_FONT = "/System/Library/Fonts/STHeiti Medium.ttc"
 EN_FONT_BOLD = "/System/Library/Fonts/Supplemental/Arial Bold.ttf"
 EN_FONT = "/System/Library/Fonts/Supplemental/Arial.ttf"
+JA_FONT = "/System/Library/Fonts/ヒラギノ角ゴシック W6.ttc"
+KO_FONT = "/System/Library/Fonts/AppleSDGothicNeo.ttc"
 
 
 SCENARIOS = [
@@ -103,6 +105,71 @@ EN_SCENARIOS = [
         "main_y": 752,
         "colors": ((20, 20, 32), (46, 34, 74), (152, 128, 255), (255, 188, 232)),
     },
+]
+
+
+# 簡體中文 / 日文 / 韓文：畫面與行銷文案都換成該語系。
+CJK_BASE = {"subtitle_size": 50}
+
+ZH_HANS_SCENARIOS = [
+    {**CJK_BASE, "slug": "01-chips", "source": "chips.png", "raw_dir": "raw-zh-Hans", "out_dir": "final-zh-Hans",
+     "headline": "快速记录筹码", "subtitle": "面额按钮直接累加，不用心算。",
+     "headline_size": 148, "main_y": 660,
+     "colors": ((28, 27, 33), (61, 36, 54), (242, 111, 170), (255, 198, 75))},
+    {**CJK_BASE, "slug": "02-blinds", "source": "blinds.png", "raw_dir": "raw-zh-Hans", "out_dir": "final-zh-Hans",
+     "headline": "一键设定盲注", "subtitle": "只问大盲，预设级别滑一下就好。",
+     "headline_size": 148, "main_y": 664,
+     "colors": ((26, 28, 39), (32, 47, 86), (104, 155, 255), (188, 219, 255))},
+    {**CJK_BASE, "slug": "03-result", "source": "result.png", "raw_dir": "raw-zh-Hans", "out_dir": "final-zh-Hans",
+     "headline": "升盲后还剩几 BB", "subtitle": "记一手输赢，深度与倒计时同时更新。",
+     "headline_size": 122, "main_y": 752,
+     "colors": ((16, 27, 23), (21, 55, 44), (110, 218, 137), (255, 214, 95))},
+    {**CJK_BASE, "slug": "04-handline", "source": "handline.png", "raw_dir": "raw-zh-Hans", "out_dir": "final-zh-Hans",
+     "headline": "按规则记下这手牌", "subtitle": "3-Bet、4-Bet 尺度自动换算成 bb。",
+     "headline_size": 122, "main_y": 752,
+     "colors": ((20, 20, 32), (46, 34, 74), (152, 128, 255), (255, 188, 232))},
+]
+
+JA_BASE = {"headline_font": JA_FONT, "subtitle_font": JA_FONT, "subtitle_size": 48}
+
+JA_SCENARIOS = [
+    {**JA_BASE, "slug": "01-chips", "source": "chips.png", "raw_dir": "raw-ja", "out_dir": "final-ja",
+     "headline": "チップを数秒で入力", "subtitle": "額面ボタンで足すだけ、暗算いらず。",
+     "headline_size": 112, "main_y": 660,
+     "colors": ((28, 27, 33), (61, 36, 54), (242, 111, 170), (255, 198, 75))},
+    {**JA_BASE, "slug": "02-blinds", "source": "blinds.png", "raw_dir": "raw-ja", "out_dir": "final-ja",
+     "headline": "ブラインドは一振り", "subtitle": "聞くのは BB だけ、プリセットも一振り。",
+     "headline_size": 112, "main_y": 664,
+     "colors": ((26, 28, 39), (32, 47, 86), (104, 155, 255), (188, 219, 255))},
+    {**JA_BASE, "slug": "03-result", "source": "result.png", "raw_dir": "raw-ja", "out_dir": "final-ja",
+     "headline": "アップ後は何 BB？", "subtitle": "1 ハンド記録すれば深さも残り時間も更新。",
+     "headline_size": 112, "main_y": 752,
+     "colors": ((16, 27, 23), (21, 55, 44), (110, 218, 137), (255, 214, 95))},
+    {**JA_BASE, "slug": "04-handline", "source": "handline.png", "raw_dir": "raw-ja", "out_dir": "final-ja",
+     "headline": "ルール通りに記録", "subtitle": "3-Bet・4-Bet のサイズを bb に自動換算。",
+     "headline_size": 112, "main_y": 752,
+     "colors": ((20, 20, 32), (46, 34, 74), (152, 128, 255), (255, 188, 232))},
+]
+
+KO_BASE = {"headline_font": KO_FONT, "subtitle_font": KO_FONT, "subtitle_size": 48}
+
+KO_SCENARIOS = [
+    {**KO_BASE, "slug": "01-chips", "source": "chips.png", "raw_dir": "raw-ko", "out_dir": "final-ko",
+     "headline": "칩을 몇 초 만에 입력", "subtitle": "액면가 버튼으로 더하기만, 암산은 그만.",
+     "headline_size": 112, "main_y": 660,
+     "colors": ((28, 27, 33), (61, 36, 54), (242, 111, 170), (255, 198, 75))},
+    {**KO_BASE, "slug": "02-blinds", "source": "blinds.png", "raw_dir": "raw-ko", "out_dir": "final-ko",
+     "headline": "블라인드는 한 번에", "subtitle": "빅블라인드만 묻고, 프리셋은 한 번 밀면 끝.",
+     "headline_size": 112, "main_y": 664,
+     "colors": ((26, 28, 39), (32, 47, 86), (104, 155, 255), (188, 219, 255))},
+    {**KO_BASE, "slug": "03-result", "source": "result.png", "raw_dir": "raw-ko", "out_dir": "final-ko",
+     "headline": "상승 후 몇 BB 남을까", "subtitle": "한 핸드만 기록해도 깊이와 카운트다운이 갱신.",
+     "headline_size": 112, "main_y": 752,
+     "colors": ((16, 27, 23), (21, 55, 44), (110, 218, 137), (255, 214, 95))},
+    {**KO_BASE, "slug": "04-handline", "source": "handline.png", "raw_dir": "raw-ko", "out_dir": "final-ko",
+     "headline": "규칙대로 핸드 기록", "subtitle": "3-Bet·4-Bet 사이즈를 bb로 자동 환산.",
+     "headline_size": 112, "main_y": 752,
+     "colors": ((20, 20, 32), (46, 34, 74), (152, 128, 255), (255, 188, 232))},
 ]
 
 
@@ -241,7 +308,7 @@ def create_preview(scenario: dict) -> None:
 
 
 def main() -> None:
-    for scenario in SCENARIOS + EN_SCENARIOS:
+    for scenario in SCENARIOS + EN_SCENARIOS + ZH_HANS_SCENARIOS + JA_SCENARIOS + KO_SCENARIOS:
         create_preview(scenario)
 
 
