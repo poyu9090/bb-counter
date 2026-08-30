@@ -171,9 +171,9 @@ BB Counter는 계정이 필요 없습니다. 칩, 블라인드, 타이머 설정
 
 | 語系 | 檔案 | ASC 上傳狀態 |
 | --- | --- | --- |
-| 简体中文 | `final-zh-Hans/01-chips` ~ `04-handline` | ⏳ 待上傳 |
+| 简体中文 | `final-zh-Hans/01-chips` ~ `04-handline` | ✅ 已上傳 |
 | 日本語 | `final-ja/01-chips` ~ `04-handline` | ✅ 已上傳 |
-| 한국어 | `final-ko/01-chips` ~ `04-handline` | ⏳ 待上傳 |
+| 한국어 | `final-ko/01-chips` ~ `04-handline` | ✅ 已上傳 |
 
 原始畫面在 `raw-ja/`、`raw-ko/`、`raw-zh-Hans/`，用 `xcrun simctl launch <udid> PaulChiang.BB-counter -AppleLanguages "(ja)"` 切語系後截的。
 文案排版在 `generate_preview_assets.py` 的 `JA_SCENARIOS` / `KO_SCENARIOS` / `ZH_HANS_SCENARIOS`，日文用 ヒラギノ角ゴ W6、韓文用 Apple SD Gothic Neo、簡中用 STHeiti。
