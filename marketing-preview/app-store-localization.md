@@ -184,9 +184,9 @@ BB Counter는 계정이 필요 없습니다. 칩, 블라인드, 타이머 설정
 
 | 語系 | 檔案 | ASC 上傳狀態 |
 | --- | --- | --- |
-| 简体中文 | `ipad-zh-Hans/01-chips`、`02-blinds`、`03-dashboard` | 待上傳 |
-| 日本語 | `ipad-ja/…` | 待上傳 |
-| 한국어 | `ipad-ko/…` | 待上傳 |
+| 简体中文 | `ipad-zh-Hans/01-chips`、`02-blinds`、`03-dashboard` | ✅ 已上傳 |
+| 日本語 | `ipad-ja/…` | ✅ 已上傳 |
+| 한국어 | `ipad-ko/…` | ✅ 已上傳 |
 
 iPad 這三套是模擬器原生截圖（不套行銷外框，與英文／繁中的 iPad 截圖一致）。拍法：把 iPad 模擬器整台切成該語系再開 App，狀態列的日期才會跟著是日文／韓文／簡中——
 `xcrun simctl spawn <udid> defaults write .GlobalPreferences AppleLanguages -array ja` → 重開機 → `xcrun simctl status_bar <udid> override --time "12:01" …`。
