@@ -10,6 +10,7 @@
 		CE32C8AA2F1CBE38000A880B /* BBTimerLiveActivity.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE32C8A02F1CBE38000A8801 /* BBTimerLiveActivity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		CECCF1142F8B4C3500A37378 /* BBLiveActivityKit in Frameworks */ = {isa = PBXBuildFile; productRef = CE32C8AE2F1CBE38000A880F /* BBLiveActivityKit */; };
 		CECCF1152F8B4C3500A37378 /* BBLiveActivityKit in Frameworks */ = {isa = PBXBuildFile; productRef = CE32C8AE2F1CBE38000A880F /* BBLiveActivityKit */; };
+		CEAA10032F900003000A0003 /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = CEAA10022F900002000A0002 /* TelemetryDeck */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,6 +100,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				CECCF1152F8B4C3500A37378 /* BBLiveActivityKit in Frameworks */,
+				CEAA10032F900003000A0003 /* TelemetryDeck in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -172,6 +174,7 @@
 			name = "BB counter";
 			packageProductDependencies = (
 				CE32C8AE2F1CBE38000A880F /* BBLiveActivityKit */,
+				CEAA10022F900002000A0002 /* TelemetryDeck */,
 			);
 			productName = "BB counter";
 			productReference = CE32C77D2F1CBE36000A882E /* BB counter.app */;
@@ -288,6 +291,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				CE32C8AD2F1CBE38000A880E /* XCLocalSwiftPackageReference "BBLiveActivityKit" */,
+				CEAA10012F900001000A0001 /* XCRemoteSwiftPackageReference "SwiftSDK" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CE32C77E2F1CBE36000A882E /* Products */;
@@ -745,7 +749,23 @@
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		CEAA10012F900001000A0001 /* XCRemoteSwiftPackageReference "SwiftSDK" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/TelemetryDeck/SwiftSDK";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
+		CEAA10022F900002000A0002 /* TelemetryDeck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CEAA10012F900001000A0001 /* XCRemoteSwiftPackageReference "SwiftSDK" */;
+			productName = TelemetryDeck;
+		};
 		CE32C8AE2F1CBE38000A880F /* BBLiveActivityKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = CE32C8AD2F1CBE38000A880E /* XCLocalSwiftPackageReference "BBLiveActivityKit" */;

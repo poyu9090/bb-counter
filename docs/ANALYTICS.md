@@ -43,16 +43,16 @@ app_opened → chips_entered → blinds_set → dashboard_shown → chip_change_
 
 `dashboard_shown` 每次啟動只記一次，所以它永遠不會超過 `app_opened`，比例可以直接讀。
 
-## 要接 TelemetryDeck 時（三步）
+## 要接 TelemetryDeck 時
 
-1. Xcode → File → Add Package Dependencies → `https://github.com/TelemetryDeck/SwiftSDK`
-2. 把後台給的 App ID 填進 `AppAnalytics.telemetryDeckAppID`
+1. ~~加 SPM 套件~~ **已加好**：`https://github.com/TelemetryDeck/SwiftSDK`（2.14.2）已經掛在 App target 上，`canImport(TelemetryDeck)` 成立，初始化與送出的程式碼都已編譯。
+2. 把後台給的 App ID 填進 `AppAnalytics.telemetryDeckAppID`（`BB counter/AppAnalytics.swift` 第一行常數）——**只剩這一步**。
 3. **送審前**同步更新隱私宣告：
    - `BB counter/PrivacyInfo.xcprivacy`：`NSPrivacyCollectedDataTypes` 加一項
      `NSPrivacyCollectedDataTypeProductInteraction`，`Linked = false`、`Tracking = false`，用途 `Analytics`
    - App Store Connect → App 隱私權：新增「使用資料 → 產品互動」，未連結身分、不用於追蹤
 
-ID 還是空字串時，第 3 步不用做，資料就只留在裝置上。
+ID 還是空字串時（現況），SDK 雖然連結進來但不會初始化、不會送任何東西，第 3 步也不用做。
 
 選 TelemetryDeck 而不是 Firebase 的理由：匿名、不需要 ATT 彈窗、SDK 很輕，隱私標籤只要多宣告一項；Firebase 會把「不收集資料」這個乾淨定位整個換掉。
 
