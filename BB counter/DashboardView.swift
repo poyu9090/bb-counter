@@ -30,9 +30,10 @@ struct DashboardView: View {
         return Double(chips) / Double(bigBlind)
     }
 
-    /// All-in 範圍還沒做，點下去只會跳「開發中」。審核把這種假門當成 placeholder 功能，
-    /// 所以先不顯示；功能做好（或要再量一次需求）時把這裡改回 true 即可。
-    private static let showsAllInRangePrompt = false
+    /// All-in 範圍還沒做，點下去只會跳「開發中」。1.3 送審前關掉是為了避開
+    /// App Review 2.1 對 placeholder 功能的判定；1.5 重新打開是為了收假門 CTR，
+    /// 決定第一個付費功能做哪個。要再關掉只改這一行。
+    private static let showsAllInRangePrompt = true
 
     private var shouldShowAllInRangePrompt: Bool {
         Self.showsAllInRangePrompt && bbCount > 0 && bbCount < 15
