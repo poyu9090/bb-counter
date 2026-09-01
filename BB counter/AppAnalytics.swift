@@ -9,17 +9,16 @@ import TelemetryDeck
 /// 埋點的單一入口。
 ///
 /// 事件一律先寫進本機的 `AnalyticsStore`（不需要網路、不需要帳號），
-/// 再轉發給有接上的後台。目前後台是選用編譯：
+/// 再轉發給 TelemetryDeck。DEBUG 建置送出的訊號會自動標成測試模式，
+/// 不會混進正式數據裡。
 ///
-/// 1. Xcode → File → Add Package Dependencies → `https://github.com/TelemetryDeck/SwiftSDK`
-/// 2. 把 TelemetryDeck 後台給的 App ID 填進 `telemetryDeckAppID`
-/// 3. 送審前記得同步更新 `PrivacyInfo.xcprivacy` 與 App 隱私標籤：
-///    會多一項「使用資料 → 產品互動」，未連結身分、不追蹤
-///
-/// 在 ID 還是空字串以前，所有資料都留在裝置上，隱私標籤維持「不收集資料」。
+/// 送出的內容只有事件名與分桶後的參數（`10k-50k`、`40-100bb`），
+/// 沒有原始金額、沒有帳號、沒有 IDFA。對應的隱私宣告是
+/// 「使用資料 → 產品互動」，未連結身分、不用於追蹤——
+/// `PrivacyInfo.xcprivacy` 已經寫進去，ASC 的 App 隱私權要在 1.5 送審前一起更新。
 enum AppAnalytics {
     /// 填入後才會真的往外送。空字串 = 只記在本機。
-    static let telemetryDeckAppID = ""
+    static let telemetryDeckAppID = "0E05125A-5D2B-4F57-A659-45284859D72E"
 
     private static let store = AnalyticsStore()
 
