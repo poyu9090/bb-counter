@@ -48,6 +48,7 @@ struct BB_counterApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .onAppear { AppAnalytics.start() }
         }
     }
 }

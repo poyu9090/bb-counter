@@ -17,6 +17,8 @@ struct ChipsInputView: View {
     @State private var increaseAmountText: String = ""
     @State private var decreaseAmountText: String = ""
     @State private var adjustmentBaseChips: Int?
+    /// 只給埋點分辨輸入方式：有按過面額鍵就算 denomination。
+    @State private var usedDenominationButtons: Bool = false
     @FocusState private var focusedInput: ChipsFocusedInput?
     @AppStorage("chipBreakdown") private var chipBreakdownStored: String = "0,0,0,0,0,0"
     
@@ -273,7 +275,15 @@ struct ChipsInputView: View {
         .padding(.top, 32)
         .keyboardAwareBottomBar {
             VStack(spacing: 12) {
-                Button(action: onNext) {
+                Button(action: {
+                    if onBack == nil {
+                        AppAnalytics.track(.chipsEntered(
+                            method: usedDenominationButtons ? .denomination : .keypad,
+                            chips: parsedChips ?? 0
+                        ))
+                    }
+                    onNext()
+                }) {
                     Text(LocalizedStringKey(buttonLabelKey))
                         .frame(maxWidth: .infinity)
                         .padding()
@@ -294,6 +304,7 @@ struct ChipsInputView: View {
     
     /// 增加：按面额逐一增加，不自动换算。
     private func addByDenomination(_ amount: Int) {
+        usedDenominationButtons = true
         guard amount > 0, let idx = Self.denomValues.firstIndex(of: amount) else { return }
         guard total(from: breakdown) + amount <= Self.maxChipValue else { return }
         breakdown[idx] += 1

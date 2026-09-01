@@ -142,8 +142,10 @@ final class BB_counterUITests: XCTestCase {
         let nextPreset = app.buttons["blind.next"]
         XCTAssertTrue(nextPreset.waitForExistence(timeout: 5))
         let target = app.buttons["blind.preset.1000"]
+        // 每翻一頁都等輪播動畫定下來再判斷，不然 exists 讀到舊值會一路點過頭。
         for _ in 0..<8 where !target.exists {
             nextPreset.tap()
+            _ = target.waitForExistence(timeout: 1)
         }
         XCTAssertTrue(target.waitForExistence(timeout: 5))
         target.tap()

@@ -90,9 +90,11 @@ struct BlindTimerCard: View {
                 Button {
                     if blindSession.isPaused {
                         blindSession.isPaused = false
+                        AppAnalytics.track(.timerResumed)
                     } else {
                         blindSession.snapRemainingAtPause()
                         blindSession.isPaused = true
+                        AppAnalytics.track(.timerPaused)
                     }
                 } label: {
                     Image(systemName: blindSession.isPaused ? "play.fill" : "pause.fill")

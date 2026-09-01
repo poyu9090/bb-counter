@@ -111,11 +111,17 @@ struct DashboardView: View {
             // 升盲當下震一下，讓人不用盯著畫面也知道級距換了。
             if timerEnabled, current > previous {
                 levelUpTrigger += 1
+                AppAnalytics.track(.blindLevelUp(bigBlind: current))
             }
         }
         .sensoryFeedback(.warning, trigger: levelUpTrigger)
         .onReceive(NotificationCenter.default.publisher(for: .blindTimerLiveActivityStatusChanged)) { notification in
             liveActivityStatusKey = notification.object as? String
+            if let key = liveActivityStatusKey {
+                AppAnalytics.track(.liveActivityUnavailable(reason: key))
+            } else {
+                AppAnalytics.track(.liveActivityStarted)
+            }
         }
         .onAppear {
             trackAllInPromptImpressionIfNeeded()
@@ -167,6 +173,7 @@ struct DashboardView: View {
 
     private func handleTimerEnabledChange(_ enabled: Bool) {
         if enabled {
+            AppAnalytics.track(.timerEnabled)
             if blindSession.queuedIndices.isEmpty {
                 blindSession.prepareTimerSheetDefaults(bigBlind: bigBlind)
                 blindSession.queuedIndices = blindSession.selectedIndicesSet.sorted()

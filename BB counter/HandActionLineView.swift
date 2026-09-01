@@ -72,6 +72,7 @@ struct HandActionLineListView: View {
         .keyboardConfirmationToolbar()
         .onAppear {
             records = HandActionLineCodec.decode(recordsStored)
+            AppAnalytics.track(.handLineOpened)
         }
         .sheet(item: $editingRecord) { record in
             HandActionLineEditor(
@@ -114,6 +115,7 @@ struct HandActionLineListView: View {
     }
 
     private func createRecord() {
+        AppAnalytics.track(.handLineCreated)
         var record = HandActionLineRecord.new(
             smallBlind: smallBlind > 0 ? smallBlind : max(0, bigBlind / 2),
             bigBlind: bigBlind,
@@ -298,6 +300,7 @@ private struct HandActionLineEditor: View {
                 HStack(spacing: 12) {
                     Button {
                         UIPasteboard.general.string = currentShareText
+                        AppAnalytics.track(.handLineCopied)
                         copiedToastVisible = true
                     } label: {
                         Label("hand.copy", systemImage: "doc.on.doc")
@@ -693,6 +696,7 @@ private struct HandActionLineEditor: View {
                 Spacer()
                 Button {
                     UIPasteboard.general.string = currentShareText
+                    AppAnalytics.track(.handLineCopied)
                     copiedToastVisible = true
                 } label: {
                     Label("hand.copy", systemImage: "doc.on.doc")
@@ -1281,6 +1285,7 @@ private struct HandActionLineEditor: View {
 
     private func addAction(_ choice: HandActionChoice) {
         guard canRecordAction else { return }
+        AppAnalytics.track(.handLineActionAdded(street: selectedStreet.rawValue))
         guard currentActionPositions.contains(selectedPosition) else { return }
         guard currentPendingActionPositions.contains(selectedPosition) else { return }
         guard let index = draft.streets.firstIndex(where: { $0.street == selectedStreet }) else { return }

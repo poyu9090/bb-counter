@@ -81,6 +81,7 @@ struct TimerConfigSheet: View {
 	}
 
 	private func saveCustomStructure(_ structure: BlindStructure, currentIndex: Int?) {
+		AppAnalytics.track(.customStructureSaved(levelCount: structure.levels.count))
 		if let existing = customStructures.firstIndex(where: { $0.id == structure.id }) {
 			customStructures[existing] = structure
 		} else {
@@ -425,6 +426,7 @@ struct TimerConfigSheet: View {
 						} else {
 							onStart(indices, nil, nil)
 						}
+						AppAnalytics.track(.timerStarted)
 						isPresented = false
 					} label: {
 						Text("timer.start")

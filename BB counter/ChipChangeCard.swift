@@ -137,7 +137,10 @@ struct ChipChangeCard: View {
     }
 
     private var footer: some View {
-        Button(action: onOpenHistory) {
+        Button(action: {
+            AppAnalytics.track(.historyOpened)
+            onOpenHistory()
+        }) {
             HStack(spacing: 10) {
                 SessionSparkline(points: summary.sparkline, height: 22, isPositive: summary.delta >= 0)
                     .frame(width: 68)
@@ -171,6 +174,7 @@ struct ChipChangeCard: View {
 
     private func record() {
         guard canRecord else { return }
+        AppAnalytics.track(.chipChangeLogged(direction: isWinning ? .win : .loss))
         let next = SessionSummary.chips(after: amount, isWinning: isWinning, from: summary.currentChips)
         onApplyChipChange(next)
         amountText = ""

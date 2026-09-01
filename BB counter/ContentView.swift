@@ -44,6 +44,10 @@ struct ContentView: View {
     // Working text states for inputs
     @State private var chipsText: String = ""
     @State private var bigBlindText: String = ""
+    /// 最後一次點到的預設盲注。跟送出的值一樣就是「選預設」，否則就是自己打的——只給埋點分辨用。
+    @State private var lastTappedBlindPreset: Int?
+    /// 一次啟動只記一次「看到儀表板」：編輯籌碼回來、冷啟動還原都不該灌大漏斗。
+    @State private var didTrackDashboardThisRun: Bool = false
     
     var body: some View {
         ZStack {
@@ -53,6 +57,7 @@ struct ContentView: View {
             if !hasCompletedOnboarding {
                 OnboardingView {
                     hasCompletedOnboarding = true
+                    AppAnalytics.track(.onboardingCompleted)
                 }
                 .transition(.opacity)
                 .zIndex(1)
@@ -93,6 +98,7 @@ struct ContentView: View {
             skipApplyFreshTimerDefaultsOnNextResult = true
             step = .result
         }
+        trackDashboardShownOnce()
     }
 
     private var contentLifecycleModifier: ContentLifecycleModifier {
@@ -148,7 +154,10 @@ struct ContentView: View {
     private var blindsStepView: some View {
         BlindLevelView(
             bigBlindText: $bigBlindText,
-            selectPreset: applyBlindPreset,
+            selectPreset: { preset in
+                lastTappedBlindPreset = preset
+                applyBlindPreset(preset)
+            },
             onShowResult: commitBlindsStep,
             onBack: leaveBlindsStep,
             onAppear: restoreBlindTexts,
@@ -194,6 +203,7 @@ struct ContentView: View {
             appendChipChangeRecord(previousChips: previousChips, newChips: chips)
         }
         if isEditingChipsFromResult {
+            AppAnalytics.track(.chipTotalEdited)
             isEditingChipsFromResult = false
             step = .result
         } else {
@@ -232,6 +242,7 @@ struct ContentView: View {
         guard bb > 0 else { return }
         bigBlindStored = bb
         smallBlindStored = max(1, bb / 2)
+        AppAnalytics.track(.blindsSet(method: lastTappedBlindPreset == bb ? .preset : .manual, bigBlind: bb))
         if isEditingBlindsFromResult {
             isEditingBlindsFromResult = false
         }
@@ -281,6 +292,7 @@ struct ContentView: View {
         timerEnabled = false
         clearPersistedTimerState()
         blindTimerSession.resetAfterGlobalReset(timerDurationSec: timerDurationSec)
+        AppAnalytics.track(.sessionReset)
         step = .chips
     }
 
@@ -306,6 +318,7 @@ struct ContentView: View {
 
     private func handleStepChanged(old: Step, new: Step) {
         guard new == .result else { return }
+        trackDashboardShownOnce()
         if skipApplyFreshTimerDefaultsOnNextResult {
             skipApplyFreshTimerDefaultsOnNextResult = false
             return
@@ -314,6 +327,13 @@ struct ContentView: View {
             timerEnabled = false
             blindTimerSession.applyFreshResultDefaults(timerDurationSec: timerDurationSec, bigBlind: bigBlindStored)
         }
+    }
+
+    private func trackDashboardShownOnce() {
+        guard !didTrackDashboardThisRun else { return }
+        didTrackDashboardThisRun = true
+        let depth = bigBlindStored > 0 ? Double(chipsStored) / Double(bigBlindStored) : 0
+        AppAnalytics.track(.dashboardShown(bbDepth: depth))
     }
 
     private func handleTimerEnabledChanged() {

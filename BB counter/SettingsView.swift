@@ -13,6 +13,8 @@ struct SettingsView: View {
 
     @State private var showTimerSheet: Bool = false
     @State private var showResetConfirmation: Bool = false
+    @State private var showAnalytics: Bool = false
+    @State private var analyticsSnapshot: AnalyticsStore.Snapshot?
 
     private var versionText: String {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "—"
@@ -50,12 +52,25 @@ struct SettingsView: View {
                 Section {
                     LabeledContent("settings.version", value: versionText)
                         .foregroundStyle(Theme.primaryText)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        // List 的列預設不吃手勢，要先給它一塊可命中的形狀。
+                        .contentShape(Rectangle())
+                        // 長按版本列＝開發者的埋點診斷頁，一般使用者不會誤觸。
+                        .onLongPressGesture(minimumDuration: 1) {
+                            analyticsSnapshot = AppAnalytics.snapshot
+                            showAnalytics = true
+                        }
                 }
             }
             .scrollContentBackground(.hidden)
             .background(Theme.background)
             .navigationTitle(Text("tab.settings"))
             .navigationBarTitleDisplayMode(.inline)
+        }
+        .sheet(isPresented: $showAnalytics) {
+            if let analyticsSnapshot {
+                AnalyticsDebugView(snapshot: analyticsSnapshot)
+            }
         }
         .sheet(isPresented: $showTimerSheet) {
             TimerConfigLauncher(
