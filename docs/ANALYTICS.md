@@ -30,7 +30,7 @@
 | `live_activity_started` / `live_activity_unavailable` | 即時動態成功／失敗 | 失敗帶 `reason` |
 | `custom_structure_saved` | 存下自訂盲注結構 | `levels` |
 | `hand_line_opened` / `hand_line_created` / `hand_line_action_added` / `hand_line_copied` | 行動線分頁 | 加入行動帶 `street` |
-| `all_in_prompt_shown` / `all_in_prompt_tapped` | All-in 範圍假門 | — |
+| `all_in_prompt_shown` / `all_in_prompt_tapped` | All-in 範圍假門（1.5 重新打開，深度 < 15BB 時才出現） | — |
 | `session_reset` | 設定頁重設 | — |
 
 **參數一律分桶**（`10k-50k`、`40-100bb`），不送原始籌碼與盲注數字——牌局金額是使用者的隱私，看趨勢也不需要精確值。
@@ -55,6 +55,8 @@ app_opened → chips_entered → blinds_set → dashboard_shown → chip_change_
 最後一項刻意留到 1.5：目前線上的 1.3 與審核中的 1.4 都**沒有**這個 SDK，現在就把商店頁改成「會收集使用資料」反而與事實不符。1.5 送審時一起更新即可——新增「使用資料 → 產品互動」，未連結身分、不用於追蹤、用途分析。
 
 **驗證過**：模擬器啟動後可以看到 App 對 `https://nom.telemetrydeck.com/v2/` 建立連線，事件確實有送出去。
+
+**踩過的雷**：`TelemetryDeck.signal()` 在還沒 `initialize` 之前呼叫會直接 assert 當掉。冷啟動還原進度那條路徑（`restoreResultStepIfDataIsComplete`）在第一次 layout 就會送 `dashboard_shown`，比 `.onAppear` 早，所以 `AppAnalytics.start()` 必須放在 `BB_counterApp.init()`；`forward` 另外用 `isBackendRunning` 擋一層，順序再變也只會少送、不會當掉。
 
 **DEBUG 建置送出的訊號會被標成測試模式**，要在 TelemetryDeck 後台打開「Test mode」才看得到；正式版（TestFlight／App Store）才會進正式數據。
 

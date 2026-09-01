@@ -22,6 +22,10 @@ enum AppAnalytics {
 
     private static let store = AnalyticsStore()
 
+    /// TelemetryDeck 在還沒 `initialize` 就呼叫 `signal` 會直接 assert 掛掉，
+    /// 所以後台沒起來之前只寫本機，不往外送。
+    private static var isBackendRunning = false
+
     private enum Key {
         static let installID = "analytics.installID"
         static let allInRangeImpressions = "analytics.allInRange.impressions"
@@ -63,10 +67,14 @@ enum AppAnalytics {
     }
 
     /// App 啟動時呼叫一次：初始化後台並記下今天有使用。
+    ///
+    /// 一定要在**畫面出現之前**呼叫（`BB_counterApp.init()`）。放在 `.onAppear`
+    /// 會晚於第一次 layout，而冷啟動還原進度那條路徑在 layout 當下就會送事件。
     static func start() {
         #if canImport(TelemetryDeck)
-        if !telemetryDeckAppID.isEmpty {
+        if !telemetryDeckAppID.isEmpty, !isBackendRunning {
             TelemetryDeck.initialize(config: .init(appID: telemetryDeckAppID))
+            isBackendRunning = true
         }
         #endif
         track(.appOpened)
@@ -121,7 +129,7 @@ enum AppAnalytics {
         #endif
 
         #if canImport(TelemetryDeck)
-        if !telemetryDeckAppID.isEmpty {
+        if isBackendRunning {
             TelemetryDeck.signal(event, parameters: parameters)
         }
         #endif

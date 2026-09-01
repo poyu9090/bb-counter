@@ -43,12 +43,14 @@ struct BB_counterApp: App {
             ].forEach { UserDefaults.standard.removeObject(forKey: $0) }
             AppAnalytics.resetForUITesting()
         }
+
+        // 一定要在畫面建起來之前，冷啟動還原進度會在第一次 layout 就送事件。
+        AppAnalytics.start()
     }
 
     var body: some Scene {
         WindowGroup {
             ContentView()
-                .onAppear { AppAnalytics.start() }
         }
     }
 }
