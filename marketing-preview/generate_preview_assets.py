@@ -173,6 +173,26 @@ KO_SCENARIOS = [
 ]
 
 
+# 義大利文：90 天內轉換率最高（196 曝光 → 15 下載）卻完全沒在地化的市場。
+IT_BASE = {"raw_dir": "raw-it", "out_dir": "final-it", "headline_font": EN_FONT_BOLD,
+           "subtitle_font": EN_FONT, "headline_size": 108, "subtitle_size": 46}
+
+IT_SCENARIOS = [
+    {**IT_BASE, "slug": "01-result", "source": "result.png",
+     "headline": "Quanti BB dopo la salita?", "subtitle": "Registra una mano: stack e timer si aggiornano insieme.",
+     "main_y": 752, "colors": ((16, 27, 23), (21, 55, 44), (110, 218, 137), (255, 214, 95))},
+    {**IT_BASE, "slug": "02-handline", "source": "handline.png",
+     "headline": "Ogni mano, azione per azione", "subtitle": "3-Bet e 4-Bet convertiti in bb in automatico.",
+     "main_y": 752, "colors": ((20, 20, 32), (46, 34, 74), (152, 128, 255), (255, 188, 232))},
+    {**IT_BASE, "slug": "03-chips", "source": "chips.png",
+     "headline": "Conta lo stack in pochi secondi", "subtitle": "I tagli si sommano da soli, niente calcoli a mente.",
+     "main_y": 660, "colors": ((28, 27, 33), (61, 36, 54), (242, 111, 170), (255, 198, 75))},
+    {**IT_BASE, "slug": "04-blinds", "source": "blinds.png",
+     "headline": "I bui in un tocco", "subtitle": "Solo il buio grande, i preset a una passata.",
+     "main_y": 664, "colors": ((26, 28, 39), (32, 47, 86), (104, 155, 255), (188, 219, 255))},
+]
+
+
 def font(path: str, size: int) -> ImageFont.FreeTypeFont:
     return ImageFont.truetype(path, size=size)
 
@@ -308,7 +328,7 @@ def create_preview(scenario: dict) -> None:
 
 
 def main() -> None:
-    for scenario in SCENARIOS + EN_SCENARIOS + ZH_HANS_SCENARIOS + JA_SCENARIOS + KO_SCENARIOS:
+    for scenario in SCENARIOS + EN_SCENARIOS + ZH_HANS_SCENARIOS + JA_SCENARIOS + KO_SCENARIOS + IT_SCENARIOS:
         create_preview(scenario)
 
 
