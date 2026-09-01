@@ -1,0 +1,14 @@
+"live.chips" = "筹码";
+"live.level" = "当前盲注";
+"live.stack" = "筹码深度";
+"live.bb_unit" = "BB";
+"live.countdown" = "升盲倒计时";
+"live.next_level" = "下一级盲注";
+"live.next_short" = "下一级";
+"live.current_short" = "当前";
+"live.up_at" = "升盲";
+
+/* 灵动岛 — 紧凑（狭长区域） */
+"live.compact.chips_caption" = "筹码";
+"live.compact.blinds_caption" = "升盲";
+"live.compact.blinds_paused" = "暂停";

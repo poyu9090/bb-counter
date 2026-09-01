@@ -1,0 +1,222 @@
+/* General Actions */
+"action.next" = "下一步";
+"action.done" = "完成";
+"action.show_result" = "显示结果";
+"action.back" = "返回";
+"action.edit_chips" = "编辑筹码";
+"action.edit_blinds" = "编辑盲注";
+"dashboard.set_blinds_first" = "先设置盲注，倒计时才有级别可以升。";
+"settings.timer_row" = "计时器与盲注结构";
+"dashboard.session" = "本场 %@";
+"dashboard.win" = "赢";
+"dashboard.lose" = "输";
+"dashboard.quick_add_a11y" = "增加 %@";
+"dashboard.record" = "记录";
+"dashboard.change_total" = "改总额";
+"dashboard.session_footer" = "%d 笔变化";
+"dashboard.after_level_up" = "升盲后 %@ BB";
+"dashboard.last_level" = "已是最后一级";
+"tab.dashboard" = "仪表盘";
+"tab.handline" = "行动线";
+"tab.settings" = "设置";
+"settings.version" = "版本";
+"settings.reset_footer" = "会清空筹码、盲注、变更记录与计时器状态，并重新开始一场。";
+"action.reset" = "重置";
+"action.confirm" = "确认";
+"action.cancel" = "取消";
+"action.delete" = "删除";
+"reset.confirm_title" = "确认重置";
+"reset.confirm_message" = "确认要重新设置吗？当前的筹码与盲注记录将消失。";
+
+/* Chips Screen */
+"chips.title" = "你有多少筹码？";
+"chips.current_title" = "你当前的筹码";
+"chips.subtitle" = "输入你有多少筹码";
+"chips.placeholder" = "筹码";
+"chips.custom_amount" = "自定义筹码";
+"chips.custom_amount_placeholder" = "输入数字";
+"chips.increase_amount" = "增加筹码";
+"chips.decrease_amount" = "减少筹码";
+"chips.after_adjustment" = "变更后筹码";
+"chips.quick_adjust" = "筹码变化";
+"chips.quick_adjust_reset" = "还原";
+"action.save" = "保存";
+"chips.depth_preview" = "在大盲 %2$@ 下是 %1$@ BB";
+"chips.history.title" = "变更记录";
+"chips.history.count" = "%d 笔记录";
+"chips.history.empty_short" = "暂无记录";
+"chips.history.empty_title" = "暂无筹码变更";
+"chips.history.empty_body" = "在仪表盘记录筹码变化后，这里会保存每一次生效的变更。";
+"chips.history.clear" = "清除记录";
+"chips.history.clear_title" = "清除筹码变更记录？";
+"chips.history.clear_message" = "此操作只会清除记录，不会改变当前筹码。";
+
+/* Quick add */
+"quick.add100" = "+100";
+"quick.add500" = "+500";
+"quick.add1k" = "+1k";
+"quick.add5k" = "+5k";
+"quick.add10k" = "+10k";
+"quick.sub100" = "-100";
+"quick.sub500" = "-500";
+"quick.sub1k" = "-1k";
+"quick.sub5k" = "-5k";
+"quick.sub10k" = "-10k";
+
+/* Blinds Screen */
+"blinds.title" = "当前盲注级别？";
+"blinds.subtitle" = "当前的盲注级别";
+"blinds.enter" = "或手动输入盲注";
+"blinds.big_blind" = "大盲";
+"blinds.big_placeholder" = "BB";
+"blinds.placeholder" = "大盲（BB）";
+
+/* Result Screen */
+"result.title" = "你拥有";
+"result.chips" = "筹码";
+"result.blinds" = "盲注";
+"result.stack_depth" = "筹码深度";
+"result.stack_pressure" = "下级盲注后";
+"result.status.danger" = "危险区";
+"result.status.short" = "短码";
+"result.status.playable" = "可操作";
+"result.status.healthy" = "健康";
+"all_in_range.title" = "All in 范围";
+"all_in_range.subtitle" = "低于 15BB 时查看推进范围";
+"all_in_range.development_title" = "此功能仍在开发中";
+"all_in_range.development_message" = "我们已记录你对此功能的兴趣。";
+
+/* 手牌行动线 */
+"hand.title" = "行动线记录";
+"hand.entry_subtitle" = "快速记录行动线，牌局后一键分享。";
+"hand.create" = "新建记录";
+"hand.editor_title" = "行动线记录";
+"hand.default_title" = "Hand #%d";
+"hand.empty_title" = "暂无行动线记录";
+"hand.empty_body" = "新建一条记录，按顺序点选动作，就能整理成可分享的行动线。";
+"hand.title_label" = "标题";
+"hand.title_placeholder" = "手牌标题";
+"hand.big_blind_only" = "BB";
+"hand.hero_cards" = "自己的手牌";
+"hand.card_one" = "第 1 张";
+"hand.card_two" = "第 2 张";
+"hand.board_placeholder" = "公共牌，例如 A89";
+"hand.board_card_count" = "请设置 %d 张公共牌";
+"hand.amount_placeholder" = "自定义尺度";
+"hand.quick_action" = "快速行动";
+"hand.quick_action_subtitle" = "正在记录%@，先填完这一街再进入下一步。";
+"hand.players" = "人数";
+"hand.table_center" = "当前位置";
+"hand.step_locked" = "请先完成公共牌与仍可行动玩家的动作，才能进入下一步。";
+"hand.no_active_players" = "当前没有可行动的玩家。";
+"hand.board_required" = "请先设置公共牌，再记录本街行动。";
+"hand.current_position_action" = "当前轮到 %@ 行动";
+"hand.add_action" = "加入行动";
+"hand.add_action_to" = "加入到 %@";
+"hand.finish_step" = "完成%@，进入%@";
+"hand.previous_step" = "上一步";
+"hand.next_step" = "下一步";
+"hand.step_hint" = "按顺序完成当前这一街";
+"hand.current_step_title" = "当前步骤：%@";
+"hand.timeline" = "行动线";
+"hand.timeline_empty" = "尚未记录行动，先从上方加入第一条。";
+"hand.share_preview" = "复制文案预览";
+"hand.street.preflop" = "翻牌前";
+"hand.street.flop" = "翻牌";
+"hand.street.turn" = "转牌";
+"hand.street.river" = "河牌";
+"hand.pot" = "底池 %@";
+"hand.pot_estimated" = "底池 ≈ %@";
+"hand.share.big_blind" = "大盲：%@";
+"hand.share.hero" = "手牌：%@";
+"hand.note" = "备注";
+"hand.note_placeholder" = "决策点、读牌或结果";
+"hand.undo" = "上一步";
+"hand.copy" = "复制";
+"hand.copied" = "已复制";
+"hand.share" = "分享";
+"hand.more" = "更多";
+"hand.card_summary" = "BB %@ · %d 个行动";
+"hand.delete_title" = "删除这手牌记录？";
+"hand.delete_message" = "这手牌会从本机记录中移除。";
+
+/* Timer */
+"timer.title" = "盲注计时器";
+"timer.5m" = "5 分钟";
+"timer.10m" = "10 分钟";
+"timer.15m" = "15 分钟";
+"timer.20m" = "20 分钟";
+"timer.25m" = "25 分钟";
+"timer.30m" = "30 分钟";
+"timer.60m" = "60 分钟";
+"timer.next" = "下一级盲注";
+"timer.configure" = "设置";
+"timer.duration" = "每级盲注时长";
+"timer.current_blind_remaining" = "当前盲注剩余时间";
+"timer.current_blind_remaining_short" = "剩余";
+"timer.remaining_minutes_placeholder" = "剩余分钟";
+"timer.duration_summary" = "当前盲注剩余 %@，后续每级盲注倒计时 %@";
+"timer.select_levels" = "选择后续盲注级别";
+"timer.selected_count" = "已选择 %d 项";
+"timer.start" = "开始";
+"timer.pause" = "暂停";
+"timer.resume" = "继续";
+"timer.enable" = "启用";
+"timer.custom" = "自定义每级盲注时长";
+"timer.min_unit" = "分钟";
+"timer.plans" = "盲注结构";
+"timer.blind_structure" = "盲注结构";
+"timer.blind_structure_desc" = "锦标赛盲注结构，共 28 个级别";
+"timer.blind_structure_detail" = "盲注结构详情";
+"timer.scheme_one" = "结构一";
+"timer.scheme_custom" = "自定义盲注结构";
+"timer.default_custom_name" = "自定义结构";
+"timer.structure_name" = "结构名称";
+"timer.structure_name_placeholder" = "我的盲注结构";
+"timer.custom_switch_structure" = "切换结构";
+"timer.custom_edit_levels" = "编辑级别";
+"timer.custom_add_levels" = "添加自定义盲注级别";
+"timer.add_level" = "添加级别";
+"timer.next_levels" = "后续级别：";
+"timer.no_more_levels" = "没有更多级别";
+"timer.current_level" = "当前";
+"timer.current" = "当前";
+"timer.no_levels" = "暂无可用级别";
+"timer.next_stack" = "升盲后剩 %@ BB";
+"timer.off_title" = "计时器未启用";
+"timer.off_body" = "开启后可在 App 与实时活动中跟踪升盲倒计时。";
+"timer.validation_name_required" = "请输入结构名称。";
+"timer.validation_levels_required" = "至少需要一个盲注级别。";
+"timer.validation_positive" = "SB 与 BB 必须大于 0。";
+"timer.validation_bb_lt_sb" = "第 %d 级的 BB 不能小于 SB。";
+"timer.validation_not_increasing" = "第 %d 级的 BB 必须高于上一级。";
+"timer.validation_duplicate" = "第 %d 级与上一级重复。";
+
+/* 输入校验 */
+"input.error_required" = "请输入大于 0 的数值。";
+"input.error_too_large" = "数值过大。";
+
+/* 通知 */
+"notification.reminder_title" = "即将升盲";
+"notification.reminder_body" = "下一级盲注：%@，还剩 1 分钟。";
+"notification.advance_title" = "盲注升级";
+"notification.advance_body" = "请升至 %@。";
+
+/* 实时活动 — 灵动岛摘要（主 App 组字） */
+"live.island.chips_bb" = "当前筹码：%1$@（%2$@bb）";
+"live.island.upgrade_at" = "升盲时间：%1$@";
+"live.island.upgrade_paused" = "升盲时间：—";
+"live.status.unsupported" = "实时活动需要 iOS 16.2 或更高版本。";
+"live.status.disabled" = "系统设置中已关闭实时活动。";
+"live.status.failed" = "实时活动无法启动，App 内计时仍会继续。";
+
+/* Onboarding */
+"onboarding.title" = "欢迎使用 BB counter";
+"onboarding.subtitle" = "快速输入筹码，跟上盲注节奏。";
+"onboarding.step1.title" = "1. 输入你的筹码";
+"onboarding.step1.description" = "可直接输入总筹码，或用快捷按钮按面额加减。";
+"onboarding.step2.title" = "2. 设置当前盲注";
+"onboarding.step2.description" = "可选择预设盲注，或手动输入当前大盲。";
+"onboarding.step3.title" = "3. 查看 BB 并启用计时";
+"onboarding.step3.description" = "立即看到你的 BB 深度，需要时开启盲注计时器。";
+"onboarding.continue" = "开始使用 App";

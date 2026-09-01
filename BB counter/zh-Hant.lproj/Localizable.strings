@@ -1,0 +1,222 @@
+/* General Actions */
+"action.next" = "下一步";
+"action.done" = "完成";
+"action.show_result" = "顯示結果";
+"action.back" = "返回";
+"action.edit_chips" = "編輯籌碼";
+"action.edit_blinds" = "編輯盲注";
+"dashboard.set_blinds_first" = "先設定盲注，倒數才有級距可以升。";
+"settings.timer_row" = "計時器與盲注結構";
+"dashboard.session" = "本場 %@";
+"dashboard.win" = "贏";
+"dashboard.lose" = "輸";
+"dashboard.quick_add_a11y" = "增加 %@";
+"dashboard.record" = "記錄";
+"dashboard.change_total" = "改總額";
+"dashboard.session_footer" = "%d 筆變化";
+"dashboard.after_level_up" = "升盲後 %@ BB";
+"dashboard.last_level" = "已是最後一級";
+"tab.dashboard" = "儀表板";
+"tab.handline" = "行動線";
+"tab.settings" = "設定";
+"settings.version" = "版本";
+"settings.reset_footer" = "會清空籌碼、盲注、變更紀錄與計時器狀態，並重新開始一場。";
+"action.reset" = "重設";
+"action.confirm" = "確認";
+"action.cancel" = "取消";
+"action.delete" = "刪除";
+"reset.confirm_title" = "確認重設";
+"reset.confirm_message" = "確認要重新設定嗎？目前的籌碼與盲注記錄將消失。";
+
+/* Chips Screen */
+"chips.title" = "您有多少籌碼？";
+"chips.current_title" = "您目前的籌碼";
+"chips.subtitle" = "輸入你有多少籌碼";
+"chips.placeholder" = "籌碼";
+"chips.custom_amount" = "自定籌碼";
+"chips.custom_amount_placeholder" = "輸入數字";
+"chips.increase_amount" = "增加籌碼";
+"chips.decrease_amount" = "減少籌碼";
+"chips.after_adjustment" = "變更後籌碼";
+"chips.quick_adjust" = "籌碼變化";
+"chips.quick_adjust_reset" = "還原";
+"action.save" = "儲存";
+"chips.depth_preview" = "在大盲 %2$@ 下是 %1$@ BB";
+"chips.history.title" = "變更紀錄";
+"chips.history.count" = "%d 筆紀錄";
+"chips.history.empty_short" = "尚無紀錄";
+"chips.history.empty_title" = "尚無籌碼變更";
+"chips.history.empty_body" = "從結果頁編輯籌碼並按完成後，這裡會保存每次生效的籌碼變化。";
+"chips.history.clear" = "清除紀錄";
+"chips.history.clear_title" = "清除籌碼變更紀錄？";
+"chips.history.clear_message" = "此操作只會清除紀錄，不會改變目前籌碼。";
+
+/* Quick add */
+"quick.add100" = "+100";
+"quick.add500" = "+500";
+"quick.add1k" = "+1k";
+"quick.add5k" = "+5k";
+"quick.add10k" = "+10k";
+"quick.sub100" = "-100";
+"quick.sub500" = "-500";
+"quick.sub1k" = "-1k";
+"quick.sub5k" = "-5k";
+"quick.sub10k" = "-10k";
+
+/* Blinds Screen */
+"blinds.title" = "目前盲注等級？";
+"blinds.subtitle" = "目前的盲注等級";
+"blinds.enter" = "或手動輸入盲注";
+"blinds.big_blind" = "大盲";
+"blinds.big_placeholder" = "BB";
+"blinds.placeholder" = "大盲（BB）";
+
+/* Result Screen */
+"result.title" = "您擁有";
+"result.chips" = "籌碼";
+"result.blinds" = "盲注";
+"result.stack_depth" = "籌碼深度";
+"result.stack_pressure" = "下級盲注後";
+"result.status.danger" = "危險區";
+"result.status.short" = "短碼";
+"result.status.playable" = "可操作";
+"result.status.healthy" = "健康";
+"all_in_range.title" = "All in 範圍";
+"all_in_range.subtitle" = "低於 15BB 時查看推進範圍";
+"all_in_range.development_title" = "目前此功能還在開發中";
+"all_in_range.development_message" = "我們已記錄你對此功能有興趣。";
+
+/* 手牌行動線 */
+"hand.title" = "行動線記錄";
+"hand.entry_subtitle" = "快速記錄行動線，牌局後一鍵分享。";
+"hand.create" = "新增紀錄";
+"hand.editor_title" = "行動線記錄";
+"hand.default_title" = "Hand #%d";
+"hand.empty_title" = "尚無行動線記錄";
+"hand.empty_body" = "新增一筆記錄，依序點選動作，就能整理成可分享的行動線。";
+"hand.title_label" = "標題";
+"hand.title_placeholder" = "手牌標題";
+"hand.big_blind_only" = "BB";
+"hand.hero_cards" = "自己的手牌";
+"hand.card_one" = "第 1 張";
+"hand.card_two" = "第 2 張";
+"hand.board_placeholder" = "公共牌，例如 A89";
+"hand.board_card_count" = "請設定 %d 張公共牌";
+"hand.amount_placeholder" = "自訂尺寸";
+"hand.quick_action" = "快速行動";
+"hand.quick_action_subtitle" = "目前正在記錄 %@，先填完這一街再前往下一步。";
+"hand.players" = "人數";
+"hand.table_center" = "目前位置";
+"hand.step_locked" = "請先完成公共牌與目前仍可行動玩家的動作，才能前往下一步。";
+"hand.no_active_players" = "目前沒有可行動玩家。";
+"hand.board_required" = "請先設定公共牌，再記錄本街行動。";
+"hand.current_position_action" = "目前輪到 %@ 行動";
+"hand.add_action" = "加入行動";
+"hand.add_action_to" = "加入到 %@";
+"hand.finish_step" = "完成 %@，前往 %@";
+"hand.previous_step" = "上一步";
+"hand.next_step" = "下一步";
+"hand.step_hint" = "依序完成目前街道";
+"hand.current_step_title" = "目前步驟：%@";
+"hand.timeline" = "行動線";
+"hand.timeline_empty" = "尚未記錄行動，先從上方加入第一筆。";
+"hand.share_preview" = "複製文案預覽";
+"hand.street.preflop" = "翻牌前";
+"hand.street.flop" = "翻牌";
+"hand.street.turn" = "轉牌";
+"hand.street.river" = "河牌";
+"hand.pot" = "底池 %@";
+"hand.pot_estimated" = "底池 ≈ %@";
+"hand.share.big_blind" = "大盲：%@";
+"hand.share.hero" = "手牌：%@";
+"hand.note" = "備註";
+"hand.note_placeholder" = "決策點、讀牌或結果";
+"hand.undo" = "上一步";
+"hand.copy" = "複製";
+"hand.copied" = "已複製";
+"hand.share" = "分享";
+"hand.more" = "更多";
+"hand.card_summary" = "BB %@ · %d 筆行動";
+"hand.delete_title" = "刪除此手牌紀錄？";
+"hand.delete_message" = "這筆手牌會從本機紀錄中移除。";
+
+/* Timer */
+"timer.title" = "盲注計時器";
+"timer.5m" = "5 分";
+"timer.10m" = "10 分";
+"timer.15m" = "15 分";
+"timer.20m" = "20 分";
+"timer.25m" = "25 分";
+"timer.30m" = "30 分";
+"timer.60m" = "60 分";
+"timer.next" = "下一級盲注";
+"timer.configure" = "設定";
+"timer.duration" = "盲注升盲時間";
+"timer.current_blind_remaining" = "目前盲注剩餘時間";
+"timer.current_blind_remaining_short" = "剩餘";
+"timer.remaining_minutes_placeholder" = "剩餘分鐘";
+"timer.duration_summary" = "目前盲注剩餘時間 %@，後續盲注倒數時間 %@";
+"timer.select_levels" = "選擇後續盲注級別";
+"timer.selected_count" = "已選擇 %d 項";
+"timer.start" = "開始";
+"timer.pause" = "暫停";
+"timer.resume" = "繼續";
+"timer.enable" = "啟用";
+"timer.custom" = "自定盲注升盲時間";
+"timer.min_unit" = "分";
+"timer.plans" = "盲注結構";
+"timer.blind_structure" = "盲注結構";
+"timer.blind_structure_desc" = "錦標賽盲注結構，共 28 個級別";
+"timer.blind_structure_detail" = "盲注結構詳情";
+"timer.scheme_one" = "結構一";
+"timer.scheme_custom" = "自定義盲注結構";
+"timer.default_custom_name" = "自訂結構";
+"timer.structure_name" = "結構名稱";
+"timer.structure_name_placeholder" = "我的盲注結構";
+"timer.custom_switch_structure" = "切換結構";
+"timer.custom_edit_levels" = "編輯級別";
+"timer.custom_add_levels" = "新增自定義盲注等級";
+"timer.add_level" = "新增級別";
+"timer.next_levels" = "後續級別：";
+"timer.no_more_levels" = "無更多級別";
+"timer.current_level" = "目前";
+"timer.current" = "目前";
+"timer.no_levels" = "無可用級別";
+"timer.next_stack" = "下級後剩 %@ BB";
+"timer.off_title" = "計時器未啟用";
+"timer.off_body" = "開啟後可在 App 與即時動態中追蹤升盲倒數。";
+"timer.validation_name_required" = "請輸入結構名稱。";
+"timer.validation_levels_required" = "至少需要一個盲注級別。";
+"timer.validation_positive" = "SB 與 BB 必須大於 0。";
+"timer.validation_bb_lt_sb" = "第 %d 級的 BB 不可小於 SB。";
+"timer.validation_not_increasing" = "第 %d 級的 BB 必須高於上一級。";
+"timer.validation_duplicate" = "第 %d 級與上一級重複。";
+
+/* 輸入驗證 */
+"input.error_required" = "請輸入大於 0 的數值。";
+"input.error_too_large" = "數值過大。";
+
+/* 通知 */
+"notification.reminder_title" = "即將升盲";
+"notification.reminder_body" = "下一級盲注：%@，剩 1 分鐘。";
+"notification.advance_title" = "盲注升級";
+"notification.advance_body" = "請升至 %@。";
+
+/* 即時動態 — 靈動島摘要（主 App 組字） */
+"live.island.chips_bb" = "目前籌碼：%1$@（%2$@bb）";
+"live.island.upgrade_at" = "盲注升級時間：%1$@";
+"live.island.upgrade_paused" = "盲注升級時間：—";
+"live.status.unsupported" = "即時動態需要 iOS 16.2 或更新版本。";
+"live.status.disabled" = "系統設定已關閉即時動態。";
+"live.status.failed" = "即時動態無法啟動，App 內計時仍會繼續。";
+
+/* Onboarding */
+"onboarding.title" = "歡迎使用 BB counter";
+"onboarding.subtitle" = "快速輸入籌碼並跟上盲注節奏。";
+"onboarding.step1.title" = "1. 輸入你的籌碼";
+"onboarding.step1.description" = "可直接輸入總籌碼，或用快速按鈕依面額加減。";
+"onboarding.step2.title" = "2. 設定目前盲注";
+"onboarding.step2.description" = "可選擇預設盲注，或手動輸入目前大盲。";
+"onboarding.step3.title" = "3. 查看 BB 並啟用計時";
+"onboarding.step3.description" = "立即看到你的 BB 深度，需要時可開啟盲注計時器。";
+"onboarding.continue" = "開始使用 App";

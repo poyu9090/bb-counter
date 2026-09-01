@@ -1,0 +1,260 @@
+# App Store 商店頁在地化 — 簡體中文 / 日文 / 韓文
+
+App ID 6762072289 · 隨 **1.4** 一起上架（商店頁的語系必須掛在可編輯的版本上）
+
+> **狀態：三個語系都已經填進 ASC 的 1.4 版本並儲存**（名稱、副標題、描述、關鍵字、版本說明）。下面留存文案本身，之後要改或要重填時對照用。
+
+字數上限：名稱 30、副標題 30、關鍵字 100（逗號分隔、逗號後不要空格）。下面每欄都已確認在上限內。
+
+---
+
+## 简体中文（zh-Hans）
+
+**名稱**（24/30）
+
+```
+BB Counter - 扑克BB计算与盲注计时
+```
+
+**副標題**（22/30）
+
+```
+实时BB换算 · 盲注倒计时 · 锦标赛必备
+```
+
+**關鍵字**（74/100）
+
+```
+扑克,德州扑克,德扑,筹码,大盲,盲注,BB,锦标赛,计时器,牌桌,筹码计算,扑克助手,扑克工具,德州策略,记牌,升盲,盲注结构,筹码换算,现场扑克
+```
+
+**描述**
+
+```
+【核心功能】
+• 筹码深度：输入筹码与当前大盲，立刻看到 BB 深度与健康度（健康／可操作／短码／危险）。
+• 筹码变化：赢／输切换 + 常用面额快捷，一手打完几秒内更新，并留下变化记录。
+• 盲注计时：可选时长、暂停／继续、指定接下来要跑的级别，并预告升盲后还剩几 BB。
+• 自定义盲注结构：自己建的级别会被记住，下次打开 App 直接沿用。
+• 行动线记录：按德州扑克规则给出合规的动作与尺度（Open 2～3.5bb、3-Bet／4-Bet 自动换算成 bb、底池比例），记完可一键复制分享。
+• 实时活动（Live Activity）：计时进行时，可在锁屏与灵动岛查看升盲倒计时（需在系统设置中允许实时活动）。
+
+【使用方式】
+1) 输入筹码总量 → 2) 设置当前大盲 → 3) 在仪表盘看 BB 深度、记录筹码变化、开启升盲倒计时。要记牌局过程时切到「行动线」标签页。
+
+【隐私与数据】
+BB Counter 无需注册账号。筹码、盲注与计时设置都存在你的设备上；本 App 没有将这些数据上传到开发者服务器的功能。
+
+【支持】
+使用问题、建议或错误反馈，请通过 App Store 支持页所列的联系方式与我们联系。
+```
+
+**版本說明（1.4）**
+
+```
+1. 新增简体中文界面。
+2. 修正若干界面细节。
+```
+
+---
+
+## 日本語（ja）
+
+**名稱**（21/30）
+
+```
+BB Counter - ポーカーBB計算
+```
+
+**副標題**（18/30）
+
+```
+チップをBB換算・ブラインドタイマー
+```
+
+**關鍵字**（84/100）
+
+```
+ポーカー,テキサスホールデム,ホールデム,チップ,ブラインド,スタック,トーナメント,タイマー,計算機,BB,ポーカー計算,ハンド記録,ブラインドアップ,ライブポーカー
+```
+
+**描述**
+
+```
+【主な機能】
+• スタックの深さ：チップ量と現在のビッグブラインドを入れるだけで、BB 換算と余裕度（余裕あり／プレイ可能／ショート／危険域）がすぐ分かります。
+• チップの変動：勝ち／負けを切り替えて金額を入れるだけ。よく使う額はワンタップで、記録も残ります。
+• ブラインドタイマー：レベルの長さを選び、一時停止／再開、この先で使うレベルの指定もできます。ブラインドアップ後に何 BB 残るかも表示。
+• カスタムストラクチャー：自分で組んだレベルは保存され、次回もそのまま使えます。
+• アクションライン：テキサスホールデムのルールに沿った選択肢とサイズ（オープン 2〜3.5bb、3-Bet／4-Bet は bb に自動換算、ポット比）で 1 ハンドを記録し、そのままコピーして共有できます。
+• ライブアクティビティ：タイマー作動中はロック画面とダイナミックアイランドでブラインドアップまでの時間を確認できます（システム設定での許可が必要です）。
+
+【使い方】
+1) チップ量を入力 → 2) 現在のビッグブラインドを設定 → 3) ダッシュボードでスタックの深さを確認し、チップの変動を記録、必要ならタイマーを開始。ハンドを残したいときは「アクションライン」タブへ。
+
+【プライバシー】
+BB Counter はアカウント登録不要です。チップ・ブラインド・タイマーの設定は端末内にのみ保存され、開発者のサーバーへ送る機能はありません。
+
+【サポート】
+ご質問・ご要望・不具合のご連絡は、App Store のサポートページ記載の連絡先までお願いします。
+```
+
+**版本說明（1.4）**
+
+```
+1. 日本語に対応しました。
+2. 細かな表示を調整しました。
+```
+
+---
+
+## 한국어（ko）
+
+**名稱**（22/30）
+
+```
+BB Counter - 포커 BB 계산기
+```
+
+**副標題**（20/30）
+
+```
+칩을 BB로 환산 · 블라인드 타이머
+```
+
+**關鍵字**（69/100）
+
+```
+포커,홀덤,텍사스홀덤,칩,블라인드,스택,토너먼트,타이머,계산기,BB,포커계산기,블라인드타이머,핸드기록,블라인드상승,라이브포커
+```
+
+**描述**
+
+```
+【주요 기능】
+• 스택 깊이: 칩과 현재 빅블라인드만 입력하면 BB 환산과 여유도(여유 있음／플레이 가능／숏스택／위험 구간)를 바로 보여줍니다.
+• 칩 변동: 승／패를 고르고 금액만 입력하면 끝. 자주 쓰는 금액은 한 번에 더할 수 있고, 변동 내역도 남습니다.
+• 블라인드 타이머: 레벨당 시간 선택, 일시정지／재개, 앞으로 진행할 레벨 지정, 블라인드 상승 후 남는 BB까지 확인할 수 있습니다.
+• 사용자 지정 구조: 직접 만든 블라인드 구조는 저장되어 다음 세션에서 그대로 쓸 수 있습니다.
+• 액션 라인: 텍사스 홀덤 규칙에 맞는 액션과 사이즈(오픈 2~3.5bb, 3-Bet／4-Bet은 bb로 자동 환산, 팟 비율)로 한 핸드를 기록하고 그대로 복사해 공유할 수 있습니다.
+• 실시간 액티비티: 타이머가 도는 동안 잠금 화면과 다이나믹 아일랜드에서 블라인드 상승까지 남은 시간을 볼 수 있습니다(시스템 설정에서 허용 필요).
+
+【사용 방법】
+1) 칩 수량 입력 → 2) 현재 빅블라인드 설정 → 3) 대시보드에서 스택 깊이를 확인하고 칩 변동을 기록하거나 타이머를 켜세요. 핸드를 남기려면 '액션 라인' 탭으로 이동합니다.
+
+【개인정보】
+BB Counter는 계정이 필요 없습니다. 칩, 블라인드, 타이머 설정은 기기에만 저장되며 개발자 서버로 전송하는 기능이 없습니다.
+
+【지원】
+문의, 제안, 오류 제보는 App Store 지원 페이지에 안내된 연락처로 보내주세요.
+```
+
+**版本說明（1.4）**
+
+```
+1. 한국어를 지원합니다.
+2. 세부 표시를 다듬었습니다.
+```
+
+---
+
+## 繁體中文／英文的 1.4 版本說明
+
+```
+繁中：1. 新增簡體中文、日文、韓文介面。
+英文：1. Added Simplified Chinese, Japanese and Korean.
+```
+
+## 截圖
+
+三個語系各有一套 iPhone 6.9"（1320×2868）截圖，App 畫面與行銷文案都是該語系：
+
+| 語系 | 檔案 | ASC 上傳狀態 |
+| --- | --- | --- |
+| 简体中文 | `final-zh-Hans/01-chips` ~ `04-handline` | ✅ 已上傳 |
+| 日本語 | `final-ja/01-chips` ~ `04-handline` | ✅ 已上傳 |
+| 한국어 | `final-ko/01-chips` ~ `04-handline` | ✅ 已上傳 |
+
+原始畫面在 `raw-ja/`、`raw-ko/`、`raw-zh-Hans/`，用 `xcrun simctl launch <udid> PaulChiang.BB-counter -AppleLanguages "(ja)"` 切語系後截的。
+文案排版在 `generate_preview_assets.py` 的 `JA_SCENARIOS` / `KO_SCENARIOS` / `ZH_HANS_SCENARIOS`，日文用 ヒラギノ角ゴ W6、韓文用 Apple SD Gothic Neo、簡中用 STHeiti。
+
+上傳方式：媒體管理 → 選該語系 → 6.9 吋顯示器那格點「編輯」（脫離「使用英文的檔案」）→ 一張一張傳（一次傳多張順序會亂）。
+
+### iPad 13"（2064×2752）
+
+| 語系 | 檔案 | ASC 上傳狀態 |
+| --- | --- | --- |
+| 简体中文 | `ipad-zh-Hans/01-chips`、`02-blinds`、`03-dashboard` | ✅ 已上傳 |
+| 日本語 | `ipad-ja/…` | ✅ 已上傳 |
+| 한국어 | `ipad-ko/…` | ✅ 已上傳 |
+
+iPad 這三套是模擬器原生截圖（不套行銷外框，與英文／繁中的 iPad 截圖一致）。拍法：把 iPad 模擬器整台切成該語系再開 App，狀態列的日期才會跟著是日文／韓文／簡中——
+`xcrun simctl spawn <udid> defaults write .GlobalPreferences AppleLanguages -array ja` → 重開機 → `xcrun simctl status_bar <udid> override --time "12:01" …`。
+
+---
+
+## Italiano（it）— 1.5 新增
+
+義大利在 90 天內用 196 次曝光換到 15 次下載（**7.7%，全場最高**），而且商店頁與 App 都還是英文。
+
+**名稱**（25/30）
+
+```
+BB Counter - Fiches in BB
+```
+
+**副標題**（30/30）
+
+```
+Poker: timer bui e stack in BB
+```
+
+**關鍵字**（95/100）— 名稱與副標題已含 bb／counter／fiches／poker／timer／bui／stack，這裡只放沒被涵蓋的詞
+
+```
+torneo,tornei,livello,buio,mano,calcolo,chip,cash,game,holdem,texas,icm,push,fold,orologio,live
+```
+
+**描述**
+
+```
+【Funzioni principali】
+• Profondità dello stack: inserisci fiches e buio grande e vedi subito quanti BB hai e quanto sei comodo (comodo／giocabile／short／zona critica).
+• Variazione fiches: scegli vinto o perso, scrivi l'importo e via. I tagli più usati si aggiungono con un tocco e resta lo storico.
+• Timer dei bui: scegli la durata del livello, metti in pausa, indica i livelli che giocherai e vedi quanti BB ti restano dopo la salita.
+• Strutture personalizzate: i livelli che crei restano salvati per la sessione successiva.
+• Linea d'azione: registra una mano con azioni e size a norma di Texas Hold'em (open da 2 a 3.5bb, 3-Bet e 4-Bet convertiti in bb, frazioni di piatto) e copiala per condividerla.
+• Attività in tempo reale: mentre il timer gira, il conto alla rovescia resta sulla schermata di blocco e nella Dynamic Island (serve il permesso nelle impostazioni di sistema).
+
+【Come si usa】
+1) Inserisci il totale delle fiches → 2) imposta il buio grande → 3) leggi la profondità in BB nella dashboard, registra le variazioni e avvia il timer. Per salvare una mano passa alla scheda «Linea d'azione».
+
+【Privacy】
+BB Counter non richiede alcun account. Fiches, bui e impostazioni del timer restano sul tuo dispositivo: l'app non ha funzioni per inviarli a un server dello sviluppatore.
+
+【Supporto】
+Per domande, suggerimenti o segnalazioni scrivi ai contatti indicati nella pagina di supporto su App Store.
+```
+
+**版本說明（1.5）**
+
+```
+1. Ora l'app parla italiano.
+2. Piccole rifiniture all'interfaccia.
+```
+
+**截圖**：`final-it/01-result` ~ `04-blinds`（1320×2868，已是深度優先的新順序）
+
+---
+
+## 英文關鍵字（1.5 要換）
+
+現行：`poker,holdem,chips,big blind,bb,stack,tournament,blind timer,home game,MTT,calculator,chip count`
+
+問題：`poker`、`calculator`、`bb`、`blind timer` 這些詞**名稱與副標題已經涵蓋**（BB Counter – Poker Calculator／Calculator · Timer · Push/Fold），重複等於浪費字元；`poker` 這種大字在美國也排不進前段。
+
+新版（95/100，只放名稱副標題沒有的詞，讓 Apple 自己組合）：
+
+```
+chips,stack,depth,blinds,level,tournament,mtt,holdem,texas,live,home,game,clock,shove,icm,range
+```

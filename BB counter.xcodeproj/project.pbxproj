@@ -6,6 +6,13 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CE32C8AA2F1CBE38000A880B /* BBTimerLiveActivity.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CE32C8A02F1CBE38000A8801 /* BBTimerLiveActivity.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		CECCF1142F8B4C3500A37378 /* BBLiveActivityKit in Frameworks */ = {isa = PBXBuildFile; productRef = CE32C8AE2F1CBE38000A880F /* BBLiveActivityKit */; };
+		CECCF1152F8B4C3500A37378 /* BBLiveActivityKit in Frameworks */ = {isa = PBXBuildFile; productRef = CE32C8AE2F1CBE38000A880F /* BBLiveActivityKit */; };
+		CEAA10032F900003000A0003 /* TelemetryDeck in Frameworks */ = {isa = PBXBuildFile; productRef = CEAA10022F900002000A0002 /* TelemetryDeck */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		CE32C78B2F1CBE38000A882E /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -21,13 +28,45 @@
 			remoteGlobalIDString = CE32C77C2F1CBE36000A882E;
 			remoteInfo = "BB counter";
 		};
+		CE32C8AC2F1CBE38000A880D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = CE32C7752F1CBE36000A882E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = CE32C8A22F1CBE38000A8803;
+			remoteInfo = BBTimerLiveActivity;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		CE32C8B32F1CBE38000A8814 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				CE32C8AA2F1CBE38000A880B /* BBTimerLiveActivity.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		CE32C77D2F1CBE36000A882E /* BB counter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "BB counter.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE32C78A2F1CBE38000A882E /* BB counterTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "BB counterTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE32C7942F1CBE38000A882E /* BB counterUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "BB counterUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CE32C8A02F1CBE38000A8801 /* BBTimerLiveActivity.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = BBTimerLiveActivity.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		CE32C8B92F1CBE38000A881A /* Exceptions for "BBTimerLiveActivity" folder in "BBTimerLiveActivity" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = CE32C8A22F1CBE38000A8803 /* BBTimerLiveActivity */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		CE32C77F2F1CBE36000A882E /* BB counter */ = {
@@ -45,6 +84,14 @@
 			path = "BB counterUITests";
 			sourceTree = "<group>";
 		};
+		CE32C8A12F1CBE38000A8802 /* BBTimerLiveActivity */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				CE32C8B92F1CBE38000A881A /* Exceptions for "BBTimerLiveActivity" folder in "BBTimerLiveActivity" target */,
+			);
+			path = BBTimerLiveActivity;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -52,6 +99,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CECCF1152F8B4C3500A37378 /* BBLiveActivityKit in Frameworks */,
+				CEAA10032F900003000A0003 /* TelemetryDeck in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -69,6 +118,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CE32C8A72F1CBE38000A8808 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CECCF1142F8B4C3500A37378 /* BBLiveActivityKit in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -76,6 +133,7 @@
 			isa = PBXGroup;
 			children = (
 				CE32C77F2F1CBE36000A882E /* BB counter */,
+				CE32C8A12F1CBE38000A8802 /* BBTimerLiveActivity */,
 				CE32C78D2F1CBE38000A882E /* BB counterTests */,
 				CE32C7972F1CBE38000A882E /* BB counterUITests */,
 				CE32C77E2F1CBE36000A882E /* Products */,
@@ -86,6 +144,7 @@
 			isa = PBXGroup;
 			children = (
 				CE32C77D2F1CBE36000A882E /* BB counter.app */,
+				CE32C8A02F1CBE38000A8801 /* BBTimerLiveActivity.appex */,
 				CE32C78A2F1CBE38000A882E /* BB counterTests.xctest */,
 				CE32C7942F1CBE38000A882E /* BB counterUITests.xctest */,
 			);
@@ -102,16 +161,20 @@
 				CE32C7792F1CBE36000A882E /* Sources */,
 				CE32C77A2F1CBE36000A882E /* Frameworks */,
 				CE32C77B2F1CBE36000A882E /* Resources */,
+				CE32C8B32F1CBE38000A8814 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				CE32C8B82F1CBE38000A8819 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				CE32C77F2F1CBE36000A882E /* BB counter */,
 			);
 			name = "BB counter";
 			packageProductDependencies = (
+				CE32C8AE2F1CBE38000A880F /* BBLiveActivityKit */,
+				CEAA10022F900002000A0002 /* TelemetryDeck */,
 			);
 			productName = "BB counter";
 			productReference = CE32C77D2F1CBE36000A882E /* BB counter.app */;
@@ -163,6 +226,29 @@
 			productReference = CE32C7942F1CBE38000A882E /* BB counterUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		CE32C8A22F1CBE38000A8803 /* BBTimerLiveActivity */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE32C8B42F1CBE38000A8815 /* Build configuration list for PBXNativeTarget "BBTimerLiveActivity" */;
+			buildPhases = (
+				CE32C8B12F1CBE38000A8812 /* Sources */,
+				CE32C8A72F1CBE38000A8808 /* Frameworks */,
+				CE32C8B22F1CBE38000A8813 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				CE32C8A12F1CBE38000A8802 /* BBTimerLiveActivity */,
+			);
+			name = BBTimerLiveActivity;
+			packageProductDependencies = (
+				CE32C8AE2F1CBE38000A880F /* BBLiveActivityKit */,
+			);
+			productName = BBTimerLiveActivity;
+			productReference = CE32C8A02F1CBE38000A8801 /* BBTimerLiveActivity.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -184,6 +270,9 @@
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = CE32C77C2F1CBE36000A882E;
 					};
+					CE32C8A22F1CBE38000A8803 = {
+						CreatedOnToolsVersion = 16.4;
+					};
 				};
 			};
 			buildConfigurationList = CE32C7782F1CBE36000A882E /* Build configuration list for PBXProject "BB counter" */;
@@ -192,15 +281,25 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hant",
+				"zh-Hans",
+				ja,
+				ko,
+				it,
 			);
 			mainGroup = CE32C7742F1CBE36000A882E;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				CE32C8AD2F1CBE38000A880E /* XCLocalSwiftPackageReference "BBLiveActivityKit" */,
+				CEAA10012F900001000A0001 /* XCRemoteSwiftPackageReference "SwiftSDK" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = CE32C77E2F1CBE36000A882E /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				CE32C77C2F1CBE36000A882E /* BB counter */,
+				CE32C8A22F1CBE38000A8803 /* BBTimerLiveActivity */,
 				CE32C7892F1CBE38000A882E /* BB counterTests */,
 				CE32C7932F1CBE38000A882E /* BB counterUITests */,
 			);
@@ -223,6 +322,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		CE32C7922F1CBE38000A882E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CE32C8B22F1CBE38000A8813 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -253,6 +359,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CE32C8B12F1CBE38000A8812 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -265,6 +378,11 @@
 			isa = PBXTargetDependency;
 			target = CE32C77C2F1CBE36000A882E /* BB counter */;
 			targetProxy = CE32C7952F1CBE38000A882E /* PBXContainerItemProxy */;
+		};
+		CE32C8B82F1CBE38000A8819 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = CE32C8A22F1CBE38000A8803 /* BBTimerLiveActivity */;
+			targetProxy = CE32C8AC2F1CBE38000A880D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -322,7 +440,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -380,7 +498,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -396,10 +514,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = AJSJ34TNH8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "BB Counter";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -409,7 +530,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "PaulChiang.BB-counter";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -424,10 +545,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = AJSJ34TNH8;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "BB Counter";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
+				INFOPLIST_KEY_NSSupportsLiveActivities = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -437,7 +561,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "PaulChiang.BB-counter";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -451,11 +575,11 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = AJSJ34TNH8;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				MARKETING_VERSION = 1.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "PaulChiang.BB-counterTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -470,11 +594,11 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 6;
 				DEVELOPMENT_TEAM = AJSJ34TNH8;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
-				MARKETING_VERSION = 1.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MARKETING_VERSION = 1.4;
 				PRODUCT_BUNDLE_IDENTIFIER = "PaulChiang.BB-counterTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -491,7 +615,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = AJSJ34TNH8;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "PaulChiang.BB-counterUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
@@ -508,13 +632,63 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = AJSJ34TNH8;
 				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "PaulChiang.BB-counterUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = "BB counter";
+			};
+			name = Release;
+		};
+		CE32C8B52F1CBE38000A8816 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = AJSJ34TNH8;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BBTimerLiveActivity/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "BB Counter";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "PaulChiang.BB-counter.BBTimerLiveActivity";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CE32C8B62F1CBE38000A8817 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 6;
+				DEVELOPMENT_TEAM = AJSJ34TNH8;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = BBTimerLiveActivity/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "BB Counter";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "PaulChiang.BB-counter.BBTimerLiveActivity";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -557,7 +731,47 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		CE32C8B42F1CBE38000A8815 /* Build configuration list for PBXNativeTarget "BBTimerLiveActivity" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CE32C8B52F1CBE38000A8816 /* Debug */,
+				CE32C8B62F1CBE38000A8817 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		CE32C8AD2F1CBE38000A880E /* XCLocalSwiftPackageReference "BBLiveActivityKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = BBLiveActivityKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		CEAA10012F900001000A0001 /* XCRemoteSwiftPackageReference "SwiftSDK" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/TelemetryDeck/SwiftSDK";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		CEAA10022F900002000A0002 /* TelemetryDeck */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CEAA10012F900001000A0001 /* XCRemoteSwiftPackageReference "SwiftSDK" */;
+			productName = TelemetryDeck;
+		};
+		CE32C8AE2F1CBE38000A880F /* BBLiveActivityKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CE32C8AD2F1CBE38000A880E /* XCLocalSwiftPackageReference "BBLiveActivityKit" */;
+			productName = BBLiveActivityKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = CE32C7752F1CBE36000A882E /* Project object */;
 }

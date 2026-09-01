@@ -1,0 +1,14 @@
+"live.chips" = "Chips";
+"live.level" = "Blinds";
+"live.stack" = "Stack";
+"live.bb_unit" = "BB";
+"live.countdown" = "Countdown";
+"live.next_level" = "Next level";
+"live.next_short" = "Next";
+"live.current_short" = "Current";
+"live.up_at" = "Up";
+
+/* Dynamic Island — compact (narrow) */
+"live.compact.chips_caption" = "Chips";
+"live.compact.blinds_caption" = "Blinds";
+"live.compact.blinds_paused" = "Paused";

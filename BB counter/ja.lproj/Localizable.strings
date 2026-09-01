@@ -1,0 +1,222 @@
+/* General Actions */
+"action.next" = "次へ";
+"action.done" = "完了";
+"action.show_result" = "結果を表示";
+"action.back" = "戻る";
+"action.edit_chips" = "チップを編集";
+"action.edit_blinds" = "ブラインドを編集";
+"dashboard.set_blinds_first" = "先にブラインドを設定すると、カウントダウンがブラインドアップを追えます。";
+"settings.timer_row" = "タイマーとブラインドストラクチャー";
+"dashboard.session" = "セッション %@";
+"dashboard.win" = "勝ち";
+"dashboard.lose" = "負け";
+"dashboard.quick_add_a11y" = "%@ を追加";
+"dashboard.record" = "記録";
+"dashboard.change_total" = "合計を変更";
+"dashboard.session_footer" = "%d 件の変動";
+"dashboard.after_level_up" = "ブラインドアップ後 %@ BB";
+"dashboard.last_level" = "ストラクチャーの最終レベルです";
+"tab.dashboard" = "ダッシュボード";
+"tab.handline" = "アクションライン";
+"tab.settings" = "設定";
+"settings.version" = "バージョン";
+"settings.reset_footer" = "チップ・ブラインド・変動履歴・タイマーの状態を消去して、新しいセッションを開始します。";
+"action.reset" = "リセット";
+"action.confirm" = "確認";
+"action.cancel" = "キャンセル";
+"action.delete" = "削除";
+"reset.confirm_title" = "リセットの確認";
+"reset.confirm_message" = "リセットしますか？現在のチップとブラインドの記録は失われます。";
+
+/* Chips Screen */
+"chips.title" = "チップはいくらありますか？";
+"chips.current_title" = "現在のチップ";
+"chips.subtitle" = "チップ量を入力";
+"chips.placeholder" = "チップ";
+"chips.custom_amount" = "チップを自由入力";
+"chips.custom_amount_placeholder" = "数値を入力";
+"chips.increase_amount" = "チップを増やす";
+"chips.decrease_amount" = "チップを減らす";
+"chips.after_adjustment" = "変更後のチップ";
+"chips.quick_adjust" = "チップの変動";
+"chips.quick_adjust_reset" = "元に戻す";
+"action.save" = "保存";
+"chips.depth_preview" = "BB %2$@ なら %1$@ BB";
+"chips.history.title" = "変動履歴";
+"chips.history.count" = "%d 件の記録";
+"chips.history.empty_short" = "記録なし";
+"chips.history.empty_title" = "チップの変動はまだありません";
+"chips.history.empty_body" = "ダッシュボードでチップの変動を記録すると、反映されたぶんがここに残ります。";
+"chips.history.clear" = "履歴を消去";
+"chips.history.clear_title" = "チップの変動履歴を消去しますか？";
+"chips.history.clear_message" = "履歴だけを消去します。現在のチップは変わりません。";
+
+/* Quick add */
+"quick.add100" = "+100";
+"quick.add500" = "+500";
+"quick.add1k" = "+1k";
+"quick.add5k" = "+5k";
+"quick.add10k" = "+10k";
+"quick.sub100" = "-100";
+"quick.sub500" = "-500";
+"quick.sub1k" = "-1k";
+"quick.sub5k" = "-5k";
+"quick.sub10k" = "-10k";
+
+/* Blinds Screen */
+"blinds.title" = "現在のブラインドは？";
+"blinds.subtitle" = "現在のブラインドレベル";
+"blinds.enter" = "手動で入力する場合";
+"blinds.big_blind" = "ビッグブラインド";
+"blinds.big_placeholder" = "BB";
+"blinds.placeholder" = "ビッグブラインド（BB）";
+
+/* Result Screen */
+"result.title" = "あなたのスタック";
+"result.chips" = "チップ";
+"result.blinds" = "ブラインド";
+"result.stack_depth" = "スタックの深さ";
+"result.stack_pressure" = "次のブラインド後";
+"result.status.danger" = "危険域";
+"result.status.short" = "ショートスタック";
+"result.status.playable" = "プレイ可能";
+"result.status.healthy" = "余裕あり";
+"all_in_range.title" = "オールインレンジ";
+"all_in_range.subtitle" = "15BB を切ったらプッシュレンジを確認";
+"all_in_range.development_title" = "この機能は現在開発中です";
+"all_in_range.development_message" = "ご関心を記録しました。";
+
+/* ハンドのアクションライン */
+"hand.title" = "アクションラインの記録";
+"hand.entry_subtitle" = "アクションラインをすばやく記録し、ハンド後に共有できます。";
+"hand.create" = "新規作成";
+"hand.editor_title" = "アクションラインの記録";
+"hand.default_title" = "Hand #%d";
+"hand.empty_title" = "アクションラインの記録はまだありません";
+"hand.empty_body" = "記録を作成し、アクションを順にタップすれば、そのまま共有できるアクションラインになります。";
+"hand.title_label" = "タイトル";
+"hand.title_placeholder" = "ハンドのタイトル";
+"hand.big_blind_only" = "BB";
+"hand.hero_cards" = "自分のハンド";
+"hand.card_one" = "1 枚目";
+"hand.card_two" = "2 枚目";
+"hand.board_placeholder" = "ボード（例：A89）";
+"hand.board_card_count" = "ボードを %d 枚設定してください";
+"hand.amount_placeholder" = "サイズを入力";
+"hand.quick_action" = "クイックアクション";
+"hand.quick_action_subtitle" = "%@ を記録中です。このストリートを終えてから次へ進んでください。";
+"hand.players" = "人数";
+"hand.table_center" = "現在のポジション";
+"hand.step_locked" = "ボードと、アクション可能なプレイヤーの入力を終えてから次へ進めます。";
+"hand.no_active_players" = "アクションできるプレイヤーがいません。";
+"hand.board_required" = "先にボードを設定してから、このストリートを記録してください。";
+"hand.current_position_action" = "%@ のアクション";
+"hand.add_action" = "アクションを追加";
+"hand.add_action_to" = "%@ に追加";
+"hand.finish_step" = "%@ を終えて %@ へ";
+"hand.previous_step" = "前のステップ";
+"hand.next_step" = "次のステップ";
+"hand.step_hint" = "現在のストリートを順に記録してください";
+"hand.current_step_title" = "現在のステップ：%@";
+"hand.timeline" = "アクションライン";
+"hand.timeline_empty" = "まだアクションがありません。上から最初の 1 手を追加してください。";
+"hand.share_preview" = "コピー用プレビュー";
+"hand.street.preflop" = "プリフロップ";
+"hand.street.flop" = "フロップ";
+"hand.street.turn" = "ターン";
+"hand.street.river" = "リバー";
+"hand.pot" = "ポット %@";
+"hand.pot_estimated" = "ポット ≈ %@";
+"hand.share.big_blind" = "BB：%@";
+"hand.share.hero" = "ハンド：%@";
+"hand.note" = "メモ";
+"hand.note_placeholder" = "判断・リード・結果など";
+"hand.undo" = "取り消す";
+"hand.copy" = "コピー";
+"hand.copied" = "コピーしました";
+"hand.share" = "共有";
+"hand.more" = "その他";
+"hand.card_summary" = "BB %@ · %d アクション";
+"hand.delete_title" = "このハンド記録を削除しますか？";
+"hand.delete_message" = "このハンドは端末内の記録から削除されます。";
+
+/* Timer */
+"timer.title" = "ブラインドタイマー";
+"timer.5m" = "5 分";
+"timer.10m" = "10 分";
+"timer.15m" = "15 分";
+"timer.20m" = "20 分";
+"timer.25m" = "25 分";
+"timer.30m" = "30 分";
+"timer.60m" = "60 分";
+"timer.next" = "次のブラインド";
+"timer.configure" = "設定";
+"timer.duration" = "1 レベルの長さ";
+"timer.current_blind_remaining" = "現在のレベルの残り時間";
+"timer.current_blind_remaining_short" = "残り";
+"timer.remaining_minutes_placeholder" = "残り分数";
+"timer.duration_summary" = "現在のレベルの残り %@、以降のレベルは %@";
+"timer.select_levels" = "この先で使うレベルを選択";
+"timer.selected_count" = "%d 件選択中";
+"timer.start" = "開始";
+"timer.pause" = "一時停止";
+"timer.resume" = "再開";
+"timer.enable" = "オンにする";
+"timer.custom" = "1 レベルの長さを自由入力";
+"timer.min_unit" = "分";
+"timer.plans" = "ブラインドストラクチャー";
+"timer.blind_structure" = "ブラインドストラクチャー";
+"timer.blind_structure_desc" = "トーナメント用ストラクチャー（全 28 レベル）";
+"timer.blind_structure_detail" = "ストラクチャーの詳細";
+"timer.scheme_one" = "ストラクチャー 1";
+"timer.scheme_custom" = "カスタムストラクチャー";
+"timer.default_custom_name" = "カスタムストラクチャー";
+"timer.structure_name" = "ストラクチャー名";
+"timer.structure_name_placeholder" = "マイストラクチャー";
+"timer.custom_switch_structure" = "ストラクチャーを切り替え";
+"timer.custom_edit_levels" = "レベルを編集";
+"timer.custom_add_levels" = "レベルを自分で追加";
+"timer.add_level" = "レベルを追加";
+"timer.next_levels" = "この先のレベル：";
+"timer.no_more_levels" = "これ以上レベルがありません";
+"timer.current_level" = "現在";
+"timer.current" = "現在";
+"timer.no_levels" = "使えるレベルがありません";
+"timer.next_stack" = "ブラインドアップ後 %@ BB";
+"timer.off_title" = "タイマーはオフです";
+"timer.off_body" = "オンにすると、アプリとライブアクティビティでブラインドアップまでの時間を確認できます。";
+"timer.validation_name_required" = "ストラクチャー名を入力してください。";
+"timer.validation_levels_required" = "レベルを 1 つ以上追加してください。";
+"timer.validation_positive" = "SB と BB は 0 より大きい値にしてください。";
+"timer.validation_bb_lt_sb" = "レベル %d の BB が SB を下回っています。";
+"timer.validation_not_increasing" = "レベル %d の BB は前のレベルより大きくしてください。";
+"timer.validation_duplicate" = "レベル %d が前のレベルと重複しています。";
+
+/* Input validation */
+"input.error_required" = "0 より大きい値を入力してください。";
+"input.error_too_large" = "値が大きすぎます。";
+
+/* Notifications */
+"notification.reminder_title" = "まもなくブラインドアップ";
+"notification.reminder_body" = "次のブラインド：%@（あと 1 分）。";
+"notification.advance_title" = "ブラインドアップ";
+"notification.advance_body" = "%@ に上げてください。";
+
+/* ライブアクティビティ — ダイナミックアイランド用（アプリ側で生成） */
+"live.island.chips_bb" = "スタック：%1$@（%2$@bb）";
+"live.island.upgrade_at" = "ブラインドアップ：%1$@";
+"live.island.upgrade_paused" = "ブラインドアップ：—";
+"live.status.unsupported" = "ライブアクティビティには iOS 16.2 以降が必要です。";
+"live.status.disabled" = "システム設定でライブアクティビティがオフになっています。";
+"live.status.failed" = "ライブアクティビティを開始できませんでした。アプリ内のタイマーは動いています。";
+
+/* Onboarding */
+"onboarding.title" = "BB Counter へようこそ";
+"onboarding.subtitle" = "スタックをすばやく入力して、ブラインドのペースについていきましょう。";
+"onboarding.step1.title" = "1. チップを入力";
+"onboarding.step1.description" = "合計を直接入力するか、額面ごとのボタンで増減できます。";
+"onboarding.step2.title" = "2. 現在のブラインドを設定";
+"onboarding.step2.description" = "プリセットから選ぶか、現在の BB を手入力します。";
+"onboarding.step3.title" = "3. BB を確認してタイマーを開始";
+"onboarding.step3.description" = "スタックの深さがすぐ分かります。必要ならブラインドタイマーもオンに。";
+"onboarding.continue" = "アプリを使い始める";

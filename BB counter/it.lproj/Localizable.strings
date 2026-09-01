@@ -1,0 +1,222 @@
+/* General Actions */
+"action.next" = "Avanti";
+"action.done" = "Fatto";
+"action.show_result" = "Mostra risultato";
+"action.back" = "Indietro";
+"action.edit_chips" = "Modifica fiches";
+"action.edit_blinds" = "Modifica bui";
+"dashboard.set_blinds_first" = "Imposta prima i bui: così il conto alla rovescia sa quando salire di livello.";
+"settings.timer_row" = "Timer e struttura dei bui";
+"dashboard.session" = "Sessione %@";
+"dashboard.win" = "Vinto";
+"dashboard.lose" = "Perso";
+"dashboard.quick_add_a11y" = "Aggiungi %@";
+"dashboard.record" = "Registra";
+"dashboard.change_total" = "Totale";
+"dashboard.session_footer" = "%d variazioni";
+"dashboard.after_level_up" = "%@ BB dopo il prossimo livello";
+"dashboard.last_level" = "Ultimo livello della struttura";
+"tab.dashboard" = "Dashboard";
+"tab.handline" = "Linea d'azione";
+"tab.settings" = "Impostazioni";
+"settings.version" = "Versione";
+"settings.reset_footer" = "Cancella fiches, bui, storico delle variazioni e stato del timer, poi apre una nuova sessione.";
+"action.reset" = "Reimposta";
+"action.confirm" = "Conferma";
+"action.cancel" = "Annulla";
+"action.delete" = "Elimina";
+"reset.confirm_title" = "Conferma reimpostazione";
+"reset.confirm_message" = "Vuoi reimpostare? Le fiches e i bui attuali andranno persi.";
+
+/* Chips Screen */
+"chips.title" = "Quante fiches hai?";
+"chips.current_title" = "Le tue fiches attuali";
+"chips.subtitle" = "Inserisci le tue fiches";
+"chips.placeholder" = "Fiches";
+"chips.custom_amount" = "Importo libero";
+"chips.custom_amount_placeholder" = "Importo";
+"chips.increase_amount" = "Aggiungi fiches";
+"chips.decrease_amount" = "Togli fiches";
+"chips.after_adjustment" = "Fiches dopo la modifica";
+"chips.quick_adjust" = "Variazione fiches";
+"chips.quick_adjust_reset" = "Annulla";
+"action.save" = "Salva";
+"chips.depth_preview" = "%1$@ BB con buio grande %2$@";
+"chips.history.title" = "Storico variazioni";
+"chips.history.count" = "%d registrazioni";
+"chips.history.empty_short" = "Nessuna registrazione";
+"chips.history.empty_title" = "Ancora nessuna variazione";
+"chips.history.empty_body" = "Registra le variazioni di fiches dalla dashboard: qui resta lo storico di ogni modifica applicata.";
+"chips.history.clear" = "Cancella storico";
+"chips.history.clear_title" = "Cancellare lo storico delle variazioni?";
+"chips.history.clear_message" = "Viene cancellato solo lo storico: le fiches attuali non cambiano.";
+
+/* Quick add */
+"quick.add100" = "+100";
+"quick.add500" = "+500";
+"quick.add1k" = "+1k";
+"quick.add5k" = "+5k";
+"quick.add10k" = "+10k";
+"quick.sub100" = "-100";
+"quick.sub500" = "-500";
+"quick.sub1k" = "-1k";
+"quick.sub5k" = "-5k";
+"quick.sub10k" = "-10k";
+
+/* Blinds Screen */
+"blinds.title" = "Qual è il livello dei bui?";
+"blinds.subtitle" = "Livello dei bui attuale";
+"blinds.enter" = "Oppure inserisci i bui a mano";
+"blinds.big_blind" = "Buio grande";
+"blinds.big_placeholder" = "BB";
+"blinds.placeholder" = "Buio grande (BB)";
+
+/* Result Screen */
+"result.title" = "Il tuo stack";
+"result.chips" = "Fiches";
+"result.blinds" = "Bui";
+"result.stack_depth" = "Profondità stack";
+"result.stack_pressure" = "Dopo il prossimo buio";
+"result.status.danger" = "Zona critica";
+"result.status.short" = "Short stack";
+"result.status.playable" = "Giocabile";
+"result.status.healthy" = "Comodo";
+"all_in_range.title" = "Range di all-in";
+"all_in_range.subtitle" = "Sotto i 15BB controlla il range di push";
+"all_in_range.development_title" = "Questa funzione è ancora in sviluppo";
+"all_in_range.development_message" = "Abbiamo registrato il tuo interesse.";
+
+/* Linea d'azione della mano */
+"hand.title" = "Linee d'azione salvate";
+"hand.entry_subtitle" = "Registra la linea d'azione al volo e condividila a fine mano.";
+"hand.create" = "Nuova registrazione";
+"hand.editor_title" = "Linea d'azione";
+"hand.default_title" = "Hand #%d";
+"hand.empty_title" = "Ancora nessuna linea d'azione";
+"hand.empty_body" = "Crea una registrazione, tocca le azioni in ordine e ottieni una linea d'azione pronta da condividere.";
+"hand.title_label" = "Titolo";
+"hand.title_placeholder" = "Titolo della mano";
+"hand.big_blind_only" = "BB";
+"hand.hero_cards" = "Le tue carte";
+"hand.card_one" = "Prima carta";
+"hand.card_two" = "Seconda carta";
+"hand.board_placeholder" = "Board, es. A89";
+"hand.board_card_count" = "Imposta %d carte del board";
+"hand.amount_placeholder" = "Size libera";
+"hand.quick_action" = "Azione rapida";
+"hand.quick_action_subtitle" = "Stai registrando %@. Completa questo street prima di passare al successivo.";
+"hand.players" = "Giocatori";
+"hand.table_center" = "Posizione attuale";
+"hand.step_locked" = "Completa il board e le azioni dei giocatori ancora in mano per passare allo step successivo.";
+"hand.no_active_players" = "Nessun giocatore può agire adesso.";
+"hand.board_required" = "Imposta prima il board, poi registra questo street.";
+"hand.current_position_action" = "Tocca a %@";
+"hand.add_action" = "Aggiungi azione";
+"hand.add_action_to" = "Aggiungi a %@";
+"hand.finish_step" = "Chiudi %@, passa a %@";
+"hand.previous_step" = "Step precedente";
+"hand.next_step" = "Step successivo";
+"hand.step_hint" = "Completa lo street attuale in ordine";
+"hand.current_step_title" = "Step attuale: %@";
+"hand.timeline" = "Linea d'azione";
+"hand.timeline_empty" = "Ancora nessuna azione. Aggiungi la prima qui sopra.";
+"hand.share_preview" = "Anteprima da copiare";
+"hand.street.preflop" = "Preflop";
+"hand.street.flop" = "Flop";
+"hand.street.turn" = "Turn";
+"hand.street.river" = "River";
+"hand.pot" = "Piatto %@";
+"hand.pot_estimated" = "Piatto ≈ %@";
+"hand.share.big_blind" = "BB: %@";
+"hand.share.hero" = "Mano: %@";
+"hand.note" = "Note";
+"hand.note_placeholder" = "Decisione, read o risultato";
+"hand.undo" = "Annulla";
+"hand.copy" = "Copia";
+"hand.copied" = "Copiato";
+"hand.share" = "Condividi";
+"hand.more" = "Altro";
+"hand.card_summary" = "BB %@ · %d azioni";
+"hand.delete_title" = "Eliminare questa mano?";
+"hand.delete_message" = "La mano verrà rimossa dalle registrazioni sul dispositivo.";
+
+/* Timer */
+"timer.title" = "Timer dei bui";
+"timer.5m" = "5 min";
+"timer.10m" = "10 min";
+"timer.15m" = "15 min";
+"timer.20m" = "20 min";
+"timer.25m" = "25 min";
+"timer.30m" = "30 min";
+"timer.60m" = "60 min";
+"timer.next" = "Prossimo livello";
+"timer.configure" = "Configura";
+"timer.duration" = "Durata del livello";
+"timer.current_blind_remaining" = "Tempo rimasto sul livello attuale";
+"timer.current_blind_remaining_short" = "Rimasti";
+"timer.remaining_minutes_placeholder" = "Minuti rimasti";
+"timer.duration_summary" = "Sul livello attuale restano %@, i livelli successivi durano %@";
+"timer.select_levels" = "Scegli i prossimi livelli";
+"timer.selected_count" = "%d selezionati";
+"timer.start" = "Avvia";
+"timer.pause" = "Pausa";
+"timer.resume" = "Riprendi";
+"timer.enable" = "Attiva";
+"timer.custom" = "Durata del livello personalizzata";
+"timer.min_unit" = "min";
+"timer.plans" = "Struttura dei bui";
+"timer.blind_structure" = "Struttura dei bui";
+"timer.blind_structure_desc" = "Struttura da torneo con 28 livelli";
+"timer.blind_structure_detail" = "Dettagli della struttura";
+"timer.scheme_one" = "Struttura 1";
+"timer.scheme_custom" = "Struttura personalizzata";
+"timer.default_custom_name" = "Struttura personalizzata";
+"timer.structure_name" = "Nome della struttura";
+"timer.structure_name_placeholder" = "La mia struttura";
+"timer.custom_switch_structure" = "Cambia struttura";
+"timer.custom_edit_levels" = "Modifica livelli";
+"timer.custom_add_levels" = "Aggiungi livelli personalizzati";
+"timer.add_level" = "Aggiungi livello";
+"timer.next_levels" = "Prossimi livelli:";
+"timer.no_more_levels" = "Non ci sono altri livelli";
+"timer.current_level" = "Attuale";
+"timer.current" = "Attuale";
+"timer.no_levels" = "Nessun livello disponibile";
+"timer.next_stack" = "%@ BB dopo il prossimo livello";
+"timer.off_title" = "Timer disattivato";
+"timer.off_body" = "Attivalo per seguire il conto alla rovescia nell'app e nell'attività in tempo reale.";
+"timer.validation_name_required" = "Inserisci il nome della struttura.";
+"timer.validation_levels_required" = "Aggiungi almeno un livello.";
+"timer.validation_positive" = "SB e BB devono essere maggiori di zero.";
+"timer.validation_bb_lt_sb" = "Al livello %d il BB è inferiore al SB.";
+"timer.validation_not_increasing" = "Il livello %d deve avere un BB più alto del precedente.";
+"timer.validation_duplicate" = "Il livello %d è uguale al precedente.";
+
+/* Input validation */
+"input.error_required" = "Inserisci un valore maggiore di zero.";
+"input.error_too_large" = "Valore troppo grande.";
+
+/* Notifications */
+"notification.reminder_title" = "I bui stanno per salire";
+"notification.reminder_body" = "Prossimo buio: %@ tra 1 minuto.";
+"notification.advance_title" = "Bui saliti";
+"notification.advance_body" = "Passa a %@.";
+
+/* Attività in tempo reale — riepilogo per la Dynamic Island (composto nell'app) */
+"live.island.chips_bb" = "Stack: %1$@ (%2$@bb)";
+"live.island.upgrade_at" = "I bui salgono alle %1$@";
+"live.island.upgrade_paused" = "I bui salgono alle: —";
+"live.status.unsupported" = "L'attività in tempo reale richiede iOS 16.2 o successivo.";
+"live.status.disabled" = "L'attività in tempo reale è disattivata nelle impostazioni di sistema.";
+"live.status.failed" = "Impossibile avviare l'attività in tempo reale. Il timer nell'app continua a funzionare.";
+
+/* Onboarding */
+"onboarding.title" = "Benvenuto in BB Counter";
+"onboarding.subtitle" = "Conta lo stack in un attimo e resta al passo con i bui.";
+"onboarding.step1.title" = "1. Inserisci le fiches";
+"onboarding.step1.description" = "Scrivi il totale oppure usa i tasti per taglio di fiche.";
+"onboarding.step2.title" = "2. Imposta i bui attuali";
+"onboarding.step2.description" = "Scegli un livello predefinito o inserisci il buio grande a mano.";
+"onboarding.step3.title" = "3. Guarda i BB e avvia il timer";
+"onboarding.step3.description" = "Vedi subito la profondità dello stack e, se serve, avvia il timer dei bui.";
+"onboarding.continue" = "Inizia a usare l'app";

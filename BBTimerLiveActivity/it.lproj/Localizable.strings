@@ -1,0 +1,14 @@
+"live.chips" = "Fiches";
+"live.level" = "Bui attuali";
+"live.stack" = "Stack";
+"live.bb_unit" = "BB";
+"live.countdown" = "Al prossimo livello";
+"live.next_level" = "Prossimo buio";
+"live.next_short" = "Prossimo";
+"live.current_short" = "Attuale";
+"live.up_at" = "Salita";
+
+/* Dynamic Island — compatta (area stretta) */
+"live.compact.chips_caption" = "Fiches";
+"live.compact.blinds_caption" = "Salita";
+"live.compact.blinds_paused" = "In pausa";
