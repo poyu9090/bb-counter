@@ -245,11 +245,13 @@ Per domande, suggerimenti o segnalazioni scrivi ai contatti indicati nella pagin
 
 **截圖**：`final-it/01-result` ~ `04-blinds`（1320×2868，已是深度優先的新順序）
 
+> **ASC 狀態（2026-09-02）**：1.4 已於 8/30 上架，1.5 版本已建立。義大利文的名稱、副標題、關鍵字、描述、版本說明都已填入並儲存，六個語系的 6.9 吋截圖也全部換成深度優先的新順序。
+
 ---
 
 ## 英文關鍵字（1.5 要換）
 
-現行：`poker,holdem,chips,big blind,bb,stack,tournament,blind timer,home game,MTT,calculator,chip count`
+現行（1.4 以前）：`poker,holdem,chips,big blind,bb,stack,tournament,blind timer,home game,MTT,calculator,chip count`
 
 問題：`poker`、`calculator`、`bb`、`blind timer` 這些詞**名稱與副標題已經涵蓋**（BB Counter – Poker Calculator／Calculator · Timer · Push/Fold），重複等於浪費字元；`poker` 這種大字在美國也排不進前段。
 
