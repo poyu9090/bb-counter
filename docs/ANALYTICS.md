@@ -20,7 +20,7 @@
 | `chips_entered` | 首次輸入籌碼按下一步 | `method`（面額鍵／打字）、`chips_bucket` |
 | `blinds_set` | 設定大盲送出 | `method`（預設／手動）、`bb_bucket` |
 | `dashboard_shown` | 進到儀表板，**每次啟動只記一次** | `depth_bucket` |
-| `chip_change_logged` | 按下「記錄」 | `direction`（win／loss） |
+| `chip_change_logged` | 按下「記錄」 | `direction`（win／loss）、`index_bucket`（本次啟動的第幾筆） |
 | `chip_total_edited` | 從儀表板改總額 | — |
 | `history_opened` | 打開變更紀錄 | — |
 | `timer_enabled` | 計時器開關打開 | — |
@@ -34,6 +34,8 @@
 | `session_reset` | 設定頁重設 | — |
 
 **參數一律分桶**（`10k-50k`、`40-100bb`），不送原始籌碼與盲注數字——牌局金額是使用者的隱私，看趨勢也不需要精確值。
+
+`index_bucket` 切在 `1` / `2` / `3-5` / `6-10` / `11-20` / `21+`。序號由 `AppAnalytics` 自己數（一個 static，隨程序結束歸零），呼叫端不用管。要看的是**衰減**：從 `1` 到 `3-5` 掉多少，代表多少人記完一筆就不記了。只看平均會被少數重度使用者拉高。
 
 ## 主漏斗
 
@@ -62,6 +64,14 @@ app_opened → chips_entered → blinds_set → dashboard_shown → chip_change_
 
 選 TelemetryDeck 而不是 Firebase 的理由：匿名、不需要 ATT 彈窗、SDK 很輕，隱私標籤只要多宣告一項；Firebase 會把「不收集資料」這個乾淨定位整個換掉。
 
+## 使用時長不用自己埋
+
+TelemetryDeck SDK 會自動把這些掛在**每一個** signal 上（`Signal.swift:119`）：`TelemetryDeck.Retention.averageSessionSeconds`、`previousSessionSeconds`、`totalSessionsCount`、`distinctDaysUsed`、`distinctDaysUsedLastMonth`、`TelemetryDeck.Acquisition.firstSessionDate`；每次新 session 另外自動送 `TelemetryDeck.Session.started`。
+
+這些是**裝置端算好再送**的，所以拿到的是「每台裝置的平均」，不是每一次 session 的精確長度——後台看得到分布，看不到單次。
+
+匿名身分是 `identifierForVendor` 的 SHA256（`SignalManager.swift:398`，salt 我們沒設）。原始 IDFV 不離開裝置，但這個 hash 跨天穩定，後台能把同一台裝置串起來——留存數字就是這樣算出來的。
+
 ## 之後要看什麼
 
 以現在每天 1～2 次下載的量，兩週後值得看的是：
@@ -70,3 +80,4 @@ app_opened → chips_entered → blinds_set → dashboard_shown → chip_change_
 2. `chip_change_logged`、`timer_started` 的絕對次數——核心功能有沒有人用
 3. `hand_line_created`——行動線是不是只有你在用
 4. `all_in_prompt_tapped / all_in_prompt_shown`——假門 CTR，決定第一個付費功能做什麼
+5. `chip_change_logged` 的 `index_bucket` 衰減——一場記幾筆才停，決定「多場次統計」這個 Pro 功能有沒有人要

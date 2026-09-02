@@ -25,7 +25,7 @@ enum AnalyticsEvent {
     case dashboardShown(bbDepth: Double)
 
     // 主要迴圈：籌碼
-    case chipChangeLogged(direction: ChipChangeDirection)
+    case chipChangeLogged(direction: ChipChangeDirection, indexInSession: Int)
     case chipTotalEdited
     case historyOpened
 
@@ -88,8 +88,11 @@ enum AnalyticsEvent {
             return ["method": method.rawValue, "bb_bucket": Self.bucket(bigBlind)]
         case let .dashboardShown(bbDepth):
             return ["depth_bucket": Self.depthBucket(bbDepth)]
-        case let .chipChangeLogged(direction):
-            return ["direction": direction.rawValue]
+        case let .chipChangeLogged(direction, indexInSession):
+            return [
+                "direction": direction.rawValue,
+                "index_bucket": Self.changeIndexBucket(indexInSession)
+            ]
         case let .blindLevelUp(bigBlind):
             return ["bb_bucket": Self.bucket(bigBlind)]
         case let .liveActivityUnavailable(reason):
@@ -111,6 +114,22 @@ enum AnalyticsEvent {
         case 10_000..<50_000: return "10k-50k"
         case 50_000..<200_000: return "50k-200k"
         default: return "200k+"
+        }
+    }
+
+    /// 這是本次啟動記的第幾筆籌碼變化。
+    ///
+    /// 只看「平均一場記幾筆」會被少數重度使用者拉高——分不出「多數人記一筆就停」
+    /// 和「多數人記零筆、少數人記二十筆」。看分桶的衰減才知道大家實際停在哪。
+    static func changeIndexBucket(_ index: Int) -> String {
+        switch index {
+        case ..<1: return "invalid"
+        case 1: return "1"
+        case 2: return "2"
+        case 3...5: return "3-5"
+        case 6...10: return "6-10"
+        case 11...20: return "11-20"
+        default: return "21+"
         }
     }
 
