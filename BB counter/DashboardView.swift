@@ -117,12 +117,10 @@ struct DashboardView: View {
         }
         .sensoryFeedback(.warning, trigger: levelUpTrigger)
         .onReceive(NotificationCenter.default.publisher(for: .blindTimerLiveActivityStatusChanged)) { notification in
+            // 純粹驅動下面那條警告文字。埋點在
+            // BlindTimerLiveActivityController 裡記，那邊才分得出
+            // 「建立成功」和「只是更新了一次」。
             liveActivityStatusKey = notification.object as? String
-            if let key = liveActivityStatusKey {
-                AppAnalytics.track(.liveActivityUnavailable(reason: key))
-            } else {
-                AppAnalytics.track(.liveActivityStarted)
-            }
         }
         .onAppear {
             trackAllInPromptImpressionIfNeeded()

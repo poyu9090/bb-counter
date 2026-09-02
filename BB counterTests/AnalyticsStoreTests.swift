@@ -119,4 +119,27 @@ struct AnalyticsStoreTests {
         #expect(AnalyticsEvent.dashboardShown(bbDepth: 87.5).parameters["depth_bucket"] == "40-100bb")
         #expect(AnalyticsEvent.dashboardShown(bbDepth: 8).parameters["depth_bucket"] == "<10bb")
     }
+
+    @Test("籌碼變化帶著本次是第幾筆，分桶在 5／10／20 切開")
+    func chipChangeCarriesItsIndex() {
+        func bucket(_ index: Int) -> String? {
+            AnalyticsEvent.chipChangeLogged(direction: .win, indexInSession: index)
+                .parameters["index_bucket"]
+        }
+
+        #expect(bucket(1) == "1")
+        #expect(bucket(2) == "2")
+        #expect(bucket(3) == "3-5")
+        #expect(bucket(5) == "3-5")
+        #expect(bucket(6) == "6-10")
+        #expect(bucket(10) == "6-10")
+        #expect(bucket(11) == "11-20")
+        #expect(bucket(20) == "11-20")
+        #expect(bucket(21) == "21+")
+        #expect(bucket(0) == "invalid")
+
+        let event = AnalyticsEvent.chipChangeLogged(direction: .loss, indexInSession: 7)
+        #expect(event.name == "chip_change_logged")
+        #expect(event.parameters["direction"] == "loss")
+    }
 }

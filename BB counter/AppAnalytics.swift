@@ -26,6 +26,9 @@ enum AppAnalytics {
     /// 所以後台沒起來之前只寫本機，不往外送。
     private static var isBackendRunning = false
 
+    /// 本次啟動記了幾筆籌碼變化。static 會隨程序結束歸零，剛好等於一次使用。
+    private static var chipChangesThisRun = 0
+
     private enum Key {
         static let installID = "analytics.installID"
         static let allInRangeImpressions = "analytics.allInRange.impressions"
@@ -80,6 +83,12 @@ enum AppAnalytics {
         track(.appOpened)
     }
 
+    /// 記一筆籌碼變化。序號由這裡自己數，呼叫端不用管。
+    static func trackChipChange(direction: AnalyticsEvent.ChipChangeDirection) {
+        chipChangesThisRun += 1
+        track(.chipChangeLogged(direction: direction, indexInSession: chipChangesThisRun))
+    }
+
     // MARK: - All-in 假門（保留既有計數，供 CTR 判讀）
 
     static var allInRangeMetrics: AllInRangeMetrics {
@@ -115,6 +124,7 @@ enum AppAnalytics {
             Key.allInRangeUniqueImpression,
             Key.allInRangeUniqueTap
         ].forEach { UserDefaults.standard.removeObject(forKey: $0) }
+        chipChangesThisRun = 0
         store.reset()
     }
 

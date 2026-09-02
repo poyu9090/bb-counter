@@ -70,4 +70,6 @@
 | `dashboard_shown / app_opened` | ≥ 50% | 埋點剛上，還沒數據 |
 | All-in 假門 CTR | ≥ 15% | 假門已在 1.5 重新打開，等數據 |
 
+**1.5 送審決定（2026-09-02）**：假門照原樣送，不在審查備註特別說明。已知風險是 Guideline 2.1 可能比照 1.3 判定為 placeholder 功能；真被退就把 `DashboardView.showsAllInRangePrompt` 改回 `false` 重送，再想別的方式量需求。
+
 達到門檻前，商業化的正確動作是**把埋點數據養出來**，尤其是假門 CTR——它直接決定第一個 Pro 功能該做哪一個。

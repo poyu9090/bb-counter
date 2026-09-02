@@ -174,7 +174,7 @@ struct ChipChangeCard: View {
 
     private func record() {
         guard canRecord else { return }
-        AppAnalytics.track(.chipChangeLogged(direction: isWinning ? .win : .loss))
+        AppAnalytics.trackChipChange(direction: isWinning ? .win : .loss)
         let next = SessionSummary.chips(after: amount, isWinning: isWinning, from: summary.currentChips)
         onApplyChipChange(next)
         amountText = ""
