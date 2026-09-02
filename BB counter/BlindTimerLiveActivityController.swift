@@ -12,6 +12,28 @@ enum BlindTimerLiveActivityController {
     private static var activity: Activity<BlindTimerAttributes>?
     private static var lastPushedState: BlindTimerAttributes.ContentState?
 
+    /// 埋點看到的結果。`postStatus` 是給畫面看的（成功、更新、結束都送 nil），
+    /// 拿它來數「啟動了幾次」會數成「推送了幾次」——一場牌局就能灌出幾十筆。
+    /// 這裡只在結果真的改變時記一次。
+    private enum Outcome: Equatable {
+        case started
+        case unavailable(String)
+    }
+
+    private static var lastReportedOutcome: Outcome?
+
+    private static func report(_ outcome: Outcome) {
+        guard outcome != lastReportedOutcome else { return }
+        lastReportedOutcome = outcome
+
+        switch outcome {
+        case .started:
+            AppAnalytics.track(.liveActivityStarted)
+        case let .unavailable(reason):
+            AppAnalytics.track(.liveActivityUnavailable(reason: reason))
+        }
+    }
+
     /// 倒數中時 Widget 用 `Text(end, style: .timer)` 自己走秒，所以每秒變動的
     /// `timeRemainingText` 不必推送——ActivityKit 的更新次數有預算，推太密會被系統節流。
     private static func shouldPush(_ state: BlindTimerAttributes.ContentState) -> Bool {
@@ -38,6 +60,7 @@ enum BlindTimerLiveActivityController {
         islandUpgradeAtClock: String
     ) {
         guard #available(iOS 16.2, *) else {
+            report(.unavailable("live.status.unsupported"))
             postStatus("live.status.unsupported")
             return
         }
@@ -48,6 +71,7 @@ enum BlindTimerLiveActivityController {
         }
 
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
+            report(.unavailable("live.status.disabled"))
             postStatus("live.status.disabled")
             return
         }
@@ -87,10 +111,12 @@ enum BlindTimerLiveActivityController {
                 pushType: nil
             )
             lastPushedState = state
+            report(.started)
             postStatus(nil)
         } catch {
             activity = nil
             lastPushedState = nil
+            report(.unavailable("live.status.failed"))
             postStatus("live.status.failed")
         }
     }
@@ -101,6 +127,8 @@ enum BlindTimerLiveActivityController {
         await existing.end(nil, dismissalPolicy: .immediate)
         activity = nil
         lastPushedState = nil
+        // 收乾淨，下次再開才會被算成一次新的啟動。
+        lastReportedOutcome = nil
         postStatus(nil)
     }
 

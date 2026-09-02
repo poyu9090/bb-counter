@@ -27,7 +27,7 @@
 | `timer_started` | 設定頁按「開始」 | — |
 | `timer_paused` / `timer_resumed` | 卡片上的暫停／播放 | — |
 | `blind_level_up` | 盲注真的升級 | `bb_bucket` |
-| `live_activity_started` / `live_activity_unavailable` | 即時動態成功／失敗 | 失敗帶 `reason` |
+| `live_activity_started` / `live_activity_unavailable` | 即時動態**真的建立**／不可用時，各記一次 | 失敗帶 `reason` |
 | `custom_structure_saved` | 存下自訂盲注結構 | `levels` |
 | `hand_line_opened` / `hand_line_created` / `hand_line_action_added` / `hand_line_copied` | 行動線分頁 | 加入行動帶 `street` |
 | `all_in_prompt_shown` / `all_in_prompt_tapped` | All-in 範圍假門（1.5 重新打開，深度 < 15BB 時才出現） | — |
@@ -36,6 +36,12 @@
 **參數一律分桶**（`10k-50k`、`40-100bb`），不送原始籌碼與盲注數字——牌局金額是使用者的隱私，看趨勢也不需要精確值。
 
 `index_bucket` 切在 `1` / `2` / `3-5` / `6-10` / `11-20` / `21+`。序號由 `AppAnalytics` 自己數（一個 static，隨程序結束歸零），呼叫端不用管。要看的是**衰減**：從 `1` 到 `3-5` 掉多少，代表多少人記完一筆就不記了。只看平均會被少數重度使用者拉高。
+
+### 為什麼即時動態的埋點記在 controller 裡
+
+`BlindTimerLiveActivityController.postStatus(nil)` 是給畫面看的警告狀態，**建立成功、每次更新、結束**都會送 nil。早期版本在 `DashboardView` 用「object 是不是 nil」來判斷啟動，結果把每一次推送都算成一次啟動——計時器沒開也灌出 8 筆。
+
+現在埋點記在 controller 內部，只在 `Activity.request` 真的成功時記 `live_activity_started`，而且用 `lastReportedOutcome` 去重；計時器結束時歸零，下次再開才會算成新的一次。`DashboardView` 那個通知只剩下驅動警告文字。
 
 ## 主漏斗
 
